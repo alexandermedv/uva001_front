@@ -1,0 +1,29 @@
+
+<html>
+    <head>
+      <title>Flask + Celery Examples</title>
+      <style>
+          .progress {
+              width: 100%;
+              text-align: center;
+          }
+      </style>
+    </head>
+    <body>
+      <h2>Пример front-end</h2>
+      <!--<button onclick="start_long_task();">Start Long Calculation</button><br><br>-->
+      <button id="start-bg-job">Показать графики</button><br><br>
+      <div id="progress"></div>
+  
+      <script src="//cdnjs.cloudflare.com/ajax/libs/nanobar/0.2.1/nanobar.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script>
+          function open_page() {
+            window.location.href = "http://msc199-sdb04.domain.local:9100/osv/";
+          }    
+          $(function() {
+              $('#start-bg-job').click(open_page);
+          });
+      </script>
+    </body>
+  </html>

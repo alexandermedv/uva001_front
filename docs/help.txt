@@ -1,0 +1,41 @@
+Структура проекта Flask, базовые принципы
+https://explore-flask.readthedocs.io/en/latest/blueprints.html
+
+
+Интграция Flask и Dash plotly
+https://dash.plotly.com/integrating-dash
+
+Запуск несколько процессов
+https://docs.docker.com/config/containers/multi-service_container/
+
+
+Проект на примере Django
+
+https://testdriven.io/blog/django-celery-periodic-tasks/
+├── .gitignore
+├── docker-compose.yml
+└── project
+    ├── Dockerfile
+    ├── core
+    │   ├── __init__.py
+    │   ├── asgi.py
+    │   ├── settings.py
+    │   ├── urls.py
+    │   └── wsgi.py
+    ├── entrypoint.sh
+    ├── manage.py
+    ├── orders
+    │   ├── __init__.py
+    │   ├── admin.py
+    │   ├── apps.py
+    │   ├── migrations
+    │   │   ├── 0001_initial.py
+    │   │   └── __init__.py
+    │   ├── models.py
+    │   ├── tests.py
+    │   ├── urls.py
+    │   └── views.py
+    ├── requirements.txt
+    └── templates
+        └── orders
+            └── order_list.html

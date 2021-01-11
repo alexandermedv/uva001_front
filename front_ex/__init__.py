@@ -12,11 +12,12 @@ flask_app.config.update(
 import front_ex.views #import app
 
 # Сборка Dashboard 
-from .dash_osv import dash_app as dash_osv
-from .dash_osv_dev import dash_app as dash_osv_dev
+from .dash_limit_oper import dash_app as dash_limit_oper
+# from .dash_osv_dev import dash_app as dash_osv_dev
 
 # Сборка в Middleware
 dispatch_app = DispatcherMiddleware(flask_app, {
-    '/dash_osv': dash_osv.server,
-    '/dash_osv_dev': dash_osv_dev.server  
+    '/limit_oper': dash_limit_oper.server
+    # '/dash_osv_dev': dash_osv_dev.server  
     }) 
+d

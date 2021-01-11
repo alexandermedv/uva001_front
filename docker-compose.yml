@@ -1,14 +1,15 @@
 version: '3.5'
 services: 
     app:
-       container_name: uva000_front_ex
-       build: 
+        container_name: uva001_front
+        build: 
             context: .
             dockerfile: dockerfile
-       command: python manage.py
-        
-       volumes: 
-           - .:/opt/fron_ex
-       ports:
-           - "9100:9102"
-       network_mode: bridge
+        command: python manage.py
+        volumes: 
+           - .:/app
+        ports:
+           - "9103:9104"
+        environment: 
+           - TZ=Europe/Moscow
+        network_mode: bridge

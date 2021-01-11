@@ -3,19 +3,18 @@ LABEL maintainer "Турганов Артем TurganovAI@pgkweb.ru"
 
 USER root
 
-WORKDIR /opt/fron_ex
 RUN pip install --upgrade pip
-COPY requirements.txt /opt/fron_ex/requirements.txt
+COPY . /app  
 
+WORKDIR /app
 RUN pip install -r requirements.txt
 
-# copy entrypoint.sh
-COPY entrypoint.sh /opt/fron_ex/entrypoint.sh
-
-# copy project
-COPY . /opt/fron_ex
+# set TZ Moscow time
+ENV TZ Europe/Moscow
+RUN apt-get install tzdata
+RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone 
 
 # run entrypoint.sh
-ENTRYPOINT ["sh", "/opt/fron_ex/entrypoint.sh"]
+ENTRYPOINT ["sh", "/app/entrypoint.sh"]
 
 EXPOSE 9102

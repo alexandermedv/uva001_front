@@ -33,7 +33,10 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
                 ON SAPABAP1.BSEG.KUNNR=SAPABAP1.KNA1.KUNNR
                 where HKONT in ('6201010100', '6202010100')
         """
-    df1=pd.read_sql(query, connection_hana)
+    con = get_connection()
+    df1=pd.read_sql(query, con)
+    con.close()
+
     print(df1.head(3)) 
 
     print(os.getcwd())
@@ -285,8 +288,15 @@ def content(klient, dogovor):
     ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
     where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and STBLG<'1' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
     """ % (klient, dogovor)
+    
+    con = get_connection()
+    df=pd.read_sql(query2, con)
+    con.close()
 
-    df=pd.read_sql(query2, connection_hana)
+    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    xl = pd.ExcelFile(file)
+    dflim = xl.parse('BSEG')
+
     df4=df.sort_values(['TIMESTAMP'], ascending=True)
     lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
     df4.insert(11, 'LIMIT', 99999999)
@@ -356,7 +366,14 @@ def content2(klient, dogovor):
     where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
     """ % (klient, dogovor)
 
-    df=pd.read_sql(query4, connection_hana)
+    con = get_connection()
+    df=pd.read_sql(query4, con)
+    con.close()
+
+    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    xl = pd.ExcelFile(file)
+    dflim = xl.parse('BSEG')
+
     df4=df.sort_values(['CPUDT', 'CPUTM'], ascending=[True, True])
     df4.insert(11, 'LIMIT', 99999999)
     lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
@@ -427,7 +444,14 @@ def content3(klient, dogovor):
     where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and STBLG<'1' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
     """ % (klient, dogovor)
 
-    df=pd.read_sql(query5, connection_hana)
+    con = get_connection()
+    df=pd.read_sql(query5, con)
+    con.close()
+
+    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    xl = pd.ExcelFile(file)
+    dflim = xl.parse('BSEG')
+
     df4=df.sort_values(['BUDAT', 'BELNR'], ascending=[True, True])
     lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
     df4.insert(10, 'LIMIT', 99999999)
@@ -496,7 +520,14 @@ def content4(klient, dogovor):
     where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
     """ % (klient, dogovor)
 
-    df=pd.read_sql(query6, connection_hana)
+    con = get_connection()
+    df=pd.read_sql(query6, con)
+    con.close()
+
+    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    xl = pd.ExcelFile(file)
+    dflim = xl.parse('BSEG')
+
     df4=df.sort_values(['BUDAT', 'BELNR'], ascending=[True, True])
     df4.insert(10, 'LIMIT', 99999999)
     lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
@@ -558,7 +589,6 @@ def content4(klient, dogovor):
         Input(component_id='dogovor', component_property='value')
     ]
 )
-
 def content5(klient, dogovor):
     query7="""
     SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, TO_TIMESTAMP(SAPABAP1.BKPF.BLDAT, 'YYYYMMDD') as BLDAT, SAPABAP1.BSEG.BELNR, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
@@ -567,7 +597,14 @@ def content5(klient, dogovor):
     where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and STBLG<'1' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
     """ % (klient, dogovor)
 
-    df=pd.read_sql(query7, connection_hana)
+    con =get_connection()
+    df=pd.read_sql(query7, con)
+    con.close()
+
+    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    xl = pd.ExcelFile(file)
+    dflim = xl.parse('BSEG')
+
     df4=df.sort_values(['BLDAT', 'BELNR'], ascending=[True, True])
     lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
     df4.insert(10, 'LIMIT', 99999999)
@@ -636,9 +673,17 @@ def content6(klient, dogovor):
     where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
     """ % (klient, dogovor)
 
-    df=pd.read_sql(query8, connection_hana)
+    con = get_connection()
+    df=pd.read_sql(query8, con)
+    con.close()
+    
     df4=df.sort_values(['BLDAT', 'BELNR'], ascending=[True, True])
     df4.insert(10, 'LIMIT', 99999999)
+
+    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    xl = pd.ExcelFile(file)
+    dflim = xl.parse('BSEG')
+
     lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
     for i, item in enumerate (df4['IND']):
         try:

@@ -6,7 +6,8 @@ from dash.dependencies import Input, Output
 
 from .. import flask_app
 
-dash_app = Dash(__name__, server = flask_app, url_base_pathname='/limit_oper1/', suppress_callback_exceptions = True)
+# Базовые URL определяет куст все страниц на сайте
+dash_app = Dash(__name__, server = flask_app, url_base_pathname='/limit_oper/', suppress_callback_exceptions = True)
 dash_app.config.update(flask_app.config)
 # Тест
 # dash_app.config..supress_callback_exceptions = True
@@ -24,7 +25,9 @@ def display_page(pathname):
     if pathname == "/limit_oper/page-2":
         return overview.create_layout(dash_app)
     else:
-        print('tcn')
-        return html.H3('URL Error!')
+        return  html.H3('URL Error!') 
+            # overview.create_layout(dash_app) 
+        
+        # html.H3('URL Error!')
 
         # overview.create_layout(dash_app)

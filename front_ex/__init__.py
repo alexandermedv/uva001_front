@@ -17,7 +17,7 @@ from .dash_limit_oper import dash_app as dash_limit_oper
 
 # Сборка в Middleware
 dispatch_app = DispatcherMiddleware(flask_app, {
-    '/limit_oper': dash_limit_oper.server
+    'limit_oper': dash_limit_oper.server
     # '/dash_osv_dev': dash_osv_dev.server  
-    }) 
-d
+    })
+    

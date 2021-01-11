@@ -5,16 +5,13 @@ from dash.dependencies import Output, Input, State
 
 import pandas as pd
 import os
-import datetime as dt  
 
 import pyhdb
 import datetime as dt
 from datetime import datetime
 import numpy as np
 
-
 def create_layout(app, start_date = None, end_date=None, debug=False):  
-
     connection_hana = pyhdb.connect(
         host = "sap-db-s4q.sap.tc",
         port = 30115,

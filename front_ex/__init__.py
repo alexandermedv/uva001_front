@@ -8,12 +8,12 @@ flask_app.config.update(
     TIMEZONE = 'Europe/Moscow',   
 )
 
-# Добавляем руты 
-import front_ex.views #import app
-
 # Сборка Dashboard 
 from .dash_limit_oper import dash_app as dash_limit_oper
 # from .dash_osv_dev import dash_app as dash_osv_dev
+
+# Добавляем руты 
+import front_ex.views #import app
 
 # Сборка в Middleware
 dispatch_app = DispatcherMiddleware(flask_app, {

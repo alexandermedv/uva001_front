@@ -1,73 +1,409 @@
 <!-- examples https://freefrontend.com/bootstrap-sidebars/ -->
 <!doctype html>
 <html>
-  <head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <title>{% block title %}{% endblock %}</title>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Cервер УВА</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <!-- <li class="nav-item active"> -->
-          <li class="nav-item">
-            <a class="nav-link" href="/">Дэшборды<span class="sr-only">(current)</span> </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/links">Ссылки</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Функции
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="#">Функция 1</a>
-              <a class="dropdown-item" href="#">Функция 2</a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="#">Прочие</a>
-            </div>
-          </li>
-          <li class="nav-item">
-            <!-- <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a> -->
-            <a class="nav-link" href="#" tabindex="-1" aria-disabled="true">Помощь</a>
-          </li>
-        </ul>
-        <form class="form-inline my-2 my-lg-0">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
-      </div>
-    </nav>  
 
-    <div class="row">
-      <div class = "col-sm-1">
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link active" href="#">Active</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" href="#">Disabled</a>
-          </li>
-        </ul>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Уточнить почему не подключается css -->
+    <!-- <link rel="stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/base.css') }}"> -->
+    <style>
+      body {
+        margin-top: 50px;
+        background-color: #fff;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        letter-spacing: 0.01em;
+        color: #39464e;
+      }
+      
+      .navbar-default {
+        background-color: #FFF;
+        margin-left: 200px;
+      }
+      
+      /*main side bar*/
+      .msb {
+        width: 200px;
+        background-color: #F5F7F9;
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: auto;
+        min-height: 100%;
+        overflow-y: auto;
+        white-space: nowrap;
+        height: 100%;
+        z-index: 1;
+        border-right: 1px solid #ddd;
+      }
+      .msb .navbar {
+        border: none;
+        margin-left: 0;
+        background-color: inherit;
+      }
+      .msb .navbar-header {
+        width: 100%;
+        border-bottom: 1px solid #e7e7e7;
+        margin-bottom: 20px;
+        background: #fff;
+      }
+      .msb .navbar-nav .panel {
+        border: 0 none;
+        box-shadow: none;
+        margin: 0;
+        background: inherit;
+      }
+      .msb .navbar-nav li {
+        display: block;
+        width: 100%;
+      }
+      .msb .navbar-nav li a {
+        padding: 15px;
+        color: #5f5f5f;
+      }
+      .msb .navbar-nav li a .glyphicon, .msb .navbar-nav li a .fa {
+        margin-right: 8px;
+      }
+      .msb .nb {
+        padding-top: 5px;
+        padding-left: 10px;
+        margin-bottom: 30px;
+        overflow: hidden;
+      }
+      
+      ul.nv,
+      ul.ns {
+        position: relative;
+        padding: 0;
+        list-style: none;
+      }
+      
+      .nv {
+        /*ns: nav-sub*/
+      }
+      .nv li {
+        display: block;
+        position: relative;
+      }
+      .nv li::before {
+        clear: both;
+        content: "";
+        display: table;
+      }
+      .nv li a {
+        color: #444;
+        padding: 10px 25px;
+        display: block;
+        vertical-align: middle;
+      }
+      .nv li a .ic {
+        font-size: 16px;
+        margin-right: 5px;
+        font-weight: 300;
+        display: inline-block;
+      }
+      .nv .ns li a {
+        padding: 10px 50px;
+      }
+      
+      /*main content wrapper*/
+      .mcw {
+        margin-left: 200px;
+        position: relative;
+        min-height: 100%;
+        /*content view*/
+      }
+      /*globals*/
+      a,
+      a:focus,
+      a:hover {
+        text-decoration: none;
+      }
+      
+      .inbox .container-fluid {
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .inbox ul, .inbox li {
+        margin: 0;
+        padding: 0;
+      }
+      .inbox ul li {
+        list-style: none;
+      }
+      .inbox ul li a {
+        display: block;
+        padding: 10px 20px;
+      }
+      
+      .msb, .mnb {
+        -moz-animation: slidein 300ms forwards;
+        -o-animation: slidein 300ms forwards;
+        -webkit-animation: slidein 300ms forwards;
+        animation: slidein 300ms forwards;
+        -webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+      }
+      
+      .mcw {
+        -moz-animation: bodyslidein 300ms forwards;
+        -o-animation: bodyslidein 300ms forwards;
+        -webkit-animation: bodyslidein 300ms forwards;
+        animation: bodyslidein 300ms forwards;
+        -webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+      }
+      
+      body.msb-x .mcw, body.msb-x .mnb {
+        margin-left: 0;
+        -moz-animation: bodyslideout 300ms forwards;
+        -o-animation: bodyslideout 300ms forwards;
+        -webkit-animation: bodyslideout 300ms forwards;
+        animation: bodyslideout 300ms forwards;
+        -webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+      }
+      body.msb-x .msb {
+        -moz-animation: slideout 300ms forwards;
+        -o-animation: slideout 300ms forwards;
+        -webkit-animation: slideout 300ms forwards;
+        animation: slideout 300ms forwards;
+        -webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+      }
+      
+      /* Slide in animation */
+      @-moz-keyframes slidein {
+        0% {
+          left: -200px;
+        }
+        100% {
+          left: 0;
+        }
+      }
+      @-webkit-keyframes slidein {
+        0% {
+          left: -200px;
+        }
+        100% {
+          left: 0;
+        }
+      }
+      @keyframes slidein {
+        0% {
+          left: -200px;
+        }
+        100% {
+          left: 0;
+        }
+      }
+      @-moz-keyframes slideout {
+        0% {
+          left: 0;
+        }
+        100% {
+          left: -200px;
+        }
+      }
+      @-webkit-keyframes slideout {
+        0% {
+          left: 0;
+        }
+        100% {
+          left: -200px;
+        }
+      }
+      @keyframes slideout {
+        0% {
+          left: 0;
+        }
+        100% {
+          left: -200px;
+        }
+      }
+      @-moz-keyframes bodyslidein {
+        0% {
+          left: 0;
+        }
+        100% {
+          margin-left: 200px;
+        }
+      }
+      @-webkit-keyframes bodyslidein {
+        0% {
+          left: 0;
+        }
+        100% {
+          left: 0;
+        }
+      }
+      @keyframes bodyslidein {
+        0% {
+          margin-left: 0;
+        }
+        100% {
+          margin-left: 200px;
+        }
+      }
+      @-moz-keyframes bodyslideout {
+        0% {
+          margin-left: 200px;
+        }
+        100% {
+          margin-right: 0;
+        }
+      }
+      @-webkit-keyframes bodyslideout {
+        0% {
+          margin-left: 200px;
+        }
+        100% {
+          margin-left: 0;
+        }
+      }
+      @keyframes bodyslideout {
+        0% {
+          margin-left: 200px;
+        }
+        100% {
+          margin-left: 0;
+        }
+      }
+
+    /*spin - Круг ожидания*/
+    @-webkit-keyframes spin {
+      0% {
+        -webkit-transform: rotate(0deg);
+      }
+      100% {
+        -webkit-transform: rotate(360deg);
+      }
+    }
+
+    ._dash-loading-callback {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #c94530; /* Цвет круга */
+      width: 100px;
+      height: 100px;
+      /* margin-top: -60px;
+      margin-bottom: -60px; */
+      display: inline-block;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      opacity: 0;
+      background-colour: #ffffff;
+      -webkit-animation: fadein 1s linear forwards, spin 2s infinite linear; /* Safari and Chrome */
+      animation: fadein 1s linear forwards, spin 2s infinite linear;
+      animation-delay: 1s;
+      -webkit-animation-delay: 1s;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes fadein {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+    @-webkit-keyframes fadein {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+    </style>
+
+  </head>
+  <!-- <body> -->
+  <body class="msb-x">
+    <nav class="mnb navbar navbar-default navbar-fixed-top" id = "nb" style="margin-left: 0 !important;">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <i class="ic fa fa-bars"></i>
+          </button>
+          <div style="padding: 15px 0;">
+            <a href="#" id="msbo"><i class="ic fa fa-bars"></i></a>
+          </div>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-left">
+            <li><a href="/" style="color: #bc4e4e;">СЕРВИС УВА</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Панели <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Дебиторская задолженность</a></li>
+                <li><a href="#">Запчасти ОСВ</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">Прочее</a></li> 
+              </ul>
+            </li>
+          </ul>
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search...">
+          </form>
+        </div>
       </div>
-      <div class = "col-sm-11">
-        {% block content %}{% endblock %}
-      </div>
+    </nav>
+
+    <!--msb: main sidebar-->
+      <!-- <div class="msb" id="msb"> -->
+      <div class="msb" id="msb" style="display: none;">
+        <nav class="navbar navbar-default" role="navigation">
+          <!-- Brand and toggle get grouped for better mobile display -->
+          <div class="navbar-header">
+            <div class="row" style="margin-left: 0; margin-right: 0">
+              <a class="navbar-left" href="https://portal/Pages/default.aspx" style="padding: 10px 5px;">
+                <img src="{{ url_for('static', filename='images/logo_pgk.png') }}" height="31px"></a>
+              <a class="navbar-brand" style="font-size: 16px;">    > Функции < </a>   
+            </div>
+          </div>
+
+          <!-- Main Menu -->
+          <div class="side-menu-container">
+            {% block menu_functions %}{% endblock %}
+          </div><!-- /.navbar-collapse -->
+        </nav>  
     </div>
-    
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>  
+    <!--main content wrapper-->
+    <div class="mcw" id="mcw" style="margin-left: 0 !important;">
+      <!--navigation here-->
+      <!--main content view-->
+      <div class="row" style="margin-left: 5px; margin-right: 5px;">
+        {% block content %}{% endblock %}
+      </div>  
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script id="rendered-js">
+      (function(){
+        $('#msbo').on('click', function(){
+          $("#mcw").removeAttr("style");
+          $("#msb").removeAttr("style");
+          $("#nb").removeAttr("style");
+          $('body').toggleClass('msb-x');
+        });
+      }());
+    </script>
   </body>
 </html>

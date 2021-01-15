@@ -14,8 +14,8 @@ import datetime as dt
 from datetime import datetime
 import numpy as np
 
-from ..pages import dash_app as app
-from ..utils import get_connection
+from . import dash_app as app
+from .utils import get_connection
 
 def create_layout(app, start_date = None, end_date=None, debug=False):  
     connection_hana = pyhdb.connect(
@@ -40,7 +40,8 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
     print(df1.head(3)) 
 
     print(os.getcwd())
-    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    # file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
     dflim = xl.parse('BSEG')
 
@@ -293,7 +294,7 @@ def content(klient, dogovor):
     df=pd.read_sql(query2, con)
     con.close()
 
-    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
     dflim = xl.parse('BSEG')
 
@@ -370,7 +371,7 @@ def content2(klient, dogovor):
     df=pd.read_sql(query4, con)
     con.close()
 
-    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
     dflim = xl.parse('BSEG')
 
@@ -448,7 +449,7 @@ def content3(klient, dogovor):
     df=pd.read_sql(query5, con)
     con.close()
 
-    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
     dflim = xl.parse('BSEG')
 
@@ -524,7 +525,7 @@ def content4(klient, dogovor):
     df=pd.read_sql(query6, con)
     con.close()
 
-    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
     dflim = xl.parse('BSEG')
 
@@ -601,7 +602,7 @@ def content5(klient, dogovor):
     df=pd.read_sql(query7, con)
     con.close()
 
-    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
     dflim = xl.parse('BSEG')
 
@@ -680,7 +681,7 @@ def content6(klient, dogovor):
     df4=df.sort_values(['BLDAT', 'BELNR'], ascending=[True, True])
     df4.insert(10, 'LIMIT', 99999999)
 
-    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
+    file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
     dflim = xl.parse('BSEG')
 

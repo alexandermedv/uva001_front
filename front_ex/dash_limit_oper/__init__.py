@@ -30,4 +30,4 @@ def display_page(pathname):
         # overview.create_layout(dash_app)
 
 # Инициализируем после Dash страницы
-from .pages import overview, page_2
+from . import overview, page_2

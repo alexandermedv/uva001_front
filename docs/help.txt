@@ -1,3 +1,6 @@
+Управляющие иконки
+https://fontawesome.com/v4.7.0/icons/
+
 Структура проекта Flask, базовые принципы
 https://explore-flask.readthedocs.io/en/latest/blueprints.html
 

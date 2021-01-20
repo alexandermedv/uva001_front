@@ -1,41 +1,5 @@
 {% extends "base.html" %}
-<!-- {% block title %}Список задач на загрузку данных {% endblock %} -->
 
 {% block content %}
-    <h5>Список отчетов</h5>
-
-    <table class="table table-hover"
-      data-show-pagination-switch="true">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Задача</th>
-          <th scope="col">Наименование</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>Плановые лимиты</td>
-          <td>Дэшборд по плановым лимитам</td>
-          <td><button type="button" class="btn btn-primary" onclick="relocate_home()">Открыть</button></td>
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>Тестовые дэшбоард 2</td>
-          <td>Описание дэшборда</td>
-          <td><button type="button" class="btn btn-primary" onclick="relocate_home()">Открыть</button></td>
-        </tr>
-      </tbody>
-    </table>
-    <!-- {% for table in tables %}
-        {{titles[loop.index]}}
-        {{ table|safe }}
-    {% endfor %} -->
-    <script>
-    function relocate_home()
-    {
-          location.href = "/limit_oper/";
-    } 
-      </script>
+  <img src="{{ url_for('static', filename='images/map_russia2.png')}}" class="img-fluid"></a>
 {% endblock %}

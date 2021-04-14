@@ -3,7 +3,6 @@ import dash_html_components as html
 import plotly.graph_objs as go
 from dash.dependencies import Output, Input, State
 
-import dash_bootstrap_components as dbc
 import dash_table
 
 import pandas as pd
@@ -14,37 +13,119 @@ import datetime as dt
 from datetime import datetime
 import numpy as np
 
-from sqlalchemy import create_engine
 from . import dash_app as app
-from .utils import get_limit_oper_data, get_limit_oper_ttl_data, get_limit_oper_client_data, get_limit_oper_zuonr_data, get_limit_oper_client_zuonr_data
+from .utils import get_connection
 
 def create_layout(app, start_date = None, end_date=None, debug=False):  
-    df1 = get_limit_oper_client_data()
+    connection_hana = pyhdb.connect(
+        host = "sap-db-s4q.sap.tc",
+        port = 30115,
+        user = "PGKAUDIT",
+        password = "Rfh,jyfhf20"
+        )
+    print(connection_hana)
 
-    print('1. Загрузка данных из Excel по лимитам')
+    cursor_hana = connection_hana.cursor()
+    query="""
+        SELECT DISTINCT(SAPABAP1.BSEG.KUNNR)as KUNNR, SAPABAP1.KNA1.NAME1 FROM SAPABAP1.BSEG
+            LEFT JOIN SAPABAP1.KNA1
+                ON SAPABAP1.BSEG.KUNNR=SAPABAP1.KNA1.KUNNR
+                where HKONT in ('6201010100', '6202010100')
+        """
+    con = get_connection()
+    df1=pd.read_sql(query, con)
+    con.close()
+
+    print(df1.head(3)) 
+
+    print(os.getcwd())
+    # file = '/home/locadm/git/uva001_front/Limit1.xlsx'
     file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
-    dflim = xl.parse('BSEG').rename(columns={'KUNNR':'kunnr', 'ZUONR': 'zuonr', 'GSBER':'gsber', 'LIMIT':'limit', 'SAP':'sap'})
-    print(dflim.head())
+    dflim = xl.parse('BSEG')
 
-    print('2. Загрузка данных по контрактам')
-    limit_oper_data = get_limit_oper_data() 
+    query11="""
+        DROP VIEW PGKAUDIT.TEST2;
+    """
+    cursor_hana.execute(query11)
 
-    print('3. Загрузка агрегированных данных')
-    limit_oper_ttl_data = get_limit_oper_ttl_data()
+    df1=pd.read_sql(query, connection_hana)
 
-    dfreit1 = limit_oper_ttl_data
+    query12="""
+        CREATE VIEW PGKAUDIT.TEST2 AS
+            SELECT 
+                CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, 
+                ZUONR,
+                SHKZG,
+                HKONT,
+                KUNNR,
+                H_BLART,
+                DMBTR,
+                SAPABAP1.BKPF.CPUDT,
+                SAPABAP1.BKPF.CPUTM,
+                TO_TIMESTAMP(SAPABAP1.BKPF.BUDAT, 'YYYYMMDD') as BUDAT,
+                SAPABAP1.BSEG.BELNR,
+                SAPABAP1.BKPF.STBLG,
+                CASE
+                    WHEN SHKZG = 'S' THEN DMBTR
+                    ELSE DMBTR*(-1)
+                END as DMBTR_sign
+            FROM SAPABAP1.BSEG 
+                LEFT JOIN SAPABAP1.BKPF
+                ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR) 
+            WHERE  
+                STBLG<'1' 
+                and H_BLART not in ('DC', 'DN') 
+                and HKONT in ('6201010100', '6202010100')
+            ORDER BY BUDAT;
+    """
+    cursor_hana.execute(query12)
 
-    print('4. Пересчет дат')
-    dflim1=dflim[['zuonr', 'limit', 'sap']]
+    query13="""
+    DROP TABLE "PGKAUDIT"."RESULT1";
+    """
+    cursor_hana.execute(query13)
 
-    dfreit2=dfreit1.merge(dflim1, on='zuonr', how='left')
+    query14="""
+    CREATE TABLE "PGKAUDIT"."RESULT1" AS(
+        SELECT ZUONR,
+            KUNNR,
+            BUDAT,
+            max(total) as max_dz,
+            min(total) as min_dz,
+            avg(total) as avg_dz
+        FROM (
+            SELECT *,
+                (SELECT SUM(DMBTR_sign) 
+                FROM PGKAUDIT.TEST2
+                WHERE BUDAT <= a.BUDAT
+                AND ZUONR = a.ZUONR) as total
+            FROM PGKAUDIT.TEST2 a
+            ORDER BY BUDAT
+            )
+        GROUP BY BUDAT,
+            KUNNR,
+            ZUONR
+        ORDER BY BUDAT)
+    """
+    cursor_hana.execute(query14)
+
+    query15="""
+        SELECT * from "PGKAUDIT"."RESULT1"
+        """
+    dfreit=pd.read_sql(query15, connection_hana)
+
+    dfreit1=dfreit
+
+    dflim1=dflim[['ZUONR', 'LIMIT', 'SAP']]
+
+    dfreit2=dfreit1.merge(dflim1, on='ZUONR', how='left')
     print(dfreit2.head(3))
 
-    dfreit2.insert(8, 'prev', '')
+    dfreit2.insert(8, 'PREV', '')
     print(dfreit2.head(3))
 
-    # dfreit_test = dfreit2[['max_dz','limit']][0:10].copy()
+    dfreit_test = dfreit2[['MAX_DZ','LIMIT']][0:10].copy()
 
     def set_prev(x):
         prev = 0 
@@ -60,43 +141,42 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
             prev = 'E'
 
         return prev
+    dfreit2['PREV'] = dfreit2[['MAX_DZ','LIMIT']].apply(lambda x: set_prev(x), axis=1)
 
-    # Узкое место по скорости    
-    dfreit2['prev'] = dfreit2[['max_dz','limit']].apply(lambda x: set_prev(x), axis=1)
-
-    dfreit2.insert(9, 'delta', '')
+    dfreit2.insert(9, 'DELTA', '')
 
     def set_delta (x):
         try:
             delta = x[0] - x[1]
         except:
-            delta = 'e'
+            delta = 'E'
         
-    dfreit2['delta'] = dfreit2[['max_dz','limit']].apply(lambda x: set_prev(x), axis=1)
-    dfreit3=dfreit2[(dfreit2['delta']>0)&(dfreit2['limit']>0)]
-    dfreit4=dfreit3.pivot_table(['prev', 'delta'], ['zuonr', 'kunnr', 'limit', 'sap'], aggfunc={'prev': 'sum', 'delta': [max, min]}).reset_index()
+    dfreit2['DELTA'] = dfreit2[['MAX_DZ','LIMIT']].apply(lambda x: set_prev(x), axis=1)
+    dfreit3=dfreit2[(dfreit2['DELTA']>0)&(dfreit2['LIMIT']>0)]
+    dfreit4=dfreit3.pivot_table(['PREV', 'DELTA'], ['ZUONR', 'KUNNR', 'LIMIT', 'SAP'], aggfunc={'PREV': 'sum', 'DELTA': [max, min]}).reset_index()
     dfreit4.columns = dfreit4.columns.map(''.join)
-    dfreit5=dfreit4.merge(df1, on='kunnr', how='left')
-    print(dfreit5.head(3))
-    dfreit6=dfreit5.sort_values(['prevsum'], ascending=False)
+    dfreit5=dfreit4.merge(df1, on='KUNNR', how='left')
+    dfreit6=dfreit5.sort_values(['PREVsum'], ascending=False)
 
-    dflim2=dflim[['zuonr', 'gsber']]
+    dflim2=dflim[['ZUONR', 'GSBER']]
 
-    dfreit7=dfreit6.merge(dflim2, on='zuonr', how='left')
+    dfreit7=dfreit6.merge(dflim2, on='ZUONR', how='left')
     print(dfreit7.head(3))
-    # del dfreit6['index']
 
     dfreit6.columns=['Договор', 'Клиент', 'Лимит', 'Лимит в SAP (1-да, 0-нет)', 'Макс_превышение', 'Мин_превышение', 'Кол-во превышений', 'Имя клиента']
-    dfreit8=dfreit7.pivot_table(['kunnr','deltamax', 'deltamin', 'prevsum'], ['gsber', 'sap'], aggfunc={'kunnr': 'count', 'deltamax': 'sum', 'deltamin': 'sum', 'prevsum': 'sum'}).reset_index()
+    dfreit8=dfreit7.pivot_table(['KUNNR','DELTAmax', 'DELTAmin', 'PREVsum'], ['GSBER', 'SAP'], aggfunc={'KUNNR': 'count', 'DELTAmax': 'sum', 'DELTAmin': 'sum', 'PREVsum': 'sum'}).reset_index()
 
     dfreit8.columns=['Филиал', 'Лимит в SAP (1-да, 0-нет)', 'Сумма Макс_превышение', 'Сумма Мин_превышение', 'Кол-во договоров', 'Сумма превышений']
-    print("5. Старт загрузки layout")
+    cursor_hana.close()
 
     layout = html.Div([
+        dbc.Navbar(
+                dbc.NavbarBrand(html.Div("УВА. Отчет по превышению лимита. Оперирование.", style={'fontSize': 25})), 
+            color='#97151c', dark=True),
         dbc.Navbar([
             html.Div('Выберите клиента:', style={'width': '15%', 'display': 'inline-block', 'color': 'white'}),
             html.Div(dcc.Dropdown(id='klient', 
-                                        options=[{'label':df1['name1'][df1['kunnr']==klient], 'value': klient} for klient in df1['kunnr']], 
+                                        options=[{'label':df1['NAME1'][df1['KUNNR']==klient], 'value': klient} for klient in df1['KUNNR']], 
                                         value='0001000134'), style={'width': '25%', 'display': 'inline-block'}),
             html.Div('Выберите договор:', style={'width': '15%', 'display': 'inline-block', 'color': 'white'}),
             html.Div(dcc.Dropdown(id='dogovor'), style={'width': '25%', 'display': 'inline-block'})
@@ -184,16 +264,15 @@ dbc.Col(html.H6('      Сторно исключено, рублей'), wi
     ]
 )
 def dogovor(klient):
-    # query3="""
-    # SELECT DISTINCT(SAPABAP1.BSEG.ZUONR) as ZUONR FROM SAPABAP1.BSEG
-    # where SAPABAP1.BSEG.KUNNR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
-    # """ % klient
-    # con = get_connection()
-    # df6=pd.read_sql(query3, con)
-    df6 = get_limit_oper_zuonr_data(klient)
+    query3="""
+    SELECT DISTINCT(SAPABAP1.BSEG.ZUONR) as ZUONR FROM SAPABAP1.BSEG
+    where SAPABAP1.BSEG.KUNNR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
+    """ % klient
+    con = get_connection()
+    df6=pd.read_sql(query3, con)
     print(df6.head())
-    # con.close()
-    return [{'label': i, 'value': i} for i in df6['zuonr']]
+    con.close()
+    return [{'label': i, 'value': i} for i in df6['ZUONR']]
 
 @app.callback(
     Output(component_id='graph', component_property='children'),
@@ -203,18 +282,16 @@ def dogovor(klient):
     ]
 )
 def content(klient, dogovor):
-    # query2="""
-    # SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, SAPABAP1.BKPF.CPUDT, SAPABAP1.BKPF.CPUTM, 
-    #     TO_TIMESTAMP(CONCAT(SAPABAP1.BKPF.CPUDT, SAPABAP1.BKPF.CPUTM), 'YYYYMMDDHHMISS') as timestamp, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
-    # LEFT JOIN SAPABAP1.BKPF
-    # ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
-    # where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and STBLG<'1' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
-    # """ % (klient, dogovor)
+    query2="""
+    SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, SAPABAP1.BKPF.CPUDT, SAPABAP1.BKPF.CPUTM, TO_TIMESTAMP(CONCAT(SAPABAP1.BKPF.CPUDT, SAPABAP1.BKPF.CPUTM), 'YYYYMMDDHHMISS') as timestamp, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
+    LEFT JOIN SAPABAP1.BKPF
+    ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
+    where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and STBLG<'1' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
+    """ % (klient, dogovor)
     
-    # con = get_connection()
-    df = get_limit_oper_client_zuonr_data(klient, dogovor)
-    # df=pd.read_sql(query2, con)
-    # con.close()
+    con = get_connection()
+    df=pd.read_sql(query2, con)
+    con.close()
 
     file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
@@ -282,18 +359,16 @@ def content(klient, dogovor):
     ]
 )
 def content2(klient, dogovor):
-    # query4="""
-    # SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, SAPABAP1.BKPF.CPUDT, SAPABAP1.BKPF.CPUTM, TO_TIMESTAMP(CONCAT(SAPABAP1.BKPF.CPUDT, SAPABAP1.BKPF.CPUTM), 'YYYYMMDDHHMISS') as timestamp, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
-    # LEFT JOIN SAPABAP1.BKPF
-    # ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
-    # where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
-    # """ % (klient, dogovor)
+    query4="""
+    SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, SAPABAP1.BKPF.CPUDT, SAPABAP1.BKPF.CPUTM, TO_TIMESTAMP(CONCAT(SAPABAP1.BKPF.CPUDT, SAPABAP1.BKPF.CPUTM), 'YYYYMMDDHHMISS') as timestamp, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
+    LEFT JOIN SAPABAP1.BKPF
+    ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
+    where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
+    """ % (klient, dogovor)
 
-    # con = get_connection()
-
-    df = get_limit_oper_client_zuonr_data(klient, dogovor)
-    # df=pd.read_sql(query4, con)
-    # con.close()
+    con = get_connection()
+    df=pd.read_sql(query4, con)
+    con.close()
 
     file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
@@ -362,18 +437,16 @@ def content2(klient, dogovor):
     ]
 )
 def content3(klient, dogovor):
-    # query5="""
-    # SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, TO_TIMESTAMP(SAPABAP1.BKPF.BUDAT, 'YYYYMMDD') as BUDAT, SAPABAP1.BSEG.BELNR, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
-    # LEFT JOIN SAPABAP1.BKPF
-    # ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
-    # where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and STBLG<'1' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
-    # """ % (klient, dogovor)
+    query5="""
+    SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, TO_TIMESTAMP(SAPABAP1.BKPF.BUDAT, 'YYYYMMDD') as BUDAT, SAPABAP1.BSEG.BELNR, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
+    LEFT JOIN SAPABAP1.BKPF
+    ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
+    where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and STBLG<'1' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
+    """ % (klient, dogovor)
 
-    # con = get_connection()
-
-    df = get_limit_oper_client_zuonr_data(klient, dogovor)
-    # df=pd.read_sql(query5, con)
-    # con.close()
+    con = get_connection()
+    df=pd.read_sql(query5, con)
+    con.close()
 
     file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
@@ -440,18 +513,16 @@ def content3(klient, dogovor):
     ]
 )
 def content4(klient, dogovor):
-    # query6="""
-    # SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, TO_TIMESTAMP(SAPABAP1.BKPF.BUDAT, 'YYYYMMDD') as BUDAT, SAPABAP1.BSEG.BELNR, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
-    # LEFT JOIN SAPABAP1.BKPF
-    # ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
-    # where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
-    # """ % (klient, dogovor)
+    query6="""
+    SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, TO_TIMESTAMP(SAPABAP1.BKPF.BUDAT, 'YYYYMMDD') as BUDAT, SAPABAP1.BSEG.BELNR, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
+    LEFT JOIN SAPABAP1.BKPF
+    ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
+    where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
+    """ % (klient, dogovor)
 
-    # con = get_connection()
-
-    df = get_limit_oper_client_zuonr_data(klient, dogovor)
-    # df=pd.read_sql(query6, con)
-    # con.close()
+    con = get_connection()
+    df=pd.read_sql(query6, con)
+    con.close()
 
     file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
@@ -519,22 +590,20 @@ def content4(klient, dogovor):
     ]
 )
 def content5(klient, dogovor):
-    # query7="""
-    # SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, TO_TIMESTAMP(SAPABAP1.BKPF.BLDAT, 'YYYYMMDD') as BLDAT, SAPABAP1.BSEG.BELNR, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
-    # LEFT JOIN SAPABAP1.BKPF
-    # ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
-    # where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and STBLG<'1' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
-    # """ % (klient, dogovor)
+    query7="""
+    SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, TO_TIMESTAMP(SAPABAP1.BKPF.BLDAT, 'YYYYMMDD') as BLDAT, SAPABAP1.BSEG.BELNR, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
+    LEFT JOIN SAPABAP1.BKPF
+    ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
+    where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and STBLG<'1' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
+    """ % (klient, dogovor)
 
-    # con =get_connection()
-    df=get_limit_oper_client_zuonr_data(klient, dogovor)
-    # df=pd.read_sql(query7, con)
-    # con.close()
+    con =get_connection()
+    df=pd.read_sql(query7, con)
+    con.close()
 
     file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
     dflim = xl.parse('BSEG')
-    print(dflim.head(3))
 
     df4=df.sort_values(['BLDAT', 'BELNR'], ascending=[True, True])
     lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
@@ -597,22 +666,19 @@ def content5(klient, dogovor):
     ]
 )
 def content6(klient, dogovor):
-    # query8="""
-    # SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, TO_TIMESTAMP(SAPABAP1.BKPF.BLDAT, 'YYYYMMDD') as BLDAT, SAPABAP1.BSEG.BELNR, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
-    # LEFT JOIN SAPABAP1.BKPF
-    # ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
-    # where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
-    # """ % (klient, dogovor)
+    query8="""
+    SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, TO_TIMESTAMP(SAPABAP1.BKPF.BLDAT, 'YYYYMMDD') as BLDAT, SAPABAP1.BSEG.BELNR, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG
+    LEFT JOIN SAPABAP1.BKPF
+    ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR)
+    where SAPABAP1.BSEG.KUNNR='%s' and ZUONR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
+    """ % (klient, dogovor)
 
-    # con = get_connection()
-
-    df = get_limit_oper_client_zuonr_data(klient, dogovor)
+    con = get_connection()
+    df=pd.read_sql(query8, con)
+    con.close()
     
-    # df=pd.read_sql(query8, con)
-    # con.close()
-    
-    df4=df.sort_values(['bldat', 'belnr'], ascending=[True, True])
-    df4.insert(10, 'limit', 99999999)
+    df4=df.sort_values(['BLDAT', 'BELNR'], ascending=[True, True])
+    df4.insert(10, 'LIMIT', 99999999)
 
     file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)

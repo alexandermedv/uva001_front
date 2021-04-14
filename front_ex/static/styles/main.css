@@ -114,22 +114,6 @@ a:hover {
   text-decoration: none;
 }
 
-.inbox .container-fluid {
-  padding-left: 0;
-  padding-right: 0;
-}
-.inbox ul, .inbox li {
-  margin: 0;
-  padding: 0;
-}
-.inbox ul li {
-  list-style: none;
-}
-.inbox ul li a {
-  display: block;
-  padding: 10px 20px;
-}
-
 .msb, .mnb {
   -moz-animation: slidein 300ms forwards;
   -o-animation: slidein 300ms forwards;

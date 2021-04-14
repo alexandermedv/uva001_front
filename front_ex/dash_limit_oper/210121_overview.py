@@ -19,23 +19,119 @@ from . import dash_app as app
 from .utils import get_limit_oper_data, get_limit_oper_ttl_data, get_limit_oper_client_data, get_limit_oper_zuonr_data, get_limit_oper_client_zuonr_data
 
 def create_layout(app, start_date = None, end_date=None, debug=False):  
-    df1 = get_limit_oper_client_data()
+    # connection_hana = pyhdb.connect(
+    #     host = "sap-db-s4q.sap.tc",
+    #     port = 30115,
+    #     user = "PGKAUDIT",
+    #     password = "Rfh,jyfhf20"
+    #     )
+    # print(connection_hana)
 
+    # cursor_hana = connection_hana.cursor()
+    # query="""
+    #     SELECT DISTINCT(SAPABAP1.BSEG.KUNNR)as KUNNR, SAPABAP1.KNA1.NAME1 FROM SAPABAP1.BSEG
+    #         LEFT JOIN SAPABAP1.KNA1
+    #             ON SAPABAP1.BSEG.KUNNR=SAPABAP1.KNA1.KUNNR
+    #             where HKONT in ('6201010100', '6202010100')
+    #     """
+    # con = get_connection()
+    # df1=pd.read_sql(query, con)
+    # con.close()
+
+    df1 = get_limit_oper_client_data()
+    print(df1.head(3)) 
+
+    # print(os.getcwd())
+    # ## file = '/home/locadm/git/uva001_front/Limit1.xlsx'
     print('1. Загрузка данных из Excel по лимитам')
     file = os.getcwd()+'/Limit1.xlsx'
     xl = pd.ExcelFile(file)
     dflim = xl.parse('BSEG').rename(columns={'KUNNR':'kunnr', 'ZUONR': 'zuonr', 'GSBER':'gsber', 'LIMIT':'limit', 'SAP':'sap'})
     print(dflim.head())
 
+    # query11="""
+    #     DROP VIEW PGKAUDIT.TEST2;
+    # """
+    # cursor_hana.execute(query11)
+
+    # df1=pd.read_sql(query, connection_hana)
+
+    # query12="""
+    #     CREATE VIEW PGKAUDIT.TEST2 AS
+    #         SELECT 
+    #             CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, 
+    #             ZUONR,
+    #             SHKZG,
+    #             HKONT,
+    #             KUNNR,
+    #             H_BLART,
+    #             DMBTR,
+    #             SAPABAP1.BKPF.CPUDT,
+    #             SAPABAP1.BKPF.CPUTM,
+    #             TO_TIMESTAMP(SAPABAP1.BKPF.BUDAT, 'YYYYMMDD') as BUDAT,
+    #             SAPABAP1.BSEG.BELNR,
+    #             SAPABAP1.BKPF.STBLG,
+    #             CASE
+    #                 WHEN SHKZG = 'S' THEN DMBTR
+    #                 ELSE DMBTR*(-1)
+    #             END as DMBTR_sign
+    #         FROM SAPABAP1.BSEG 
+    #             LEFT JOIN SAPABAP1.BKPF
+    #             ON CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR)=CONCAT(SAPABAP1.BKPF.BELNR, SAPABAP1.BKPF.GJAHR) 
+    #         WHERE  
+    #             STBLG<'1' 
+    #             and H_BLART not in ('DC', 'DN') 
+    #             and HKONT in ('6201010100', '6202010100')
+    #         ORDER BY BUDAT;
+    # """
+    # cursor_hana.execute(query12)
     print('2. Загрузка данных по контрактам')
+    # sql = "select * from sap_s4.limit_oper"
+    # limit_oper_data = pd.read_sql(sql, create_engine("postgresql://locadm:Temp001@msc199-sdb04.domain.local:8036/uva_cons", max_identifier_length=128, encoding='utf-8'))
+
     limit_oper_data = get_limit_oper_data() 
+
+    # query13="""
+    # DROP TABLE "PGKAUDIT"."RESULT1";
+    # """
+    # # cursor_hana.execute(query13)
+
+    # query14="""
+    # CREATE TABLE "PGKAUDIT"."RESULT1" AS(
+    #     SELECT ZUONR,
+    #         KUNNR,
+    #         BUDAT,
+    #         max(total) as max_dz,
+    #         min(total) as min_dz,
+    #         avg(total) as avg_dz
+    #     FROM (
+    #         SELECT *,
+    #             (SELECT SUM(DMBTR_sign) 
+    #             FROM PGKAUDIT.TEST2
+    #             WHERE BUDAT <= a.BUDAT
+    #             AND ZUONR = a.ZUONR) as total
+    #         FROM PGKAUDIT.TEST2 a
+    #         ORDER BY BUDAT
+    #         )
+    #     GROUP BY BUDAT,
+    #         KUNNR,
+    #         ZUONR
+    #     ORDER BY BUDAT)
+    # """
+    # cursor_hana.execute(query14)
+
+    # query15="""
+    #     SELECT * from "PGKAUDIT"."RESULT1"
+    #     """
+    # dfreit=pd.read_sql(query15, connection_hana)
 
     print('3. Загрузка агрегированных данных')
     limit_oper_ttl_data = get_limit_oper_ttl_data()
 
     dfreit1 = limit_oper_ttl_data
-
+    # dfreit1=dfreit
     print('4. Пересчет дат')
+
     dflim1=dflim[['zuonr', 'limit', 'sap']]
 
     dfreit2=dfreit1.merge(dflim1, on='zuonr', how='left')
@@ -90,9 +186,12 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
     dfreit8=dfreit7.pivot_table(['kunnr','deltamax', 'deltamin', 'prevsum'], ['gsber', 'sap'], aggfunc={'kunnr': 'count', 'deltamax': 'sum', 'deltamin': 'sum', 'prevsum': 'sum'}).reset_index()
 
     dfreit8.columns=['Филиал', 'Лимит в SAP (1-да, 0-нет)', 'Сумма Макс_превышение', 'Сумма Мин_превышение', 'Кол-во договоров', 'Сумма превышений']
+  
     print("5. Старт загрузки layout")
-
     layout = html.Div([
+        dbc.Navbar(
+                dbc.NavbarBrand(html.Div("УВА. Отчет по превышению лимита. Оперирование.", style={'fontSize': 25})), 
+            color='#97151c', dark=True),
         dbc.Navbar([
             html.Div('Выберите клиента:', style={'width': '15%', 'display': 'inline-block', 'color': 'white'}),
             html.Div(dcc.Dropdown(id='klient', 

@@ -17,4 +17,4 @@ RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 # run entrypoint.sh
 ENTRYPOINT ["sh", "/app/entrypoint.sh"]
 
-EXPOSE 9102
+EXPOSE 9104

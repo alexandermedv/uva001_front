@@ -22,7 +22,8 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
     df1 = get_limit_oper_client_data()
 
     print('1. Загрузка данных из Excel по лимитам')
-    file = os.getcwd()+'/Limit1.xlsx'
+    # file = os.getcwd()+'/Limit1.xlsx'
+    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
     xl = pd.ExcelFile(file)
     dflim = xl.parse('BSEG').rename(columns={'KUNNR':'kunnr', 'ZUONR': 'zuonr', 'GSBER':'gsber', 'LIMIT':'limit', 'SAP':'sap'})
     print(dflim.head())
@@ -216,7 +217,8 @@ def content(klient, dogovor):
     # df=pd.read_sql(query2, con)
     # con.close()
 
-    file = os.getcwd()+'/Limit1.xlsx'
+    # file = os.getcwd()+'/Limit1.xlsx' 
+    file = '/home/locadm/git/uva001_front/Limit1.xlsx'
     xl = pd.ExcelFile(file)
     dflim = xl.parse('BSEG')
 

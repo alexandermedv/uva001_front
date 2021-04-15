@@ -17,7 +17,11 @@ def get_connection_sap():
 def get_connection_postgre_string():
     """Строка подключения к postgre тест"""
     return "postgresql://locadm:Temp001@msc199-sdb04.domain.local:8036/uva_cons"
-
+def get_limit1():
+        sql = "select * from analytics.limit1"
+        con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+        data = pd.read_sql(sql, con=con)
+        return data    
 def get_limit_oper_data():
         """Получение первичных данных"""
         sql = "select * from sap_s4.limit_oper"

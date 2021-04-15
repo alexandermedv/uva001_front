@@ -17,15 +17,19 @@ import numpy as np
 from sqlalchemy import create_engine
 from . import dash_app as app
 from .utils import get_limit_oper_data, get_limit_oper_ttl_data, get_limit_oper_client_data, get_limit_oper_zuonr_data, get_limit_oper_client_zuonr_data
+from .utils import get_limit_oper_client_zuonr_data, get_limit1
+
 
 def create_layout(app, start_date = None, end_date=None, debug=False):  
     df1 = get_limit_oper_client_data()
 
     print('1. Загрузка данных из Excel по лимитам')
-    file = os.getcwd()+'/Limit1.xlsx'
-    xl = pd.ExcelFile(file)
-    dflim = xl.parse('BSEG').rename(columns={'KUNNR':'kunnr', 'ZUONR': 'zuonr', 'GSBER':'gsber', 'LIMIT':'limit', 'SAP':'sap'})
-    print(dflim.head())
+    # file = os.getcwd()+'/uva001_front/Limit1.xlsx'
+    # file = '/home/turganovai@domain.local/git/uva001_front/Limit1.xlsx'
+    # print(file)
+    # xl = pd.ExcelFile(file)
+    dflim = get_limit1().rename(columns={'KUNNR':'kunnr', 'ZUONR': 'zuonr', 'GSBER':'gsber', 'LIMIT':'limit', 'SAP':'sap'})
+    # dflim = xl.parse('BSEG').rename(columns={'KUNNR':'kunnr', 'ZUONR': 'zuonr', 'GSBER':'gsber', 'LIMIT':'limit', 'SAP':'sap'})
 
     print('2. Загрузка данных по контрактам')
     limit_oper_data = get_limit_oper_data() 
@@ -216,9 +220,12 @@ def content(klient, dogovor):
     # df=pd.read_sql(query2, con)
     # con.close()
 
-    file = os.getcwd()+'/Limit1.xlsx'
-    xl = pd.ExcelFile(file)
-    dflim = xl.parse('BSEG')
+    # # file = os.getcwd()+'/uva001_front/Limit1.xlsx'
+    # file = '/home/turganovai@domain.local/git/uva001_front/Limit1.xlsx'
+    # xl = pd.ExcelFile(file)
+    # dflim = xl.parse('BSEG')
+    dflim = get_limit1()
+  
 
     df4=df.sort_values(['TIMESTAMP'], ascending=True)
     lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
@@ -295,9 +302,11 @@ def content2(klient, dogovor):
     # df=pd.read_sql(query4, con)
     # con.close()
 
-    file = os.getcwd()+'/Limit1.xlsx'
-    xl = pd.ExcelFile(file)
-    dflim = xl.parse('BSEG')
+    # file = os.getcwd()+'/uva001_front/Limit1.xlsx'
+    # file = '/home/turganovai@domain.local/git/uva001_front/Limit1.xlsx'
+    # xl = pd.ExcelFile(file)
+    # dflim = xl.parse('BSEG')
+    dflim = get_limit1()
 
     df4=df.sort_values(['CPUDT', 'CPUTM'], ascending=[True, True])
     df4.insert(11, 'LIMIT', 99999999)
@@ -375,9 +384,11 @@ def content3(klient, dogovor):
     # df=pd.read_sql(query5, con)
     # con.close()
 
-    file = os.getcwd()+'/Limit1.xlsx'
-    xl = pd.ExcelFile(file)
-    dflim = xl.parse('BSEG')
+    # # file = os.getcwd()+'/uva001_front/Limit1.xlsx'
+    # file = '/home/turganovai@domain.local/git/uva001_front/Limit1.xlsx'
+    # xl = pd.ExcelFile(file)
+    # dflim = xl.parse('BSEG')
+    dflim = get_limit1()
 
     df4=df.sort_values(['BUDAT', 'BELNR'], ascending=[True, True])
     lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
@@ -453,9 +464,11 @@ def content4(klient, dogovor):
     # df=pd.read_sql(query6, con)
     # con.close()
 
-    file = os.getcwd()+'/Limit1.xlsx'
-    xl = pd.ExcelFile(file)
-    dflim = xl.parse('BSEG')
+    # # file = os.getcwd()+'/uva001_front/Limit1.xlsx'
+    # file = '/home/turganovai@domain.local/git/uva001_front/Limit1.xlsx'
+    # xl = pd.ExcelFile(file)
+    # dflim = xl.parse('BSEG')
+    dflim = get_limit1()
 
     df4=df.sort_values(['BUDAT', 'BELNR'], ascending=[True, True])
     df4.insert(10, 'LIMIT', 99999999)
@@ -531,10 +544,12 @@ def content5(klient, dogovor):
     # df=pd.read_sql(query7, con)
     # con.close()
 
-    file = os.getcwd()+'/Limit1.xlsx'
-    xl = pd.ExcelFile(file)
-    dflim = xl.parse('BSEG')
-    print(dflim.head(3))
+    # # file = os.getcwd()+'/uva001_front/Limit1.xlsx'
+    # file = '/home/turganovai@domain.local/git/uva001_front/Limit1.xlsx'
+    # xl = pd.ExcelFile(file)
+    # dflim = xl.parse('BSEG')
+    # print(dflim.head(3))
+    dflim = get_limit1()
 
     df4=df.sort_values(['BLDAT', 'BELNR'], ascending=[True, True])
     lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
@@ -614,9 +629,11 @@ def content6(klient, dogovor):
     df4=df.sort_values(['bldat', 'belnr'], ascending=[True, True])
     df4.insert(10, 'limit', 99999999)
 
-    file = os.getcwd()+'/Limit1.xlsx'
-    xl = pd.ExcelFile(file)
-    dflim = xl.parse('BSEG')
+    # # file = os.getcwd()+'/uva001_front/Limit1.xlsx'
+    # file = '/home/turganovai@domain.local/git/uva001_front/Limit1.xlsx'
+    # xl = pd.ExcelFile(file)
+    # dflim = xl.parse('BSEG')
+    dflim = get_limit1()
 
     lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
     for i, item in enumerate (df4['IND']):

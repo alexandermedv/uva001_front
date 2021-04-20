@@ -81,5 +81,16 @@
         });
       }());
     </script>
+    <!-- Автоматическая высота под высоту документа вычетаем верхний бар -->
+    <script>
+      ;(function($){
+          $(document).ready(function(){
+              $('iframe').height( $(window).height() - 64+"px");
+              $(window).resize(function(){
+                  $('iframe').height($(this).height());
+              });
+          });
+      })(jQuery);
+    </script>
   </body>
 </html>

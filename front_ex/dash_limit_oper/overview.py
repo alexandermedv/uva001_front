@@ -95,7 +95,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
             html.Div('Выберите договор:', style={'width': '15%', 'display': 'inline-block', 'color': 'white'}),
             html.Div(dcc.Dropdown(id='dogovor'), style={'width': '25%', 'display': 'inline-block'})
         # ], dark=True, sticky="top", color='rgb(71, 71, 71)'),
-        ], dark=True, color='rgb(71, 71, 71)'),
+        ], dark=True, sticky="top", color='rgb(71, 71, 71)'),
         html.Div([
             html.H6('Рейтинг клиентов:'),
             dbc.Col(dash_table.DataTable(
@@ -169,7 +169,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
         dbc.Row(dbc.Col(html.H6('      Сторно исключено, рублей'), width=12)),
         dbc.Row(dbc.Col(html.Div(id='graph5'), width=12))
     #    ,
-    ], className='twelve columns')
+    ], className='twelve columns', style={'fontSize': 12})
     return layout
 
 @app.callback(

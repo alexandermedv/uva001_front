@@ -39,7 +39,7 @@ def get_limit_oper_client_data():
            
 def get_limit_oper_zuonr_data(client):
         """Выгрузка данных по контрактам"""
-        sql = "SELECT kunnr, name1 from sap_s4.limit_oper_kna where kunnr = '%s'" % client
+        sql = "SELECT kunnr, zuonr from sap_s4.limit_oper_kna where kunnr = '%s'" % client
         data = pd.read_sql(sql, con=create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8'))
         # print(data.head(3))
         return data
@@ -83,7 +83,10 @@ def get_limit_oper_ttl_data(debug=False):
 
 def get_limit_oper_client_zuonr_data(client, zuonr, debug=False):
         """Выгрузка проводок по клиентам и контрактам"""
-        sql = "SELECT kunnr, zuonr from sap_s4.limit_oper where kunnr = '%s' and zuonr = '%s'" % (client, zuonr)
+        sql = """
+                SELECT kunnr, zuonr, ind, shkzg, hkont, h_blart, dmbtr, cpudt, cputm, budat, belnr,dmbtr_sign 
+                        from sap_s4.limit_oper where kunnr = '%s' and zuonr = '%s'
+        """ % (client, zuonr)
         data = pd.read_sql(sql, con=create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8'))
         if debug: print(data.head(3))
         return data 

@@ -180,6 +180,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
 )
 def dogovor(klient):
     print('dogovor')
+    print(klient)
     # query3="""
     # SELECT DISTINCT(SAPABAP1.BSEG.ZUONR) as ZUONR FROM SAPABAP1.BSEG
     # where SAPABAP1.BSEG.KUNNR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
@@ -192,9 +193,7 @@ def dogovor(klient):
         return None
     else:
         # print('dogovor', df.head())
-        # con.close()
-        # return [{'label': i, 'value': i} for i in df['zuonr']]
-        return None
+        return [{'label': i, 'value': i} for i in df['zuonr']]
 @app.callback(
     Output(component_id='graph', component_property='children'),
     [
@@ -215,7 +214,6 @@ def content(klient, dogovor):
     # con = get_connection()
     df = get_limit_oper_client_zuonr_data(klient, dogovor)
     if df.empty:
-        print('None')
         return None
     else: 
         # df=pd.read_sql(query2, con)
@@ -636,8 +634,10 @@ def content6(klient, dogovor):
 
     # con = get_connection()
     print('graph6')
+    print(klient, dogovor)
     df = get_limit_oper_client_zuonr_data(klient, dogovor)
     
+    print(df.head())
     # df=pd.read_sql(query8, con)
     # con.close()
     if df.empty:

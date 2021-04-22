@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Уточнить почему не подключается css -->
     <link rel="stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/main.css')}}">
-    <!-- Настройке Dash Plotly -->
-    <link rel="stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/dash.css')}}">
   </head>
 
   <!-- <body> -->
@@ -92,5 +90,15 @@
           });
       })(jQuery);
     </script>
+    <!-- <script>
+      ;(function($){
+          $(document).ready(function(){
+              $('iframe').width( $(window).width() - 241+"px");
+              $(window).resize(function(){
+                  $('iframe').width($(this).width());
+              });
+          });
+      })(jQuery);
+    </script> -->
   </body>
 </html>

@@ -20,7 +20,7 @@
   display: inline-block;
   position:fixed;
   top: 40%;
-  left: 40%;
+  left: 45%;
   opacity: 0;
   /* background-colour: #ffffff; */
   -webkit-animation: fadein 1s linear forwards, spin 2s infinite linear; /* Safari and Chrome */

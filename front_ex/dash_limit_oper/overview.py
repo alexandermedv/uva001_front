@@ -188,7 +188,6 @@ def dogovor(klient):
     # con = get_connection()
     # df6=pd.read_sql(query3, con)
     df = get_limit_oper_zuonr_data(klient)
-    print(df.head())
     if df.empty:
         return None
     else:
@@ -464,7 +463,6 @@ def content4(klient, dogovor):
     # """ % (klient, dogovor)
 
     # con = get_connection()
-    print('graph4')
     df = get_limit_oper_client_zuonr_data(klient, dogovor)
     # df=pd.read_sql(query6, con)
     # con.close()
@@ -477,18 +475,18 @@ def content4(klient, dogovor):
         return None
     else: 
         dflim = get_limit1()
-
-        df4=df.sort_values(['BUDAT', 'BELNR'], ascending=[True, True])
-        df4.insert(10, 'LIMIT', 99999999)
+        print('graph4')
+        df4=df.sort_values(['budat', 'belnr'], ascending=[True, True])
+        df4.insert(10, 'limit', 99999999)
         lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
-        for i, item in enumerate (df4['IND']):
+        for i, item in enumerate (df4['ind']):
             try:
                 df4.iloc[i,10]=int(lim)
             except:
                 df4.iloc[i,10]=0
         df5=df4
-        df5.insert(11, 'SUMM2', 999999999)
-        for i, item in enumerate (df5['IND']):
+        df5.insert(11, 'summ2', 999999999)
+        for i, item in enumerate (df5['ind']):
             if df5.iloc[0,2]=='S':
                 df5.iloc[0,11]=df5.iloc[0,6]
             else:
@@ -503,17 +501,17 @@ def content4(klient, dogovor):
                     df5.iloc[i,11]=df5.iloc[i-1,11]+int(df5.iloc[i,6])
                 else:
                     df5.iloc[i,11]=df5.iloc[i-1,11]+int(df5.iloc[i,6])*(-1)
-        df5.insert(12, 'ZERO', 9)
-        for i, item in enumerate (df5['IND']):
+        df5.insert(12, 'zero', 9)
+        for i, item in enumerate (df5['ind']):
             try:
                 df5.iloc[i,12]=int('0')
             except:
                 df5.iloc[i,12]=0
-        dates=df5['BELNR']
-        points=df5['SUMM2']
-        points1=df5['LIMIT']
-        dates4=df5['BUDAT']
-        points2=df5['ZERO']
+        dates=df5['belnr']
+        points=df5['summ2']
+        points1=df5['limit']
+        dates4=df5['budat']
+        points2=df5['zero']
         return dcc.Graph(figure=go.Figure(
             data=[go.Scatter(x=[dates4, dates], y=points, mode='lines+markers', name= 'Дебиторская задолженность', line_shape='spline', line_color='grey', xaxis='x1'),
                 go.Scatter(x=[dates4, dates], y=points1, mode='lines', name= 'Кредитный лимит', line_color='rgb(207,0,15)', xaxis='x1'),
@@ -562,7 +560,6 @@ def content5(klient, dogovor):
     if df.empty:
         return None
     else:     
-        print('df')
         df4=df.sort_values(['bldat', 'belnr'], ascending=[True, True])
         lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
         df4.insert(10, 'limit', 99999999)
@@ -634,10 +631,7 @@ def content6(klient, dogovor):
 
     # con = get_connection()
     print('graph6')
-    print(klient, dogovor)
     df = get_limit_oper_client_zuonr_data(klient, dogovor)
-    
-    print(df.head())
     # df=pd.read_sql(query8, con)
     # con.close()
     if df.empty:

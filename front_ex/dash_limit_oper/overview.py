@@ -86,6 +86,9 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
 
     dfreit8=dfreit7.pivot_table(['kunnr','deltamax', 'deltamin', 'prevsum'], ['gsber', 'sap'], aggfunc={'kunnr': 'count', 'deltamax': 'sum', 'deltamin': 'sum', 'prevsum': 'sum'}).reset_index()
     dfreit8.columns=['Филиал', 'Лимит в SAP (1-да, 0-нет)', 'Сумма Макс_превышение', 'Сумма Мин_превышение', 'Кол-во договоров', 'Сумма превышений']
+    dfreit8['Лимит в SAP'] = dfreit8['Лимит в SAP (1-да, 0-нет)'].apply(lambda x: 'Да' if x==1 else 'Нет')
+    dfreit8_cols = ['Филиал', 'Лимит в SAP', 'Сумма Макс_превышение', 'Сумма Мин_превышение', 'Кол-во договоров', 'Сумма превышений']
+  
     print("5. Старт загрузки layout")
 
     layout = html.Div([
@@ -102,15 +105,15 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
             html.H6('Рейтинг клиентов:'),
             dbc.Col(dash_table.DataTable(
                 id='datatable',
-                columns=[{"name": i, "id": i, "deletable": True, "selectable": True} for i in dfreit6.columns],
+                columns=[{"name": i, "id": i, "deletable": True, "selectable": True} for i in dfreit6[dfreit6_cols].columns],
                 data=dfreit6[dfreit6_cols].to_dict('records'),
-                editable=True,
+                # editable=True,
                 filter_action="native",
                 sort_action="native",
                 sort_mode="multi",
-                column_selectable="single",
-                row_selectable="multi",
-                row_deletable=True,
+                # column_selectable="single",
+                # row_selectable="multi",
+                # row_deletable=True,
                 selected_columns=[],
                 selected_rows=[],
                 page_action="native",
@@ -118,30 +121,31 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
                 page_size= 10, 
                 style_cell = {'textAlign': 'left'},
                 style_as_list_view=True, 
-                style_data_conditional=[
-                    {'if': {'column_id': 'Лимит в SAP (1-да, 0-нет)'},
-                    'width': '35px'},
-                ]
+                # style_data_conditional=[
+                #     {'if': {'column_id': 'Лимит в SAP'},
+                #     'width': '35px'},
+                # ]
             ), width=12)
         ], className='eleven columns'),
         html.Div([
             html.H6('Рейтинг филиалов:'),
             dbc.Col(dash_table.DataTable(
                 id='datatable2',
-                columns=[{"name": i, "id": i, "deletable": True, "selectable": True} for i in dfreit8.columns],
-                data=dfreit8.to_dict('records'),
-                editable=True,
+                columns=[{"name": i, "id": i, "deletable": True, "selectable": True} for i in dfreit8[dfreit8_cols].columns],
+                data=dfreit8[dfreit8_cols].to_dict('records'),
+                # editable=True,
                 filter_action="native",
                 sort_action="native",
                 sort_mode="multi",
-                column_selectable="single",
-                row_selectable="multi",
-                row_deletable=True,
+                # column_selectable="single",
+                # row_selectable="multi",
+                # row_deletable=True,
                 selected_columns=[],
                 selected_rows=[],
                 page_action="native",
                 page_current= 0,
-                page_size= 10
+                page_size= 10,
+                style_as_list_view=True, 
             ), width=12)
         ], className='eleven columns'),
         dbc.Row(
@@ -218,7 +222,8 @@ def content(klient, dogovor):
     # """ % (klient, dogovor)
     
     # con = get_connection()
-    df = get_limit_oper_client_zuonr_data(klient, dogovor)
+    cols = ['ind','zuonr','shkzg','hkont','kunnr','h_blart','dmbtr','cpudt','cputm','timestamp', 'stblg']
+    df = get_limit_oper_client_zuonr_data(klient, dogovor)[cols]
     if df.empty:
         return None
     else: 
@@ -268,6 +273,13 @@ def content(klient, dogovor):
         points1=df5['limit']
         dates2=df5['timestamp']
         points2=df5['zero']
+
+        # print('Excel')
+        # with pd.ExcelWriter('/home/turganovai@domain.local/git/uva001_front/test.xlsx') as wr:
+        #     df.to_excel(wr, sheet_name = 'df', encoding = 'utf-8', index = False)
+        #     df5.to_excel(wr, sheet_name = 'df5', encoding = 'utf-8', index = False) 
+
+
         return dcc.Graph(figure=go.Figure(
             data=[go.Scatter(x=[dates2, dates, dates1], y=points, mode='lines+markers', name= 'Дебиторская задолженность', line_color='rgb(40,80,0)', line_shape='spline', xaxis='x1'),
                 go.Scatter(x=[dates2, dates, dates1], y=points1, mode='lines', name= 'Кредитный лимит', line_color='rgb(207,0,15)', xaxis='x1'),
@@ -302,7 +314,8 @@ def content2(klient, dogovor):
 
     # con = get_connection()
     print('graph2')
-    df = get_limit_oper_client_zuonr_data(klient, dogovor)
+    cols = ['ind','zuonr','shkzg','hkont','kunnr','h_blart','dmbtr','cpudt','cputm','timestamp', 'stblg']
+    df = get_limit_oper_client_zuonr_data(klient, dogovor)[cols]
 
     if df.empty:
         return None
@@ -315,7 +328,6 @@ def content2(klient, dogovor):
         # xl = pd.ExcelFile(file)
         # dflim = xl.parse('BSEG')
         dflim = get_limit1()
-        print(df.head())
 
         df4=df.sort_values(['cpudt', 'cputm'], ascending=[True, True])
         df4.insert(11, 'limit', 99999999)
@@ -389,7 +401,8 @@ def content3(klient, dogovor):
 
     # con = get_connection()
     print('graph3')
-    df = get_limit_oper_client_zuonr_data(klient, dogovor)
+    cols = ['ind','zuonr','shkzg','hkont','kunnr','h_blart','dmbtr','budat','belnr', 'stblg']
+    df = get_limit_oper_client_zuonr_data(klient, dogovor)[cols]
     if df.empty:
         return None
     else: 
@@ -471,7 +484,8 @@ def content4(klient, dogovor):
     # """ % (klient, dogovor)
 
     # con = get_connection()
-    df = get_limit_oper_client_zuonr_data(klient, dogovor)
+    cols = ['ind','zuonr','shkzg','hkont','kunnr','h_blart','dmbtr','budat','belnr', 'stblg']
+    df = get_limit_oper_client_zuonr_data(klient, dogovor)[cols]
     # df=pd.read_sql(query6, con)
     # con.close()
 
@@ -554,7 +568,8 @@ def content5(klient, dogovor):
     # """ % (klient, dogovor)
     print('graph5')
     # con =get_connection()
-    df=get_limit_oper_client_zuonr_data(klient, dogovor)
+    cols = ['ind','zuonr','shkzg','hkont','kunnr','h_blart','dmbtr','bldat','belnr', 'stblg']
+    df=get_limit_oper_client_zuonr_data(klient, dogovor)[cols]
     # print(df.head(3))
     # df=pd.read_sql(query7, con)
     # con.close()
@@ -642,7 +657,8 @@ def content6(klient, dogovor):
 
     # con = get_connection()
     print('graph6')
-    df = get_limit_oper_client_zuonr_data(klient, dogovor)
+    cols = ['ind','zuonr','shkzg','hkont','kunnr','h_blart','dmbtr','bldat','belnr', 'stblg']
+    df = get_limit_oper_client_zuonr_data(klient, dogovor)[cols]
     # df=pd.read_sql(query8, con)
     # con.close()
     if df.empty:

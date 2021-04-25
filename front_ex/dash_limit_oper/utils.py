@@ -84,7 +84,7 @@ def get_limit_oper_ttl_data(debug=False):
 def get_limit_oper_client_zuonr_data(client, zuonr, debug=False):
         """Выгрузка проводок по клиентам и контрактам"""
         sql = """
-                SELECT kunnr, zuonr, ind, shkzg, hkont, h_blart, dmbtr, cpudt, cputm, budat, belnr, bldat, dmbtr_sign 
+                SELECT kunnr, zuonr, ind, shkzg, hkont, h_blart, dmbtr, cpudt, cputm, budat, belnr, bldat, dmbtr_sign, timestamp 
                         from sap_s4.limit_oper where kunnr = '%s' and zuonr = '%s'
         """ % (client, zuonr)
         data = pd.read_sql(sql, con=create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8'))

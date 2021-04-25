@@ -81,6 +81,8 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
     dfreit6=dfreit4.merge(limit_oper_client_data, on='kunnr', how='left').sort_values(['prevsum'], ascending=False)
     dfreit7=dfreit6.merge(dflim[['zuonr', 'gsber']], on='zuonr', how='left')
     dfreit6.columns=['Договор', 'Клиент', 'Лимит', 'Лимит в SAP (1-да, 0-нет)', 'Макс_превышение', 'Мин_превышение', 'Кол-во превышений', 'Имя клиента']
+    dfreit6['Лимит в SAP'] = dfreit6['Лимит в SAP (1-да, 0-нет)'].apply(lambda x: 'Да' if x==1 else 'Нет')
+    dfreit6_cols = ['Договор', 'Клиент', 'Лимит', 'Лимит в SAP', 'Макс_превышение', 'Мин_превышение', 'Кол-во превышений', 'Имя клиента']
 
     dfreit8=dfreit7.pivot_table(['kunnr','deltamax', 'deltamin', 'prevsum'], ['gsber', 'sap'], aggfunc={'kunnr': 'count', 'deltamax': 'sum', 'deltamin': 'sum', 'prevsum': 'sum'}).reset_index()
     dfreit8.columns=['Филиал', 'Лимит в SAP (1-да, 0-нет)', 'Сумма Макс_превышение', 'Сумма Мин_превышение', 'Кол-во договоров', 'Сумма превышений']
@@ -101,7 +103,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
             dbc.Col(dash_table.DataTable(
                 id='datatable',
                 columns=[{"name": i, "id": i, "deletable": True, "selectable": True} for i in dfreit6.columns],
-                data=dfreit6.to_dict('records'),
+                data=dfreit6[dfreit6_cols].to_dict('records'),
                 editable=True,
                 filter_action="native",
                 sort_action="native",
@@ -113,7 +115,13 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
                 selected_rows=[],
                 page_action="native",
                 page_current= 0,
-                page_size= 10
+                page_size= 10, 
+                style_cell = {'textAlign': 'left'},
+                style_as_list_view=True, 
+                style_data_conditional=[
+                    {'if': {'column_id': 'Лимит в SAP (1-да, 0-нет)'},
+                    'width': '35px'},
+                ]
             ), width=12)
         ], className='eleven columns'),
         html.Div([
@@ -137,7 +145,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
             ), width=12)
         ], className='eleven columns'),
         dbc.Row(
-            html.H4('    По дате ввода')
+            html.H5('    По дате ввода')
         ),
         html.Div(
             html.H6('      С учетом сторно, рублей')
@@ -152,7 +160,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
             dbc.Col(html.Div(id='graph'), width=12)
         ),
         dbc.Row(
-            html.H4('    По дате проводки')
+            html.H5('    По дате проводки'), 
         ),
         dbc.Row(
             html.H6('      С учетом сторно, рублей')
@@ -163,7 +171,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
         dbc.Row(
         dbc.Col(html.H6('      Сторно исключено, рублей'), width=12)),
         dbc.Row(dbc.Col(html.Div(id='graph3'), width=12)),
-        dbc.Row(html.H4('    По дате документа')),
+        dbc.Row(html.H5('    По дате документа')),
         dbc.Row(html.H6('      С учетом сторно, рублей')),
         dbc.Row(dbc.Col(html.Div(id='graph6'), width=12)),
         dbc.Row(dbc.Col(html.H6('      Сторно исключено, рублей'), width=12)),
@@ -173,14 +181,14 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
     return layout
 
 @app.callback(
-    Output(component_id='dogovor', component_property='options'),
+        [Output('dogovor', 'options'),
+        Output('dogovor', 'value')],
+    # Output(component_id='dogovor', component_property='options'),
     [
         Input(component_id='klient', component_property='value')
     ]
 )
 def dogovor(klient):
-    print('dogovor')
-    print(klient)
     # query3="""
     # SELECT DISTINCT(SAPABAP1.BSEG.ZUONR) as ZUONR FROM SAPABAP1.BSEG
     # where SAPABAP1.BSEG.KUNNR='%s' and H_BLART not in ('DC', 'DN') and HKONT in ('6201010100', '6202010100')
@@ -188,12 +196,10 @@ def dogovor(klient):
     # con = get_connection()
     # df6=pd.read_sql(query3, con)
     df = get_limit_oper_zuonr_data(klient)
-    print(df.head())
     if df.empty:
         return None
     else:
-        # print('dogovor', df.head())
-        return [{'label': i, 'value': i} for i in df['zuonr']]
+        return  [{'label': i, 'value': i} for i in df['zuonr']], df['zuonr'][0]
 @app.callback(
     Output(component_id='graph', component_property='children'),
     [
@@ -226,7 +232,7 @@ def content(klient, dogovor):
         dflim = get_limit1()
 
         df4=df.sort_values(['timestamp'], ascending=True)
-        lim=dflim[dflim['zuonr']==dogovor]['limit'].max()
+        lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
         df4.insert(11, 'limit', 99999999)
         for i, item in enumerate (df4['ind']):
             try:
@@ -309,18 +315,19 @@ def content2(klient, dogovor):
         # xl = pd.ExcelFile(file)
         # dflim = xl.parse('BSEG')
         dflim = get_limit1()
+        print(df.head())
 
-        df4=df.sort_values(['CPUDT', 'CPUTM'], ascending=[True, True])
-        df4.insert(11, 'LIMIT', 99999999)
+        df4=df.sort_values(['cpudt', 'cputm'], ascending=[True, True])
+        df4.insert(11, 'limit', 99999999)
         lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
-        for i, item in enumerate (df4['IND']):
+        for i, item in enumerate (df4['ind']):
             try:
                 df4.iloc[i,11]=int(lim)
             except:
                 df4.iloc[i,11]=0
         df5=df4
-        df5.insert(12, 'SUMM2', 999999999)
-        for i, item in enumerate (df5['IND']):
+        df5.insert(12, 'summ2', 999999999)
+        for i, item in enumerate (df5['ind']):
             if df5.iloc[0,2]=='S':
                 df5.iloc[0,12]=df5.iloc[0,6]
             else:
@@ -335,18 +342,18 @@ def content2(klient, dogovor):
                     df5.iloc[i,12]=df5.iloc[i-1,12]+int(df5.iloc[i,6])
                 else:
                     df5.iloc[i,12]=df5.iloc[i-1,12]+int(df5.iloc[i,6])*(-1)
-        df5.insert(13, 'ZERO', 9)
-        for i, item in enumerate (df5['IND']):
+        df5.insert(13, 'zero', 9)
+        for i, item in enumerate (df5['ind']):
             try:
                 df5.iloc[i,13]=int('0')
             except:
                 df5.iloc[i,13]=0
-        dates=df5['CPUDT']
-        dates2=df5['CPUTM']
-        points=df5['SUMM2']
-        points1=df5['LIMIT']
-        dates4=df5['TIMESTAMP']
-        points2=df5['ZERO']
+        dates=df5['cpudt']
+        dates2=df5['cputm']
+        points=df5['summ2']
+        points1=df5['limit']
+        dates4=df5['timestamp']
+        points2=df5['zero']
         return dcc.Graph(figure=go.Figure(
             data=[go.Scatter(x=[dates4, dates, dates2], y=points, mode='lines+markers', name= 'Дебиторская задолженность', line_shape='spline', line_color='grey', xaxis='x1'),
                 go.Scatter(x=[dates4, dates, dates2], y=points1, mode='lines', name= 'Кредитный лимит', line_color='rgb(207,0,15)', xaxis='x1'),
@@ -395,17 +402,17 @@ def content3(klient, dogovor):
         # dflim = xl.parse('BSEG')
         dflim = get_limit1()
 
-        df4=df.sort_values(['BUDAT', 'BELNR'], ascending=[True, True])
+        df4=df.sort_values(['budat', 'belnr'], ascending=[True, True])
         lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
-        df4.insert(10, 'LIMIT', 99999999)
-        for i, item in enumerate (df4['IND']):
+        df4.insert(10, 'limit', 99999999)
+        for i, item in enumerate (df4['ind']):
             try:
                 df4.iloc[i,10]=int(lim)
             except:
                 df4.iloc[i,10]=0
         df5=df4
-        df5.insert(11, 'SUMM2', 999999999)
-        for i, item in enumerate (df5['IND']):
+        df5.insert(11, 'summ2', 999999999)
+        for i, item in enumerate (df5['ind']):
             if df5.iloc[0,2]=='S':
                 df5.iloc[0,11]=df5.iloc[0,6]
             else:
@@ -420,17 +427,17 @@ def content3(klient, dogovor):
                     df5.iloc[i,11]=df5.iloc[i-1,11]+int(df5.iloc[i,6])
                 else:
                     df5.iloc[i,11]=df5.iloc[i-1,11]+int(df5.iloc[i,6])*(-1)
-        df5.insert(12, 'ZERO', 9)
-        for i, item in enumerate (df5['IND']):
+        df5.insert(12, 'zero', 9)
+        for i, item in enumerate (df5['ind']):
             try:
                 df5.iloc[i,12]=int('0')
             except:
                 df5.iloc[i,12]=0
-        dates=df5['BELNR']
-        points=df5['SUMM2']
-        points1=df5['LIMIT']
-        dates2=df5['BUDAT']
-        points2=df5['ZERO']
+        dates=df5['belnr']
+        points=df5['summ2']
+        points1=df5['limit']
+        dates2=df5['budat']
+        points2=df5['zero']
         return dcc.Graph(figure=go.Figure(
             data=[go.Scatter(x=[dates2, dates], y=points, mode='lines+markers', name= 'Дебиторская задолженность', line_color='rgb(40,80,0)', line_shape='spline', xaxis='x1'),
                 go.Scatter(x=[dates2, dates], y=points1, mode='lines', name= 'Кредитный лимит', line_color='rgb(207,0,15)', xaxis='x1'),
@@ -464,7 +471,6 @@ def content4(klient, dogovor):
     # """ % (klient, dogovor)
 
     # con = get_connection()
-    print('graph4')
     df = get_limit_oper_client_zuonr_data(klient, dogovor)
     # df=pd.read_sql(query6, con)
     # con.close()
@@ -477,18 +483,18 @@ def content4(klient, dogovor):
         return None
     else: 
         dflim = get_limit1()
-
-        df4=df.sort_values(['BUDAT', 'BELNR'], ascending=[True, True])
-        df4.insert(10, 'LIMIT', 99999999)
+        print('graph4')
+        df4=df.sort_values(['budat', 'belnr'], ascending=[True, True])
+        df4.insert(10, 'limit', 99999999)
         lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
-        for i, item in enumerate (df4['IND']):
+        for i, item in enumerate (df4['ind']):
             try:
                 df4.iloc[i,10]=int(lim)
             except:
                 df4.iloc[i,10]=0
         df5=df4
-        df5.insert(11, 'SUMM2', 999999999)
-        for i, item in enumerate (df5['IND']):
+        df5.insert(11, 'summ2', 999999999)
+        for i, item in enumerate (df5['ind']):
             if df5.iloc[0,2]=='S':
                 df5.iloc[0,11]=df5.iloc[0,6]
             else:
@@ -503,17 +509,17 @@ def content4(klient, dogovor):
                     df5.iloc[i,11]=df5.iloc[i-1,11]+int(df5.iloc[i,6])
                 else:
                     df5.iloc[i,11]=df5.iloc[i-1,11]+int(df5.iloc[i,6])*(-1)
-        df5.insert(12, 'ZERO', 9)
-        for i, item in enumerate (df5['IND']):
+        df5.insert(12, 'zero', 9)
+        for i, item in enumerate (df5['ind']):
             try:
                 df5.iloc[i,12]=int('0')
             except:
                 df5.iloc[i,12]=0
-        dates=df5['BELNR']
-        points=df5['SUMM2']
-        points1=df5['LIMIT']
-        dates4=df5['BUDAT']
-        points2=df5['ZERO']
+        dates=df5['belnr']
+        points=df5['summ2']
+        points1=df5['limit']
+        dates4=df5['budat']
+        points2=df5['zero']
         return dcc.Graph(figure=go.Figure(
             data=[go.Scatter(x=[dates4, dates], y=points, mode='lines+markers', name= 'Дебиторская задолженность', line_shape='spline', line_color='grey', xaxis='x1'),
                 go.Scatter(x=[dates4, dates], y=points1, mode='lines', name= 'Кредитный лимит', line_color='rgb(207,0,15)', xaxis='x1'),
@@ -562,9 +568,8 @@ def content5(klient, dogovor):
     if df.empty:
         return None
     else:     
-        print('df')
         df4=df.sort_values(['bldat', 'belnr'], ascending=[True, True])
-        lim=dflim[dflim['zuonr']==dogovor]['limit'].max()
+        lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
         df4.insert(10, 'limit', 99999999)
         for i, item in enumerate (df4['ind']):
             try:
@@ -612,7 +617,10 @@ def content5(klient, dogovor):
                     showdividers=False),
                 margin={'l': 30, 'b': 30, 't': 20, 'r': 0},
                 legend={'x': 0, 'y': 1},
-                showlegend=True
+                showlegend=True,
+                font=dict(
+                    size=12
+                )
             )
         ), config={'displayModeBar': False})
     
@@ -634,10 +642,7 @@ def content6(klient, dogovor):
 
     # con = get_connection()
     print('graph6')
-    print(klient, dogovor)
     df = get_limit_oper_client_zuonr_data(klient, dogovor)
-    
-    print(df.head())
     # df=pd.read_sql(query8, con)
     # con.close()
     if df.empty:
@@ -653,14 +658,14 @@ def content6(klient, dogovor):
         dflim = get_limit1()
 
         lim=dflim[dflim['ZUONR']==dogovor]['LIMIT'].max()
-        for i, item in enumerate (df4['IND']):
+        for i, item in enumerate (df4['ind']):
             try:
                 df4.iloc[i,10]=int(lim)
             except:
                 df4.iloc[i,10]=0
         df5=df4
-        df5.insert(11, 'SUMM2', 999999999)
-        for i, item in enumerate (df5['IND']):
+        df5.insert(11, 'summ2', 999999999)
+        for i, item in enumerate (df5['ind']):
             if df5.iloc[0,2]=='S':
                 df5.iloc[0,11]=df5.iloc[0,6]
             else:
@@ -675,17 +680,17 @@ def content6(klient, dogovor):
                     df5.iloc[i,11]=df5.iloc[i-1,11]+int(df5.iloc[i,6])
                 else:
                     df5.iloc[i,11]=df5.iloc[i-1,11]+int(df5.iloc[i,6])*(-1)
-        df5.insert(12, 'ZERO', 9)
-        for i, item in enumerate (df5['IND']):
+        df5.insert(12, 'zero', 9)
+        for i, item in enumerate (df5['ind']):
             try:
                 df5.iloc[i,12]=int('0')
             except:
                 df5.iloc[i,12]=0
-        dates=df5['BELNR']
-        points=df5['SUMM2']
-        points1=df5['LIMIT']
-        dates4=df5['BLDAT']
-        points2=df5['ZERO']
+        dates=df5['belnr']
+        points=df5['summ2']
+        points1=df5['limit']
+        dates4=df5['bldat']
+        points2=df5['zero']
         return dcc.Graph(figure=go.Figure(
             data=[go.Scatter(x=[dates4, dates], y=points, mode='lines+markers', name= 'Дебиторская задолженность', line_shape='spline', line_color='grey', xaxis='x1'),
                 go.Scatter(x=[dates4, dates], y=points1, mode='lines', name= 'Кредитный лимит', line_color='rgb(207,0,15)', xaxis='x1'),

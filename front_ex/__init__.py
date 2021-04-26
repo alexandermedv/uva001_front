@@ -2,10 +2,14 @@
 import flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
+import config
+
 flask_app = flask.Flask(__name__)
 flask_app.config.update(
     USE_TZ = True,
     TIMEZONE = 'Europe/Moscow',   
+    # USE_TZ = True,
+    # TIMEZONE = 'Europe/Moscow',   
 )
 
 # Сборка Dashboard 

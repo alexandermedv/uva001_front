@@ -5,15 +5,22 @@ class BaseConfig():
 
 
 class DevConfig(BaseConfig):
-   FLASK_ENV = 'development'
-   DEBUG = True
-   SQLALCHEMY_DATABASE_URI = 'postgresql://locadm:Temp001@msc199-sdb04.domain.local:8036/uva_cons'
+    FLASK_ENV = 'development'
+    USE_TZ = True
+    TIMEZONE = 'Europe/Moscow' 
+    DEBUG = True
+    USE_RELOADER = True
+    SQLALCHEMY_DATABASE_URI = 'postgresql://locadm:Temp001@msc199-sdb04.domain.local:8036/uva_cons'
+    TEST = True
 #    CELERY_BROKER = 'pyamqp://rabbit_user:rabbit_password@broker-rabbitmq//'
 #    CELERY_RESULT_BACKEND = 'rpc://rabbit_user:rabbit_password@broker-rabbitmq//'
 
-
 class ProductionConfig(BaseConfig):
-   FLASK_ENV = 'production'
+    FLASK_ENV = 'production'
+    USE_TZ = True
+    TIMEZONE = 'Europe/Moscow' 
+    DEBUG = False
+    USE_RELOADER = False
 #    SQLALCHEMY_DATABASE_URI = 'postgresql://db_user:db_password@db-postgres:5432/flask-deploy'
 #    CELERY_BROKER = 'pyamqp://rabbit_user:rabbit_password@broker-rabbitmq//'
 #    CELERY_RESULT_BACKEND = 'rpc://rabbit_user:rabbit_password@broker-rabbitmq//'

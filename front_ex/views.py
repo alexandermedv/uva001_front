@@ -10,6 +10,10 @@ def hello():
 def render_dashboard():
     return flask.render_template('/limit_oper/overview.html')
 
+@flask_app.route('/dashboards/repair_parts/dashboard1/')
+def render_dashboard():
+    return flask.render_template('/dashapp1/overview.html')
+
 # @flask_app.route('/reports')
 # def render_reports():
 #     return flask.redirect('/dash2')

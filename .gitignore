@@ -1,1 +1,19 @@
 *.pyc
+
+# Settings Visual Studio Code
+.vscode
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Docker
+requirements.txt
+
+# Excel
+*.xlsx

@@ -17,4 +17,5 @@ RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 # run entrypoint.sh
 ENTRYPOINT ["sh", "/app/entrypoint.sh"]
 
-EXPOSE 9104
+# EXPOSE 9104
+EXPOSE {FLASK_PORT_PROD}

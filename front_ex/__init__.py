@@ -19,7 +19,7 @@ import front_ex.views #import app
 # Сборка в Middleware
 dispatch_app = DispatcherMiddleware(flask_app, {
     'limit_oper': dash_limit_oper.server,
-    'details_shortage': dashapp1.server
+    'dashapp1': dashapp1.server
     # '/dash_osv_dev': dash_osv_dev.server  
     })
     

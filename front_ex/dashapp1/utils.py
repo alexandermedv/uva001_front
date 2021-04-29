@@ -5,7 +5,8 @@ import pandas as pd
 
 #from sqlalchemy import create_engine
 #from app import engine_analysis, engine_cons
-from . import engine_cons
+
+# from . import engine_cons
 
 # engine_cons = create_engine("""postgresql://locadm:Temp001@msc199-
 # sdb04.domain.local:8031/uva_cons""", max_identifier_length=128, encoding='utf-8')

@@ -11,7 +11,7 @@ body {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
 }
-.page_landscape_a4 {
+/* .page_landscape_a4 {
   position: relative;
   width: 297mm;
   min-height: 210mm;
@@ -20,8 +20,8 @@ body {
   border-radius: 5px;
   background: white;
   box-shadow: 0 0 10px lightgrey;
-}
-.page_landscape_a3 {
+} */
+/* .page_landscape_a3 {
   position: relative;
   width: 420mm;
   min-height: 297mm;
@@ -30,7 +30,7 @@ body {
   border-radius: 5px;
   background: white;
   box-shadow: 0 0 10px lightgrey;
-}
+} */
 
 .pagetwo {
   position: relative;

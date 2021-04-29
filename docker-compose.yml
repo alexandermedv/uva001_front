@@ -9,7 +9,8 @@ services:
         volumes: 
            - .:/app
         ports:
-           - "9103:9104"
+         #   - "9103:9104"
+           - "9100:9101"
         environment: 
            - TZ=Europe/Moscow
         network_mode: bridge

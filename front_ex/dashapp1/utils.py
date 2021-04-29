@@ -2,10 +2,11 @@
 import datetime as dt
 
 import pandas as pd
-
-#from sqlalchemy import create_engine
+import front_ex.config as config
+from sqlalchemy import create_engine
 #from app import engine_analysis, engine_cons
-from . import engine_cons
+
+# from . import engine_cons
 
 # engine_cons = create_engine("""postgresql://locadm:Temp001@msc199-
 # sdb04.domain.local:8031/uva_cons""", max_identifier_length=128, encoding='utf-8')
@@ -39,15 +40,16 @@ def get_osv_detail_by_dates(start_date, end_date, debug = False):
             FROM sap_s4.osv_94
                 LEFT JOIN sap_s4.material
                     ON sap_s4.osv_94."Материал" = '00000000'||sap_s4.material."Код материала"
-            WHERE TO_DATE("Дата ввода", 'YYYYMMDD') BETWEEN %(dstart)s AND %(dfinish)s
+            WHERE TO_DATE("Дата ввода", 'YYYYMMDD') BETWEEN %s AND %s
             GROUP BY "Название бизнес-сферы",
                      sap_s4.material."Группа материалов",
                      "Наименование склада"
-    '''
-
+    ''' % (start_date, end_date)
+    print('1')
     if debug:
         print(sql)
-    return pd.read_sql(sql, con=engine_cons, params={"dstart":start_date,"dfinish":end_date})
+    # return pd.read_sql(sql, con=engine_cons, params={"dstart":start_date,"dfinish":end_date})
+    return pd.read_sql(sql, con=create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8'))
 
 
 # Выгрузка куба данных операций по счету 94* за выбранный период
@@ -228,7 +230,7 @@ def get_osv_data(start_date, end_date, debug = False):
 					FROM sap_s4.osv_94
 						LEFT JOIN sap_s4.material
 							ON sap_s4.osv_94."Материал" = '00000000'||sap_s4.material."Код материала"
-					WHERE TO_DATE("Дата проводки", 'YYYYMMDD') < %(dstart)s 
+					WHERE TO_DATE("Дата проводки", 'YYYYMMDD') < '%s' 
 					GROUP BY "Название бизнес-сферы",
 							"Группа материалов",
 							"Наименование склада"
@@ -236,7 +238,7 @@ def get_osv_data(start_date, end_date, debug = False):
 				ON i."Название бизнес-сферы" = sap_s4.osv_94."Название бизнес-сферы"
 					AND i."Группа материалов" = sap_s4.material."Группа материалов"
 					AND i."Наименование склада" = sap_s4.osv_94."Наименование склада"
-            WHERE TO_DATE(sap_s4.osv_94."Дата проводки", 'YYYYMMDD') BETWEEN %(dstart)s AND %(dfinish)s
+            WHERE TO_DATE(sap_s4.osv_94."Дата проводки", 'YYYYMMDD') BETWEEN '%s' AND '%s'
             GROUP BY sap_s4.osv_94."Дата проводки",
 					 sap_s4.osv_94."Название бизнес-сферы",
                      sap_s4.material."Группа материалов",
@@ -250,11 +252,11 @@ def get_osv_data(start_date, end_date, debug = False):
 					 g.cumsum_sklad_count,
 					 h.cumsum_count,
 					 i.initial_date
-    '''
+    ''' % (str(start_date)[:10], str(start_date)[:10], str(end_date)[:10])
     if debug:
         print(sql)
-    return pd.read_sql(sql, con=engine_cons, params={"dstart":start_date,"dfinish":end_date})
-
+    # return pd.read_sql(sql, con=engine_cons, params={"dstart":start_date,"dfinish":end_date})
+    return pd.read_sql(sql, con=create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8'))
 
 # Выгрузка оборота и количества операций по счету 94* за выбранный период для вкладки 4
 def get_osv_detail_by_dates2(start_date, end_date, debug = False):
@@ -277,7 +279,8 @@ def get_osv_detail_by_dates2(start_date, end_date, debug = False):
     if debug:
         print(sql)
 
-    return pd.read_sql(sql, con=engine_cons)
+    # return pd.read_sql(sql, con=engine_cons)
+    return pd.read_sql(sql, con=create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8'))
 
 
 # Значения списка филиалов
@@ -291,8 +294,8 @@ def get_branch_names(debug = False):
     if debug:
         print(sql)
 
-    return pd.read_sql(sql, con=engine_cons)
-
+    # return pd.read_sql(sql, con=engine_cons)
+    return pd.read_sql(sql, con=create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8'))
 
 # Значения списка типов запчастей
 def get_detail_type_names(debug = False):
@@ -305,8 +308,8 @@ def get_detail_type_names(debug = False):
     if debug:
         print(sql)
 
-    return pd.read_sql(sql, con=engine_cons)
-
+    # return pd.read_sql(sql, con=engine_cons)
+    return pd.read_sql(sql, con=create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8'))
 
 # Значения списка складов
 def get_warehouse_names(debug = False):
@@ -316,10 +319,10 @@ def get_warehouse_names(debug = False):
         FROM sap_s4.osv_94
         ORDER BY "Наименование склада" ASC
     '''
-    if debug:
-        print(sql)
+    if debug: print(sql)
 
-    return pd.read_sql(sql, con=engine_cons)
+    # return pd.read_sql(sql, con=engine_cons)
+    return pd.read_sql(sql, con=create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8'))
 
 # Максимальная дата в выгрузке
 def get_max_date():
@@ -328,4 +331,6 @@ def get_max_date():
     SELECT MAX(TO_DATE("Дата ввода", 'YYYYMMDD'))
     FROM sap_s4.osv_94
     '''
-    return engine_cons.execute(sql).fetchone()[0]
+    # return engine_cons.execute(sql).fetchone()[0]
+    con = create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8')
+    return con.execute(sql).fetchone()[0]

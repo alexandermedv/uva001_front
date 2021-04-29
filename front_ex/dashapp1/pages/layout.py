@@ -3,8 +3,11 @@ from datetime import date
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from . import engine_cons
+# from . import engine_cons
 from ..utils import get_max_date
+from sqlalchemy import create_engine
+import front_ex.config as config
+
 #import dash_table
 #import pandas as pd
 
@@ -12,6 +15,7 @@ from ..utils import get_max_date
 
 def create_layout():
     """Создание шаблона"""
+    engine_cons = create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8')
     layout2 = html.Div([
         html.Div([
             # Row 1 - Описание отчета

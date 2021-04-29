@@ -3,20 +3,22 @@ import datetime as dt
 from datetime import datetime
 import numpy as np 
 import pandas as pd
+import front_ex.config as config
 from sqlalchemy import create_engine
 
 def get_connection_sap():
     connection_hana = pyhdb.connect(
-            host = "sap-db-s4q.sap.tc",
-            port = 30115,
-            user = "PGKAUDIT",
-            password = "Rfh,jyfhf20"
+            host = config.SAP_HOST ,
+            port = config.SAP_HOST_PORT,
+            user = config.SAP_HOST_USER,
+            password = config.SAP_HOST_PASSWORD
             )
     return connection_hana
 
 def get_connection_postgre_string():
     """Строка подключения к postgre тест"""
-    return "postgresql://locadm:Temp001@msc199-sdb04.domain.local:8036/uva_cons"
+    return config.POSTGRE_DB
+
 def get_limit1():
         sql = "select * from analytics.limit1"
         con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')

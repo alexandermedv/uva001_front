@@ -1,7 +1,11 @@
 # Инициализация Celery
 import flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
-import front_ex.config
+import front_ex.config as config
+
+# Добавляем логирование пользователей и роли
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 
 flask_app = flask.Flask(__name__)
 flask_app.config.update(
@@ -9,7 +13,13 @@ flask_app.config.update(
     TIMEZONE = config.TIMEZONE,   
 )
 
-# Сборка Dashboard 
+# Добавляем базы данных и логин-менеджер
+app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.SQLALCHEMY_TRACK_MODIFICATIONS
+db = SQLAlchemy(app)
+manager = LoginManager(app)
+
+# Сборка Dashboards
 from .dash_limit_oper import dash_app as dash_limit_oper
 from .dashapp1 import dash_app as dashapp1
 # from .dash_osv_dev import dash_app as dash_osv_dev

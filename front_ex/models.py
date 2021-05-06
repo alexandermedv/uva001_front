@@ -1,10 +1,16 @@
+from flask_wtf import FlaskForm
 from flask_login import UserMixin, current_user
-from . import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
+from wtforms import StringField, PasswordField, BooleanField
+from wtforms import SubmitField, TextAreaField, SelectField, IntegerField
+from wtforms.validators import DataRequired, Length, InputRequired, Email, NumberRange, EqualTo
+from wtforms.fields.html5 import DateField, EmailField
+
+from . import db, login
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
-    __table_args = {'schema':'ver1'}
+    # __table_args = {'schema':'ver1'}
 
     id = db.Column(db.Integer, primary_key=True)
     personnel_number = db.Column(db.Integer)
@@ -15,7 +21,6 @@ class User(db.Model, UserMixin):
     dept_id = db.Column(db.Integer)
     position = db.Column(db.Unicode(1000))
     email = db.Column('email', db.Unicode(100), nullable=False)
-    # type = db.Column(db.Unicode(100))
     status = db.Column(db.Unicode(100))
     password_hash = db.Column(db.Unicode(200))
     role = db.Column(db.String(100), default='guest')

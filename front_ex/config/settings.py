@@ -5,6 +5,9 @@ class DefaultConfig():
     USE_TZ = True
     TIMEZONE = 'Europe/Moscow' 
     SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(32)
+    # Пользовательские роли
+    USER_ROLES = ['Администратор','Аудитор','ПКУ','Запчасти']
+    USER_STATUS = ['Активен', 'Неактивен']
 class DevelopConfig(DefaultConfig):
     FLASK_ENV = 'development'
     # Настройки WSGI - run_simple

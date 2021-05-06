@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 
+{% block css %}
+  <link rel="stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/slidebar_dash.css')}}"> 
+{% endblock %}
+
+{% block navbar_header %}
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+      <span class="sr-only">Toggle navigation</span>
+      <i class="ic fa fa-bars"></i>
+    </button>
+    <div style="padding: 15px 0;">
+      <a href="#" id="msbo"><i class="ic fa fa-bars"></i></a>
+    </div>
+  </div>  
+{% endblock%}
+
 {% block title %}{% endblock %}
 
 {% block sidebar %}
@@ -28,3 +44,38 @@
 {% endblock %}
 
 {% block content %}{% endblock %}
+
+{% block slidebar_scripts %}
+  <script id="rendered-js">
+    (function(){
+      $('#msbo').on('click', function(){
+        // $("#mnb").removeAttr("style");
+        // $("#msb").removeAttr("style");
+        // $("#mcw").removeAttr("style");
+        $('body').toggleClass('msb-x');
+      });
+    }());
+  </script>
+    <!-- Автоматическая высота под высоту документа вычетаем верхний бар -->
+  <script>
+    (function($){
+        $(document).ready(function(){
+            $('iframe').height( $(window).height() - 64+"px");
+            $(window).resize(function(){
+                $('iframe').height($(this).height());
+            });
+        });
+    })(jQuery);
+  </script>
+
+   <!-- <script>
+      ;(function($){
+          $(document).ready(function(){
+              $('iframe').width( $(window).width() - 241+"px");
+              $(window).resize(function(){
+                  $('iframe').width($(this).width());
+              });
+          });
+      })(jQuery);
+    </script> -->
+{% endblock %}

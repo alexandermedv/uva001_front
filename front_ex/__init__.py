@@ -1,7 +1,11 @@
 # Инициализация Celery
 import flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
+
 import front_ex.config as config
+
 
 # Добавляем логирование пользователей и роли
 from flask_sqlalchemy import SQLAlchemy
@@ -14,18 +18,25 @@ flask_app.config.update(
 )
 
 # Добавляем базы данных и логин-менеджер
-app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.SQLALCHEMY_TRACK_MODIFICATIONS
-db = SQLAlchemy(app)
-manager = LoginManager(app)
+flask_app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
+flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+flask_app.config['SECRET_KEY'] = config.SECRET_KEY or os.randov
+db = SQLAlchemy(flask_app)
+db.create_all()
+
+
+login = LoginManager(flask_app)
+migrate = Migrate(flask_app, db)
+
+manager = Manager(flask_app)
+manager.add_command('db', MigrateCommand)
 
 # Сборка Dashboards
 from .dash_limit_oper import dash_app as dash_limit_oper
 from .dashapp1 import dash_app as dashapp1
-# from .dash_osv_dev import dash_app as dash_osv_dev
 
 # Добавляем руты 
-import front_ex.views #import app
+import front_ex.routes
 
 # Сборка в Middleware
 dispatch_app = DispatcherMiddleware(flask_app, {

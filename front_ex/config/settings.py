@@ -4,8 +4,7 @@ class DefaultConfig():
     # Установка временной зоны для приложения и Docker
     USE_TZ = True
     TIMEZONE = 'Europe/Moscow' 
-    # Настройка базы данных фронта
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(32)
 class DevelopConfig(DefaultConfig):
     FLASK_ENV = 'development'
     # Настройки WSGI - run_simple

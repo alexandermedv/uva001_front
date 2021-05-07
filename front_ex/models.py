@@ -5,6 +5,7 @@ from wtforms import StringField, PasswordField, BooleanField
 from wtforms import SubmitField, TextAreaField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Length, InputRequired, Email, NumberRange, EqualTo
 from wtforms.fields.html5 import DateField, EmailField
+from functools import wraps
 
 from . import db, login
 
@@ -24,6 +25,12 @@ class User(db.Model, UserMixin):
     status = db.Column(db.Unicode(100))
     password_hash = db.Column(db.Unicode(200))
     role = db.Column(db.String(100), default='guest')
+    
+    def __repr__(self):
+        return '<User {}>'.format(self.username)
+    
+    def get_role(self, *args):
+        return set(args).issubset({role.name for role in self.roles})
 
     def to_json(self):
         return { "personnel_number": self.personnel_number,
@@ -48,7 +55,7 @@ class User(db.Model, UserMixin):
         return False
 
     def get_id(self):
-        return str(self.email)
+        return str(self.id)
 
     def set_password(self, password):
 	    self.password_hash = generate_password_hash(password)
@@ -58,10 +65,11 @@ class User(db.Model, UserMixin):
 
 def requires_roles(*roles):
     """Проверка роли"""
+    print(current_user.has_roles())
     def wrapper(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
-            if current_user.role not in roles:
+            if current_user.has_roles(*args) not in roles:
                 # Redirect the user to an unauthorized notice!
                 return "You are not authorized to access this page"
             return f(*args, **kwargs)

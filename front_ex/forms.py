@@ -45,4 +45,16 @@ class CreateUserForm(FlaskForm):
     role = SelectField("Роль: ", choices = config.USER_ROLES,
         validators=[InputRequired(message='Выберите тип пользователя.')], description='Роль')
     submit = SubmitField("Создать")
+
+class ProfileForm(FlaskForm):
+    """Форма профиля пользователя"""
+    full_name = StringField('Полное имя', render_kw={'readonly': True})
+    email = EmailField('Email', render_kw={'readonly': True})
+    password = PasswordField('Пароль',
+        validators=[InputRequired(message='Введите пароль.'),
+        Length(min=8, message='Длина пароля должна быть не менее 8 символов.'),
+                            EqualTo('password_confirmation', message='Пароли не совпадают.')], description="Пароль")
+    password_confirmation = PasswordField('Подтверждение пароля', validators=[DataRequired()], description="Подтверждение пароля")
+    change_password = SubmitField('Изменить пароль')
+
     

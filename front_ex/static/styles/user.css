@@ -15,10 +15,6 @@ body {
     background: #dfd3d0;
   }
 
-.form-group {
-    margin-bottom: 15px;
-}
-
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -31,19 +27,25 @@ body {
   padding-left: 15px;
 }
 
-.form_create_user {
+.form_user {
   width: 450px;
   margin: 30px auto;
 }
 
-.form_create_user h3 {
+.form_user h3 {
   color: #333;
   font-weight: bold;
-      margin-top: 0;
+      margin-top: 25px;
   }
 
-.form_create_user label {
-  color: #515050;
+.form_user label {
+  font-size: 0.9em;
+  font-style: inherit;
+  color: rgb(107, 119, 140);
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 4px;
+  margin-top: 0px;
 }
 
 input[type="submit"] {
@@ -54,6 +56,7 @@ input[type="submit"] {
   font-weight: bold;
   border: none;
   min-width: 140px;
+  width: auto;
 }
 
 input[type="submit"]:hover, .input[type="submit"]:focus{
@@ -62,7 +65,7 @@ input[type="submit"]:hover, .input[type="submit"]:focus{
 }
 
 
-.form_create_user form {
+.form_user form {
   color: #999;
   border-radius: 3px;
   margin-bottom: 10px;

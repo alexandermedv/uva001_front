@@ -18,8 +18,15 @@ Output(component_id='dropdown1', component_property='options'),
 def conflict_labels(tab):
     """Значения списка конфликтов на вкладке 2"""
 
-    conf = pd.read_excel(os.getenv("INITIAL_DIRECTORY") + '/ics/dashapp3/utils/SAP_conflicts.xlsx',
-    sheet_name='Для загрузки')
+    # conf = pd.read_excel(os.getenv("INITIAL_DIRECTORY") + '/ics/dashapp3/utils/SAP_conflicts.xlsx',
+    # sheet_name='Для загрузки')
+
+    conf = pd.read_excel(
+     '''./uva001_front/front_ex/dashapp3/utils/SAP_conflicts.xlsx''',
+     #os.path.join(APP_PATH, "Data", "aug_latest.xlsm"),
+     engine='openpyxl',
+     sheet_name='Для загрузки',
+    )
 
     return [{'label': conf.iloc[i]['Название конфликта'],
     'value': conf.iloc[i]['Конфликт']} for i in conf.index]
@@ -180,9 +187,16 @@ def render_content(tab, conflict, function1, function2):
     elif tab == 'tab-2':
         # Конфликты и критичные полномочия
 
+        # conf = pd.read_excel(
+        #     os.getenv("INITIAL_DIRECTORY") + '''/ics/dashapp3/utils/SAP_conflicts.xlsx''',
+        #     sheet_name='Для загрузки')
+
         conf = pd.read_excel(
-            os.getenv("INITIAL_DIRECTORY") + '''/ics/dashapp3/utils/SAP_conflicts.xlsx''',
-            sheet_name='Для загрузки')
+            '''./uva001_front/front_ex/dashapp3/utils/SAP_conflicts.xlsx''',
+            #os.path.join(APP_PATH, "Data", "aug_latest.xlsm"),
+            engine='openpyxl',
+            sheet_name='Для загрузки',
+        )
 
         if conflict == 'conflict1':
             data = utils.get_conflict1_data()

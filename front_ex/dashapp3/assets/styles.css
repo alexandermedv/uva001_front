@@ -11,7 +11,7 @@ body {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
 }
-.page_landscape_a4 {
+/* .page_landscape_a4 {
   position: relative;
   width: 297mm;
   min-height: 210mm;
@@ -32,7 +32,7 @@ body {
   border-radius: 5px;
   background: white;
   box-shadow: 0 0 10px lightgrey;
-}
+} */
 
 .pagetwo {
   position: relative;
@@ -64,7 +64,7 @@ body {
     width: 210mm;
     height: 297mm;
   }
-  .page_landscape_a4 {
+  /* .page_landscape_a4 {
     margin: 0;
     border: initial;
     border-radius: initial;
@@ -83,7 +83,7 @@ body {
     box-shadow: initial;
     background: initial;
     page-break-after: always;
-  }
+  } */
   .no-print,
   .no-print * {
     display: none !important;

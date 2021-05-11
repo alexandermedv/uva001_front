@@ -4,10 +4,11 @@ from dash.dependencies import Input, Output
 import dash_html_components as html
 import dash_core_components as dcc
 
-from .. import flask_app, db, engine_cons
+from .. import flask_app
+#, db, engine_cons
 
 dash_app = Dash(__name__, server = flask_app,
-                url_base_pathname='/dashboards/access/dashboard3/',
+                url_base_pathname='/dashapp3/',
                 suppress_callback_exceptions = True)
 dash_app.config.update(flask_app.config)
 dash_app.layout = html.Div()
@@ -27,7 +28,7 @@ from .pages import layout
 def display_page(pathname):
     """Выбор шаблона"""
     print(pathname)
-    if pathname == "/dashboards/access/dashboard3/":
+    if pathname == "/dashapp3/":
         layout_dash1 = layout.create_layout()
         return layout_dash1
         #page_4.create_layout(dash_app)

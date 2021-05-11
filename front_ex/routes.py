@@ -6,6 +6,14 @@ from . import flask_app, db, login
 from .forms import LoginForm, CreateUserForm, ProfileForm
 from .models import User, requires_roles
 
+# Доступы по текущей сессии
+@login.user_loader
+def load_user(id):
+    """Инициализация пользователя"""
+    user = User.query.filter_by(id=id).first()
+    print(user.get_role())
+    return user
+
 # Руты к дэшбордам
 @flask_app.route('/limit_oper/')
 @login_required
@@ -109,10 +117,3 @@ def logout():
     """Выход из системы"""  
     logout_user()
     return redirect(url_for('signin'))
-
-# Доступы по текущей сессии
-@login.user_loader
-def load_user(id):
-    """Инициализация пользователя"""
-    user = User.query.filter_by(id=id).first()
-    return user

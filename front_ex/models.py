@@ -8,6 +8,7 @@ from wtforms.fields.html5 import DateField, EmailField
 from functools import wraps
 
 from . import db, login
+from .config.html_roles import html_access_roles
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
@@ -27,10 +28,17 @@ class User(db.Model, UserMixin):
     role = db.Column(db.String(100), default='guest')
     
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return '<User {}>'.format(self.full_name)
     
+    # Модель подразумевает одну роль на один логин и много ролей на один роут
     def get_role(self, *args):
-        return set(args).issubset({role.name for role in self.roles})
+        return self.role
+    
+    def get_role_by_html_element(*args):
+        print('args', args[1])
+        if args:
+            return html_access_roles.get(args[1])
+        return []
 
     def to_json(self):
         return { "personnel_number": self.personnel_number,
@@ -65,13 +73,13 @@ class User(db.Model, UserMixin):
 
 def requires_roles(*roles):
     """Проверка роли"""
-    print(current_user.has_roles())
     def wrapper(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
-            if current_user.has_roles(*args) not in roles:
+            print('get_role')
+            if current_user.get_role(*args) not in roles:
                 # Redirect the user to an unauthorized notice!
-                return "You are not authorized to access this page"
+                return "Ваш аккаунт не имеет доступа к данной странице."
             return f(*args, **kwargs)
         return wrapped
     return wrapper

@@ -25,7 +25,9 @@ db = SQLAlchemy(flask_app)
 db.create_all()
 
 
-login = LoginManager(flask_app)
+login = LoginManager()
+login.init_app(flask_app)
+
 migrate = Migrate(flask_app, db)
 
 manager = Manager(flask_app)

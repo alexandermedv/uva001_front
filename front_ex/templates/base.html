@@ -20,8 +20,10 @@
           <ul class="nav navbar-nav navbar-left" style="font-size: 16px;">
             {% block title %}{% endblock %}
           </ul>
+
           <!-- Администрирование -->
           <ul class="nav navbar-nav navbar-right" style="font-size: 15px;">
+            {% if current_user.get_role() in current_user.get_role_by_html_element('admin') %}
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Администрирование<span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -31,6 +33,7 @@
                 <li><a href="#">Управление ролями</a></li> -->
               </ul>
             </li>
+            {% endif %}
             <!-- Пользователь  -->
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle fa-lg"></i></a>

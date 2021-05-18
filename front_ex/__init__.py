@@ -28,7 +28,7 @@ db.create_all()
 login = LoginManager()
 login.init_app(flask_app)
 
-migrate = Migrate(flask_app, db)
+migrate = Migrate(flask_app, db, compare_type=True)
 
 manager = Manager(flask_app)
 manager.add_command('db', MigrateCommand)

@@ -20,7 +20,7 @@ class User(db.Model, UserMixin):
     family_name = db.Column(db.Unicode(100))
     first_name = db.Column(db.Unicode(100))
     second_name = db.Column(db.Unicode(100))
-    dept_id = db.Column(db.Integer)
+    dept_id = db.Column(db.Unicode(100))
     position = db.Column(db.Unicode(1000))
     email = db.Column('email', db.Unicode(100), nullable=False)
     status = db.Column(db.Unicode(100))
@@ -76,7 +76,6 @@ def requires_roles(*roles):
     def wrapper(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
-            print('get_role')
             if current_user.get_role(*args) not in roles:
                 # Redirect the user to an unauthorized notice!
                 return "Ваш аккаунт не имеет доступа к данной странице."

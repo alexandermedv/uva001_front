@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block css %}
+  <link rel="stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/slidebar_dash.css')}}"> 
+{% endblock %}
+
+{% block navbar_header %}
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+      <span class="sr-only">Toggle navigation</span>
+      <i class="ic fa fa-bars"></i>
+    </button>
+    <div style="padding: 15px 0;">
+      <a href="#" id="msbo"><i class="ic fa fa-bars"></i></a>
+    </div>
+  </div>  
+{% endblock%}
+
+{% block title %}{% endblock %}
+
+{% block sidebar %}
+  <!-- <div class="msb" id="msb"> -->
+    <div class="msb" id="msb">
+      <nav class="navbar navbar-default" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <div class="row" style="margin-left: 0; margin-right: 0">
+            <a class="navbar-left" href="https://portal/Pages/default.aspx" style="padding: 5px 5px;">
+              <img src="{{ url_for('static', filename='images/logo_pgk.png') }}" height="40px" position="center"></a>
+            <a class="navbar-right" style="padding: 5px 5px; margin-right: 10px; margin-top: 10px; font-size: 15px; color: black" height="40px"> СЕРВИС УВА</a>
+          </div>
+        </div>
+
+        <!-- Вертикальное меню side-menu-container-->
+        <div class="side-menu-container">
+          <ul class="nav navbar-nav">
+              <!-- Cписок дэшей -->
+              <li><a href="/limit_oper"><i class="fa fa-dashboard"></i>Дебиторская задолженность</a></li>
+              <li><a href="/dashapp1"><i class="fa fa-dashboard"></i>Недостача запчастей</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </nav>  
+    </div>
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block slidebar_scripts %}
+  <script id="rendered-js">
+    (function(){
+      $('#msbo').on('click', function(){
+        // $("#mnb").removeAttr("style");
+        // $("#msb").removeAttr("style");
+        // $("#mcw").removeAttr("style");
+        $('body').toggleClass('msb-x');
+      });
+    }());
+  </script>
+    <!-- Автоматическая высота под высоту документа вычетаем верхний бар -->
+  <script>
+    (function($){
+        $(document).ready(function(){
+            $('iframe').height( $(window).height() - 64+"px");
+            $(window).resize(function(){
+                $('iframe').height($(this).height());
+            });
+        });
+    })(jQuery);
+  </script>
+
+   <!-- <script>
+      ;(function($){
+          $(document).ready(function(){
+              $('iframe').width( $(window).width() - 241+"px");
+              $(window).resize(function(){
+                  $('iframe').width($(this).width());
+              });
+          });
+      })(jQuery);
+    </script> -->
+{% endblock %}

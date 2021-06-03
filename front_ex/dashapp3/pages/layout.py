@@ -20,7 +20,7 @@ def create_layout():
     #         sheet_name='Функции')
 
     func = pd.read_excel(
-     '''./uva001_front/front_ex/dashapp3/utils/SAP_conflicts.xlsx''',
+     '''./front_ex/dashapp3/utils/SAP_conflicts.xlsx''',
      #os.path.join(APP_PATH, "Data", "aug_latest.xlsm"),
      engine='openpyxl',
      sheet_name='Функции',

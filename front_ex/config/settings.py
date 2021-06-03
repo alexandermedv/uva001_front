@@ -50,8 +50,7 @@ class TestConfig(DefaultConfig):
     # General
     DEBUG = False
     # Настройки Postgre
-    POSTGRE_DB = os.environ.get('POSTGRE_URL_PROD')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI_DEV')
+    POSTGRE_DB = os.environ.get('POSTGRE_URL_DASH_PROD')
     # Настройки SAP
     SAP_HOST = os.environ.get('SAP_HOST_PROD')
     SAP_HOST_PORT = os.environ.get('SAP_HOST_PORT_PROD')

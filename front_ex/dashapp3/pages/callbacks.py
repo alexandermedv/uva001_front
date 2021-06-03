@@ -18,7 +18,8 @@ Output(component_id='dropdown1', component_property='options'),
 def conflict_labels(tab):
     """Значения списка конфликтов на вкладке 2"""
 
-    conf = pd.read_excel(os.getenv("INITIAL_DIRECTORY") + '/ics/dashapp3/utils/SAP_conflicts.xlsx',
+    conf = pd.read_excel('./front_ex/dashapp3/utils/SAP_conflicts.xlsx',
+    engine='openpyxl',
     sheet_name='Для загрузки')
 
     return [{'label': conf.iloc[i]['Название конфликта'],
@@ -33,7 +34,8 @@ def conflict_labels1(tab):
 
     if tab == 'tab-6':
         func = pd.read_excel(
-                os.getenv("INITIAL_DIRECTORY") + '''/ics/dashapp3/utils/SAP_conflicts.xlsx''',
+                './front_ex/dashapp3/utils/SAP_conflicts.xlsx',
+                engine='openpyxl',
                 sheet_name='Функции')
 
         return [{'label': func.iloc[i]['Функция'],
@@ -51,7 +53,8 @@ def conflict_labels2(tab, function1):
 
     if tab == 'tab-6':
         func = pd.read_excel(
-                os.getenv("INITIAL_DIRECTORY") + '''/ics/dashapp3/utils/SAP_conflicts.xlsx''',
+                './front_ex/dashapp3/utils/SAP_conflicts.xlsx',
+                engine='openpyxl',
                 sheet_name='Конфликты по функциям')
 
         func = func[func['Номер_функции_1'] == int(function1)]
@@ -73,7 +76,8 @@ def conflict_value(tab, function1):
 
     if tab == 'tab-6':
         func = pd.read_excel(
-                os.getenv("INITIAL_DIRECTORY") + '''/ics/dashapp3/utils/SAP_conflicts.xlsx''',
+                './front_ex/dashapp3/utils/SAP_conflicts.xlsx',
+                engine='openpyxl',
                 sheet_name='Конфликты по функциям')
 
         func = func[func['Номер_функции_1'] == int(function1)]
@@ -181,7 +185,8 @@ def render_content(tab, conflict, function1, function2):
         # Конфликты и критичные полномочия
 
         conf = pd.read_excel(
-            os.getenv("INITIAL_DIRECTORY") + '''/ics/dashapp3/utils/SAP_conflicts.xlsx''',
+            './front_ex/dashapp3/utils/SAP_conflicts.xlsx',
+            engine='openpyxl',
             sheet_name='Для загрузки')
 
         if conflict == 'conflict1':
@@ -433,17 +438,20 @@ def render_content(tab, conflict, function1, function2):
         # Конфликты полномочий на уровне транзакций
 
         matrix = pd.read_excel(
-                os.getenv("INITIAL_DIRECTORY") + '''/ics/dashapp3/utils/SAP_conflicts.xlsx''',
+                './front_ex/dashapp3/utils/SAP_conflicts.xlsx',
+                engine='openpyxl',
                 sheet_name='Critical_segregations')
 
         func = pd.read_excel(
-            os.getenv("INITIAL_DIRECTORY") + '''/ics/dashapp3/utils/SAP_conflicts.xlsx''',
+            './front_ex/dashapp3/utils/SAP_conflicts.xlsx',
+            engine='openpyxl',
             sheet_name='Функции')
         #return [{'label': func.iloc[i]['function'],
         # 'value': func.iloc[i]['function_number']} for i in func.index]
 
         transactions = pd.read_excel(
-                os.getenv("INITIAL_DIRECTORY") + '''/ics/dashapp3/utils/SAP_conflicts.xlsx''',
+                './front_ex/dashapp3/utils/SAP_conflicts.xlsx',
+                engine='openpyxl',
                 sheet_name='Transactions')
 
         transactions1 = transactions[transactions['Номер_функции']==int(function1)]

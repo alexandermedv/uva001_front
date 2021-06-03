@@ -12,7 +12,7 @@ class DevelopConfig(DefaultConfig):
     # General
     DEBUG = True
     # Настройки Postgre
-    POSTGRE_DB = os.environ.get('POSTGRE_URL_DEV')
+    POSTGRE_DB = os.environ.get('POSTGRE_URL_DASH_DEV')
     # Настройки SAP
     SAP_HOST =  os.environ.get('SAP_HOST_DEV')
     SAP_HOST_PORT = os.environ.get('SAP_HOST_PORT_DEV')
@@ -28,7 +28,7 @@ class ProdConfig(DefaultConfig):
      # General
     DEBUG = False
     # Настройки Postgre
-    POSTGRE_DB = os.environ.get('POSTGRE_URL_PROD')
+    POSTGRE_DB = os.environ.get('POSTGRE_URL_DASH_PROD')
     # Настройки SAP
     SAP_HOST = os.environ.get('SAP_HOST_PROD')
     SAP_HOST_PORT = os.environ.get('SAP_HOST_PORT_PROD')
@@ -44,7 +44,7 @@ class TestConfig(DefaultConfig):
     # General
     DEBUG = False
     # Настройки Postgre
-    POSTGRE_DB = os.environ.get('POSTGRE_URL_PROD')
+    POSTGRE_DB = os.environ.get('POSTGRE_URL_DASH_PROD')
     # Настройки SAP
     SAP_HOST = os.environ.get('SAP_HOST_PROD')
     SAP_HOST_PORT = os.environ.get('SAP_HOST_PORT_PROD')

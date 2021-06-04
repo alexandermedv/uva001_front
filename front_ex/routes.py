@@ -24,6 +24,11 @@ def render_limit_oper():
 def render_dashapp1():
     return render_template('/dashapp1/overview.html')    
 
+@flask_app.route('/dashboard3/')
+@login_required
+def render_dashapp3():
+    return render_template('/dashapp3/overview.html')   
+
 # Общий роутинг
 @flask_app.route('/', methods=['GET', 'POST'])
 def signin():

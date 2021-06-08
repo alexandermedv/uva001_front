@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
 {% block css %}
-  <link rel="stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/slidebar_dash.css')}}"> 
+  <link rel="stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/slidebar_dash.css')}}">
+
+  <link rel="stylesheet" type= "text/css" href= "https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css" /> 
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 {% endblock %}
 
 {% block navbar_header %}
@@ -38,6 +42,7 @@
               <li><a href="/limit_oper"><i class="fa fa-dashboard"></i>Дебиторская задолженность</a></li>
               <li><a href="/dashapp1"><i class="fa fa-dashboard"></i>Недостача запчастей</a></li>
               <li><a href="/dashboard3"><i class="fa fa-dashboard"></i>Полномочия в SAP</a></li>
+              <li><a href="/report1"><i class="fa fa-dashboard"></i>Детали в статусе ДОСТ</a></li>
           </ul>
         </div><!-- /.navbar-collapse -->
       </nav>  

@@ -1,0 +1,41 @@
+{% extends "base_sidebar_dash.html" %}
+
+
+{% block content %}
+    <h1>Детали в статусе ДОСТ</h1>
+    <table id="report1" class="display" style="margin:0">
+        <thead>
+            <tr>
+                <th>ЕО</th>
+                <th>Тип детали</th>
+                <th>статус</th>
+                <th>Дата создания</th>
+                <th>Вагон</th>
+                <th>Тип ЕО</th>
+                <th>Дата последней операции</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in items %}
+            <tr>
+                <td>{{row.equnr}}</td>
+                <td>{{row.eartx}}</td>
+                <td>{{row.status}}</td>
+                <td>{{row.erdat}}</td>
+                <td>{{row.hequi}}</td>
+                <td>{{row.typtx}}</td>
+                <td>{{row.last_oper_date}}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        $(document).ready(function() {
+            $('#report1').DataTable( {
+                "scrollX": true,
+                "pageLength": 20,
+                "language": {"url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"}
+                } );
+            } );
+    </script>
+{% endblock %}

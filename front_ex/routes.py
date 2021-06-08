@@ -5,6 +5,9 @@ import pandas as pd
 from . import flask_app, db, login
 from .forms import LoginForm, CreateUserForm, ProfileForm, EditUserForm, PasswordUserForm
 from .models import User, requires_roles
+from sqlalchemy import create_engine
+import os
+import front_ex.config as config
 
 # Доступы по текущей сессии
 @login.user_loader
@@ -28,6 +31,18 @@ def render_dashapp1():
 @login_required
 def render_dashapp3():
     return render_template('/dashapp3/overview.html')   
+
+@flask_app.route('/report1/')
+@login_required
+def render_report1():
+    con = create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8')
+    sql = '''SELECT *
+    FROM dashboard.equipment
+    LIMIT 100
+    '''
+    df1 = pd.read_sql(sql, con=con)
+    print(df1)
+    return render_template('/report1/report1.html', title='report1', items=df1[['equnr', 'eartx', 'status', 'erdat', 'hequi', 'typtx', 'last_oper_date']].to_dict(orient='records')) 
 
 # Общий роутинг
 @flask_app.route('/', methods=['GET', 'POST'])
@@ -151,7 +166,7 @@ def edit_password_user(user):
                     db.session.commit()
             return redirect(url_for('users', user=user.id))
 
-    return render_template('/user/edit_password_user.html', title='edit password user', form = form, user = user.id)
+    return render_template('/user/edit_password_user.html', title='edit password user', form=form, user=user.id)
 
 @flask_app.route('/user/delete_user/<user>', methods=['GET', 'POST'])
 @login_required
@@ -169,12 +184,12 @@ def delete_user(user):
 @flask_app.route('/user/users/<user>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Администратор')
-def users(user = current_user):
+def users(user=current_user):
     """Управление пользователями"""
     # if current_user.is_authenticated:
     users = User.query.order_by(User.id.asc()).all()
     cur_user = User.query.filter_by(id=user).first()
-    return render_template('/user/users.html', users = users, user = cur_user)
+    return render_template('/user/users.html', users=users, user=cur_user)
     
 @flask_app.route('/user/profile', methods=['GET', 'POST'])
 @login_required

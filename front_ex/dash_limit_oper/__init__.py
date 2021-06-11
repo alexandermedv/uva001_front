@@ -8,12 +8,12 @@ import os
 
 import dash_bootstrap_components as dbc
 
-from .. import flask_app
+from .. import app
 
 # Базовые URL определяет куст все страниц на сайте
-dash_app = Dash(__name__, server = flask_app, url_base_pathname='/limit_oper_dash/', suppress_callback_exceptions = True,
+dash_app = Dash(__name__, server = app, url_base_pathname='/limit_oper_dash/', suppress_callback_exceptions = True,
     external_stylesheets=[dbc.themes.BOOTSTRAP])
-dash_app.config.update(flask_app.config)
+dash_app.config.update(app.config)
 
 dash_app.layout = html.Div(
     [dcc.Location(id="url", refresh=False), html.Div(id='page-content')]

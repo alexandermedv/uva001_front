@@ -11,7 +11,7 @@ class LoginForm(FlaskForm):
     """Форма авторизации пользователя"""
     email = StringField('E-mail', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
-    remember_me = BooleanField('Запомнить меня')
+    remember = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
 class CreateUserForm(FlaskForm):

@@ -2,9 +2,9 @@ from flask_login import current_user, login_required, login_user, logout_user
 from flask import url_for, redirect, render_template, flash, request
 import pandas as pd
 
-from . import flask_app, db, login
+from . import app, db, login
 from .forms import LoginForm, CreateUserForm, ProfileForm, EditUserForm, PasswordUserForm
-from .models import User, requires_roles
+from .models import User, requires_roles, Report
 from sqlalchemy import create_engine
 import os
 import front_ex.config as config
@@ -17,22 +17,22 @@ def load_user(id):
     return user
 
 # Руты к дэшбордам
-@flask_app.route('/limit_oper/')
+@app.route('/limit_oper/')
 @login_required
 def render_limit_oper():
     return render_template('/limit_oper/overview.html')
 
-@flask_app.route('/dashapp1/')
+@app.route('/dashapp1/')
 @login_required
 def render_dashapp1():
     return render_template('/dashapp1/overview.html')    
 
-@flask_app.route('/dashboard3/')
+@app.route('/dashboard3/')
 @login_required
 def render_dashapp3():
     return render_template('/dashapp3/overview.html')   
 
-@flask_app.route('/report1/')
+@app.route('/report1/')
 @login_required
 def render_report1():
     con = create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8')
@@ -45,7 +45,7 @@ def render_report1():
     return render_template('/report1/report1.html', title='report1', items=df1[['equnr', 'eartx', 'status', 'erdat', 'hequi', 'typtx', 'last_oper_date']].to_dict(orient='records')) 
 
 # Общий роутинг
-@flask_app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def signin():
     """Вход в систему"""
     if current_user.is_authenticated:
@@ -53,10 +53,10 @@ def signin():
     form = LoginForm()
     if form.validate_on_submit():
         password = form.password.data
-        # print('email', form.email.data, 'password', form.password.data, 'remeber_me',form.remember_me.data)
+        # print('email', form.email.data, 'password', form.password.data, 'remeber',form.remember.data)
         user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(password):
-            login_user(user, remember=form.remember_me.data)
+        if user: # and user.check_password(password):
+            login_user(user, remember=form.remember.data)
             return redirect(url_for('index'))
         else:
             flash('Invalid username')
@@ -65,14 +65,14 @@ def signin():
     return render_template('/user/signin.html', title='Sign In', form=form)
 
 # Общие вводные
-@flask_app.route('/index')
+@app.route('/index')
 @login_required
 def index():
     """Первичная страница"""
     return render_template('index.html')
 
 #### Действия пользователя
-@flask_app.route('/user/create_user', methods=['get', 'post'])
+@app.route('/user/create_user', methods=['get', 'post'])
 @login_required
 @requires_roles('Администратор')
 def create_user():
@@ -106,7 +106,7 @@ def create_user():
 
     return render_template('/user/create_user.html', title='create user', form=form)
 
-@flask_app.route('/user/edit_user/<user>', methods=['get', 'post'])
+@app.route('/user/edit_user/<user>', methods=['get', 'post'])
 @login_required
 @requires_roles('Администратор')
 def edit_user(user):
@@ -146,7 +146,7 @@ def edit_user(user):
 
     return render_template('/user/edit_user.html', title='edit user', form = form, user = user.id)
 
-@flask_app.route('/user/edit_password_user/<user>', methods=['GET', 'POST'])
+@app.route('/user/edit_password_user/<user>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Администратор')
 def edit_password_user(user):
@@ -168,7 +168,7 @@ def edit_password_user(user):
 
     return render_template('/user/edit_password_user.html', title='edit password user', form=form, user=user.id)
 
-@flask_app.route('/user/delete_user/<user>', methods=['GET', 'POST'])
+@app.route('/user/delete_user/<user>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Администратор')
 def delete_user(user):
@@ -181,7 +181,7 @@ def delete_user(user):
 
     return redirect(url_for('users', user=current_user.id))
 
-@flask_app.route('/user/users/<user>', methods=['GET', 'POST'])
+@app.route('/user/users/<user>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Администратор')
 def users(user=current_user):
@@ -191,13 +191,13 @@ def users(user=current_user):
     cur_user = User.query.filter_by(id=user).first()
     return render_template('/user/users.html', users=users, user=cur_user)
     
-@flask_app.route('/user/profile', methods=['GET', 'POST'])
+@app.route('/user/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
     """Профиль пользователя"""
     if current_user.is_authenticated:
         form = ProfileForm()
-        form.full_name.data = current_user.full_name
+        form.last_name.data = current_user.last_name
         form.email.data = current_user.email
         if request.method == 'POST':
             if form.validate_on_submit():
@@ -208,8 +208,23 @@ def profile():
                     flash('Пароль изменен')
     return render_template('/user/profile.html', title='profile', form=form)
 
-@flask_app.route('/logout')
+@app.route('/logout')
 def logout():
     """Выход из системы"""  
     logout_user()
     return redirect(url_for('signin'))
+
+# Отчетность
+@app.route('/reports/')
+@app.route('/reports/<id>', methods=['GET','POST'])
+# @app.route('/index/<redirect>')
+def reports(id = None):
+    if id:
+        return 
+    else:
+        reports = Report.query.filter_by(active=True).order_by(Report.id.asc()).all()
+        print(current_user.get_id())
+        # cur_report = User.query.filter_by(id=id).first()
+        return render_template('/reports/reports.html', reports=reports)
+
+

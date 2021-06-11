@@ -1,37 +1,97 @@
-# Инициализация Celery
-import flask
+import os
+import os.path as op
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
+
+
+from flask import Flask
+from flask_bootstrap import Bootstrap
+from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
+from flask_login import UserMixin, LoginManager
+from flask_admin import Admin 
 
-import front_ex.config as config
+from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required, current_user
+from flask_admin.contrib import fileadmin
 
+# Добавление русской локали
+from flask_babelex import Babel
+
+# Встроенные API
+from flask_restful import Api 
+
+from . import config
+from .forms import LoginForm
 
 # Добавляем логирование пользователей и роли
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
-flask_app = flask.Flask(__name__)
-flask_app.config.update(
+app = Flask(__name__)
+app.config.update(
     USE_TZ = config.USE_TZ,
     TIMEZONE = config.TIMEZONE,   
 )
 
+#### Добавляет шаблон Bootstrap
+Bootstrap(app)
+
+# Добавляем локаль
+app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
+app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Moscow'
+babel = Babel(app)
+
 # Добавляем базы данных и логин-менеджер
-flask_app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
-flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-flask_app.config['SECRET_KEY'] = config.SECRET_KEY or os.randov
-db = SQLAlchemy(flask_app)
+app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = config.SECRET_KEY or os.randov
+
+db = SQLAlchemy(app)
 db.create_all()
 
-
-login = LoginManager()
-login.init_app(flask_app)
-
-migrate = Migrate(flask_app, db, compare_type=True)
-
-manager = Manager(flask_app)
+# Миграция - создание и обновление структуры баз данных
+migrate = Migrate(app, db, compare_type=True)
+manager = Manager(app)
 manager.add_command('db', MigrateCommand)
+
+# Логирование 
+login = LoginManager()
+login.init_app(app)
+
+from .models import User,Role,HomeIndexView,UserModelView,RoleModelView,ReportModelView,RedirectTaskView,Report 
+
+# Добавляем админку
+# Добавление ролевой модели из Flask_Security
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+security = Security(app, user_datastore, login_form=LoginForm)
+
+# декоратор под первого пользователя
+@app.before_first_request
+def create_user():
+    db.create_all()
+    user = User.query.first()
+    if not user:
+        user_datastore.create_user(email='admin@admin', password='admin')
+        db.session.commit()
+
+# Create directory
+path = op.join(op.dirname(__file__), 'files')
+try:
+    os.mkdir(path)
+except OSError:
+    pass
+
+# добавление административной формы
+admin = Admin(app, name = 'Администрирование', template_mode='bootstrap3', \
+    index_view=HomeIndexView(name='Обзор', endpoint='admin.user', url='/admin'))
+admin.add_view(UserModelView(User, db.session, name='Пользователи'))
+admin.add_view(RoleModelView(Role, db.session, name='Роли'))
+admin.add_view(ReportModelView(Report, db.session, name='Отчеты'))
+admin.add_view(fileadmin.FileAdmin(path , '/files/', name='Файлы'))
+admin.add_view(RedirectTaskView(name='Задачи'))
+
+# Встроенный API
+api = Api(app)
 
 # Сборка Dashboards
 from .dash_limit_oper import dash_app as dash_limit_oper
@@ -42,8 +102,11 @@ from .dashapp3 import dash_app as dashapp3
 # Добавляем руты 
 import front_ex.routes
 
+# Инициализируем отчеты
+import front_ex.reports
+
 # Сборка в Middleware
-dispatch_app = DispatcherMiddleware(flask_app, {
+dispatch_app = DispatcherMiddleware(app, {
     'limit_oper': dash_limit_oper.server,
     'dashapp1': dashapp1.server,
     'dashboard3': dashapp3.server

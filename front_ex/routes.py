@@ -1,5 +1,5 @@
 from flask_login import current_user, login_required, login_user, logout_user
-from flask import url_for, redirect, render_template, flash, request
+from flask import url_for, redirect, render_template, flash, request, jsonify
 import pandas as pd
 
 from . import app, db, login
@@ -8,6 +8,9 @@ from .models import User, requires_roles, Report
 from sqlalchemy import create_engine
 import os
 import front_ex.config as config
+from .report1 import utils as report1
+from .report_equipment import utils as report_equipment
+import json
 
 
 # Доступы по текущей сессии
@@ -43,14 +46,36 @@ def render_dashapp3():
 @app.route('/report1/')
 @login_required
 def render_report1():
-    con = create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8')
-    sql = '''SELECT *
-    FROM dashboard.equipment
-    LIMIT 100
-    '''
-    df1 = pd.read_sql(sql, con=con)
+    # con = create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8')
+    # sql = '''SELECT *
+    # FROM dashboard.equipment
+    # LIMIT 100
+    # '''
+    df1 = report1.get_details_dost()
     print(df1)
-    return render_template('/report1/report1.html', title='report1', items=df1[['equnr', 'eartx', 'status', 'erdat', 'hequi', 'typtx', 'last_oper_date']].to_dict(orient='records')) 
+    return render_template('/report1/report1.html', title='report1', items=df1[['equnr', 'eartx', 'status', 'erdat', 'hequi', 'typtx', 'last_oper_date']].to_dict(orient='records'))
+
+
+@flask_app.route('/report_equipment/')
+@login_required
+def render_report_equipment():
+    # df1 = report_equipment.get_equipment()
+    # print(df1)
+    return render_template('/report_equipment/report_equipment.html', title='report_equipment')
+
+
+@flask_app.route('/_get_table')
+def get_table():
+
+    df1 = report_equipment.get_equipment()
+    print(df1)
+    print(jsonify(
+                   my_table=json.loads(df1.to_json(orient="split"))["data"],
+                   columns=[{"title": str(col)} for col in json.loads(df1.to_json(orient="split"))["columns"]]))
+    return jsonify(
+                   my_table=json.loads(df1.to_json(orient="split"))["data"],
+                   columns=[{"title": str(col)} for col in json.loads(df1.to_json(orient="split"))["columns"]])
+#    return jsonify(df1.count, my_table=df1.to_html(classes='table table-striped" id = "a_nice_table',index=False, border=0))
 
 
 # Общий роутинг

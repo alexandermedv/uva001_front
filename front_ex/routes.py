@@ -12,6 +12,7 @@ from .report1 import utils as report1
 from .report_equipment import utils as report_equipment
 import json
 
+
 # Доступы по текущей сессии
 @login.user_loader
 def load_user(id):
@@ -19,21 +20,28 @@ def load_user(id):
     user = User.query.filter_by(id=id).first()
     return user
 
+
 # Руты к дэшбордам
 @app.route('/limit_oper/')
 @login_required
 def render_limit_oper():
+    """Дашборд по дебиторской задолженности и превышению лимита"""
     return render_template('/limit_oper/overview.html')
+
 
 @app.route('/dashapp1/')
 @login_required
 def render_dashapp1():
+    """Дашборд по размеру и динамике недостачи"""
     return render_template('/dashapp1/overview.html')    
+
 
 @app.route('/dashboard3/')
 @login_required
 def render_dashapp3():
+    """Дашборд по полномочиям в SAP"""
     return render_template('/dashapp3/overview.html')   
+
 
 @app.route('/report1/')
 @login_required
@@ -69,6 +77,7 @@ def get_table():
                    columns=[{"title": str(col)} for col in json.loads(df1.to_json(orient="split"))["columns"]])
 #    return jsonify(df1.count, my_table=df1.to_html(classes='table table-striped" id = "a_nice_table',index=False, border=0))
 
+
 # Общий роутинг
 @app.route('/', methods=['GET', 'POST'])
 def signin():
@@ -89,6 +98,7 @@ def signin():
     else: print('errors', form.errors)
     return render_template('/user/signin.html', title='Sign In', form=form)
 
+
 # Общие вводные
 @app.route('/index')
 @login_required
@@ -96,7 +106,8 @@ def index():
     """Первичная страница"""
     return render_template('index.html')
 
-#### Действия пользователя
+
+# Действия пользователя
 @app.route('/user/create_user', methods=['get', 'post'])
 @login_required
 @requires_roles('Администратор')
@@ -131,16 +142,17 @@ def create_user():
 
     return render_template('/user/create_user.html', title='create user', form=form)
 
+
 @app.route('/user/edit_user/<user>', methods=['get', 'post'])
 @login_required
 @requires_roles('Администратор')
 def edit_user(user):
     """Редактирование пользователя"""
     if current_user.is_authenticated:
-        
+
         user = User.query.filter_by(id=user).first()
         form = EditUserForm()
-        
+
         if request.method == 'GET':
             form.personnel_number.data = user.personnel_number
             form.email.data = user.email
@@ -171,13 +183,14 @@ def edit_user(user):
 
     return render_template('/user/edit_user.html', title='edit user', form = form, user = user.id)
 
+
 @app.route('/user/edit_password_user/<user>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Администратор')
 def edit_password_user(user):
     """Изменение пароля пользователя"""
     if current_user.is_authenticated:
-        
+
         user = User.query.filter_by(id=user).first()
         form = PasswordUserForm()
 
@@ -193,18 +206,20 @@ def edit_password_user(user):
 
     return render_template('/user/edit_password_user.html', title='edit password user', form=form, user=user.id)
 
+
 @app.route('/user/delete_user/<user>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Администратор')
 def delete_user(user):
     """Удаление пользователя"""
     if current_user.is_authenticated:
-        
+
         user = User.query.filter_by(id=user).delete()
         db.session.commit()
         return redirect(url_for('users', user=current_user.id))
 
     return redirect(url_for('users', user=current_user.id))
+
 
 @app.route('/user/users/<user>', methods=['GET', 'POST'])
 @login_required
@@ -215,7 +230,8 @@ def users(user=current_user):
     users = User.query.order_by(User.id.asc()).all()
     cur_user = User.query.filter_by(id=user).first()
     return render_template('/user/users.html', users=users, user=cur_user)
-    
+
+
 @app.route('/user/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
@@ -233,23 +249,23 @@ def profile():
                     flash('Пароль изменен')
     return render_template('/user/profile.html', title='profile', form=form)
 
+
 @app.route('/logout')
 def logout():
-    """Выход из системы"""  
+    """Выход из системы"""
     logout_user()
     return redirect(url_for('signin'))
+
 
 # Отчетность
 @app.route('/reports/')
 @app.route('/reports/<id>', methods=['GET','POST'])
 # @app.route('/index/<redirect>')
-def reports(id = None):
+def reports(id=None):
     if id:
-        return 
+        return
     else:
         reports = Report.query.filter_by(active=True).order_by(Report.id.asc()).all()
         print(current_user.get_id())
         # cur_report = User.query.filter_by(id=id).first()
         return render_template('/reports/reports.html', reports=reports)
-
-

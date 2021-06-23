@@ -102,8 +102,8 @@ from .dashapp3 import dash_app as dashapp3
 # Добавляем руты 
 import front_ex.routes
 
-# Инициализируем отчеты
-import front_ex.reports
+# # Инициализируем отчеты
+# import front_ex.reports
 
 # Сборка в Middleware
 dispatch_app = DispatcherMiddleware(app, {

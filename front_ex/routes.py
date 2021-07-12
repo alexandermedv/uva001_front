@@ -223,7 +223,7 @@ def delete_user(user):
 
 @app.route('/user/users/<user>', methods=['GET', 'POST'])
 @login_required
-@requires_roles('Администратор')
+@requires_roles('Admin')
 def users(user=current_user):
     """Управление пользователями"""
     # if current_user.is_authenticated:
@@ -263,9 +263,11 @@ def logout():
 # @app.route('/index/<redirect>')
 def reports(id=None):
     if id:
-        return
+        report = Report.query.filter_by(active=True, id=id ).order_by(Report.id.asc()).first()
+        print(report.id)
+        return redirect('/reports/{instance}'.format(instance=report.instance))
+
     else:
         reports = Report.query.filter_by(active=True).order_by(Report.id.asc()).all()
-        print(current_user.get_id())
         # cur_report = User.query.filter_by(id=id).first()
         return render_template('/reports/reports.html', reports=reports)

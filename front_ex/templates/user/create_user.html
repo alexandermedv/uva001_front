@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block css %}
+    <link rel="stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/user.css')}}">
+{% endblock %}
+
+{% block title %}
+    <div class="row" style="margin-left: 0; margin-right: 0">
+        <li>    
+            <a class="navbar-left" href="https://portal/Pages/default.aspx" style="padding: 5px 5px;">
+            <img src="{{ url_for('static', filename='images/logo_pgk.png') }}" height="40px" position="center"></a>
+            <a class="navbar-right" style="padding: 5px 5px; margin-right: 10px; margin-top: 10px; font-size: 15px; color: black" height="40px"> СЕРВИС УВА</a>
+        </li>
+        <!-- <li position = "center"><a style = "padding-top: 15px; color:#bc4e4e;">   Создание нового пользователя</a></li>     -->
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    <div class="form_user">
+        <form action="" method="post">
+
+            {{ form.csrf_token() }}
+            <h3> Создание нового пользователя</h3>
+            <hr>
+                         
+            {% for field in form if field.name != "csrf_token" %}
+                    {% if field.name in ['status', 'role'] %}
+                        {{ field.label() }}
+                    {% endif %}
+                    <div class = "form-group">
+                            {{ field(class_="form-control", placeholder = field.description)}}
+                    </div>
+                    {% for error in field.errors %}
+                        {{ error }}
+                    {% endfor %}
+            {% endfor %}
+
+        </form>
+    </div>
+{% endblock %}

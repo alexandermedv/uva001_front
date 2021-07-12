@@ -1,21 +1,30 @@
-FROM python:3.7.4
+# Set version python 
+FROM python:3.8.5
 LABEL maintainer "Турганов Артем TurganovAI@pgkweb.ru"
 
-USER root
-
-RUN pip install --upgrade pip
-COPY . /app  
-
-WORKDIR /app
-RUN pip install -r requirements.txt
+# set workdir directory
+WORKDIR /usr/src/app
 
 # set TZ Moscow time
 ENV TZ Europe/Moscow
 RUN apt-get install tzdata
 RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone 
 
-# run entrypoint.sh
-ENTRYPOINT ["sh", "/app/entrypoint.sh"]
+# install system dependencies
+RUN pip install --upgrade pip
+# copy requirements and projects 
+COPY . /usr/src/app/  
 
-# EXPOSE 9104
-EXPOSE {FLASK_PORT_PROD}
+# install necessary python modules
+RUN pip install -r requirements.txt
+
+# copy entrypoint.sh
+# COPY ./entrypoint.sh /opt/restapi/entrypoint.sh
+
+USER root
+
+# run entrypoint.sh
+# ENTRYPOINT ["sh", "/usr/src/app/entrypoint.sh"]
+
+EXPOSE 7007
+# EXPOSE {FLASK_PORT_PROD}

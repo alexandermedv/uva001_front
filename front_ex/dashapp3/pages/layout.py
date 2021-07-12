@@ -12,9 +12,20 @@ import os
 def create_layout():
     """Создание шаблона"""
 
+    print('directory:', os.getcwd())
+    # func = pd.read_excel(
+    #         #os.getenv("INITIAL_DIRECTORY") + '''/ics/dashapp3/utils/SAP_conflicts.xlsx''',
+    #         #sheet_name='Функции')
+    #         '''./uva001_front/front_ex/dashapp3/utils/SAP_conflicts.xlsx''',
+    #         sheet_name='Функции')
+
     func = pd.read_excel(
-            os.getenv("INITIAL_DIRECTORY") + '''/ics/dashapp3/utils/SAP_conflicts.xlsx''',
-            sheet_name='Функции')
+     '''./front_ex/dashapp3/utils/SAP_conflicts.xlsx''',
+     #os.path.join(APP_PATH, "Data", "aug_latest.xlsm"),
+     engine='openpyxl',
+     sheet_name='Функции',
+    )
+    print(func)
 
     layout2 = html.Div([
         html.Div([

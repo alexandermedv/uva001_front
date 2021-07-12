@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"> 
+    <link rel="stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/blank.css')}}"> 
+    <script>
+        setTimeout(function(){
+            document.location = "/reports/";
+        }, 500)
+    </script>
+</head>
+<body>
+    <iframe width="0" height="0" src= "{{ redirect_url }}" ></iframe>
+</body>
+</html>

@@ -28,20 +28,17 @@ def render_limit_oper():
     """Дашборд по дебиторской задолженности и превышению лимита"""
     return render_template('/limit_oper/overview.html')
 
-
 @app.route('/dashapp1/')
 @login_required
 def render_dashapp1():
     """Дашборд по размеру и динамике недостачи"""
     return render_template('/dashapp1/overview.html')    
 
-
 @app.route('/dashboard3/')
 @login_required
 def render_dashapp3():
     """Дашборд по полномочиям в SAP"""
     return render_template('/dashapp3/overview.html')   
-
 
 @app.route('/report1/')
 @login_required
@@ -56,7 +53,7 @@ def render_report1():
     return render_template('/report1/report1.html', title='report1', items=df1[['equnr', 'eartx', 'status', 'erdat', 'hequi', 'typtx', 'last_oper_date']].to_dict(orient='records'))
 
 
-@flask_app.route('/report_equipment/')
+@app.route('/report_equipment/')
 @login_required
 def render_report_equipment():
     # df1 = report_equipment.get_equipment()
@@ -64,7 +61,7 @@ def render_report_equipment():
     return render_template('/report_equipment/report_equipment.html', title='report_equipment')
 
 
-@flask_app.route('/_get_table')
+@app.route('/_get_table')
 def get_table():
 
     df1 = report_equipment.get_equipment()
@@ -106,8 +103,7 @@ def index():
     """Первичная страница"""
     return render_template('index.html')
 
-
-# Действия пользователя
+#### Действия пользователя
 @app.route('/user/create_user', methods=['get', 'post'])
 @login_required
 @requires_roles('Администратор')
@@ -141,7 +137,6 @@ def create_user():
             return render_template('/user/create_user.html', form=form)
 
     return render_template('/user/create_user.html', title='create user', form=form)
-
 
 @app.route('/user/edit_user/<user>', methods=['get', 'post'])
 @login_required
@@ -183,7 +178,6 @@ def edit_user(user):
 
     return render_template('/user/edit_user.html', title='edit user', form = form, user = user.id)
 
-
 @app.route('/user/edit_password_user/<user>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Администратор')
@@ -206,7 +200,6 @@ def edit_password_user(user):
 
     return render_template('/user/edit_password_user.html', title='edit password user', form=form, user=user.id)
 
-
 @app.route('/user/delete_user/<user>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Администратор')
@@ -220,7 +213,6 @@ def delete_user(user):
 
     return redirect(url_for('users', user=current_user.id))
 
-
 @app.route('/user/users/<user>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Admin')
@@ -230,8 +222,7 @@ def users(user=current_user):
     users = User.query.order_by(User.id.asc()).all()
     cur_user = User.query.filter_by(id=user).first()
     return render_template('/user/users.html', users=users, user=cur_user)
-
-
+    
 @app.route('/user/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
@@ -248,7 +239,6 @@ def profile():
                     db.session.commit()
                     flash('Пароль изменен')
     return render_template('/user/profile.html', title='profile', form=form)
-
 
 @app.route('/logout')
 def logout():

@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"> 
+    <link rel="stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/blank.css')}}"> 
     <script>
         setTimeout(function(){
-            document.location = "/index/";
+            document.location = "/reports/";
         }, 500)
     </script>
 </head>
 <body>
-    <iframe width="0" height="0" src="http://msc199-sdb04.domain.local:7103/api/report1?datefrom=2021-06-07&dateto=2021-06-08"></iframe>
+    <iframe width="0" height="0" src= "{{ redirect_url }}" ></iframe>
 </body>
 </html>

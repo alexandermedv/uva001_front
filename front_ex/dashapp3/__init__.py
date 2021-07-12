@@ -4,13 +4,13 @@ from dash.dependencies import Input, Output
 import dash_html_components as html
 import dash_core_components as dcc
 
-from .. import flask_app
+from .. import app
 #, db, engine_cons
 
-dash_app = Dash(__name__, server=flask_app,
+dash_app = Dash(__name__, server=app,
                 url_base_pathname='/dashboard3/',
                 suppress_callback_exceptions=True)
-dash_app.config.update(flask_app.config)
+dash_app.config.update(app.config)
 dash_app.layout = html.Div()
 
 # Тест

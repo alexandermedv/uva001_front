@@ -1,5 +1,7 @@
 # Инициализация Celery
-import flask
+import os
+from os import path as op
+from flask import Flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
@@ -11,26 +13,26 @@ import front_ex.config as config
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
-flask_app = flask.Flask(__name__)
-flask_app.config.update(
+app = Flask(__name__)
+app.config.update(
     USE_TZ = config.USE_TZ,
     TIMEZONE = config.TIMEZONE,   
 )
 
 # Добавляем базы данных и логин-менеджер
-flask_app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
-flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-flask_app.config['SECRET_KEY'] = config.SECRET_KEY or os.randov
-db = SQLAlchemy(flask_app)
+app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = config.SECRET_KEY or os.randov
+db = SQLAlchemy(app)
 db.create_all()
 
 
 login = LoginManager()
-login.init_app(flask_app)
+login.init_app(app)
 
-migrate = Migrate(flask_app, db, compare_type=True)
+migrate = Migrate(app, db, compare_type=True)
 
-manager = Manager(flask_app)
+manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
 # Сборка Dashboards
@@ -42,11 +44,17 @@ from .dashapp3 import dash_app as dashapp3
 # Добавляем руты 
 import front_ex.routes
 
+# # Сборка в Middleware
+# dispatch_app = DispatcherMiddleware(flask_app, {
+#     'limit_oper': dash_limit_oper.server,
+#     'dashapp1': dashapp1.server,
+#     'dashboard3': dashapp3.server
+#     # '/dash_osv_dev': dash_osv_dev.server  
+#     })
+
 # Сборка в Middleware
-dispatch_app = DispatcherMiddleware(flask_app, {
+dispatch_app = DispatcherMiddleware(app.wsgi_app, {
     'limit_oper': dash_limit_oper.server,
     'dashapp1': dashapp1.server,
     'dashboard3': dashapp3.server
-    # '/dash_osv_dev': dash_osv_dev.server  
     })
-    

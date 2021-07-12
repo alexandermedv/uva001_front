@@ -1,3 +1,7 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 *.pyc
 
 # Settings Visual Studio Code
@@ -17,7 +21,3 @@ requirements.txt
 
 # Excel
 *.xlsx
-<<<<<<< HEAD
-
-=======
->>>>>>> sod

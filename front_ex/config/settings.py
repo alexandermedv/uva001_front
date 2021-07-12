@@ -49,7 +49,7 @@ class TestConfig(DefaultConfig):
     FLASK_ENV = 'development'
     # Настройки WSGI - run_simple
     USE_DEBUGGER = False
-    USE_RELOADER = False
+    USE_RELOADER = True
     # General
     DEBUG = False
     # Настройки Postgre

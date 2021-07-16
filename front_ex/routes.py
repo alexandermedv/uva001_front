@@ -393,13 +393,11 @@ def logout():
 
 # Отчетность
 @app.route('/reports/')
-@app.route('/reports/<id>', methods=['GET','POST'])
-# @app.route('/index/<redirect>')
+@app.route('/reports/<id>', methods=['GET'])
 def reports(id=None):
     if id:
         report = Report.query.filter_by(active=True, id=id ).order_by(Report.id.asc()).first()
-        print(report.id)
-        return redirect('/reports/{instance}'.format(instance=report.instance))
+        return redirect('/reports/filter/{instance}'.format(instance=report.instance))
 
     else:
         reports = Report.query.filter_by(active=True).order_by(Report.id.asc()).all()

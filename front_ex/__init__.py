@@ -102,6 +102,8 @@ manager.add_command('db', MigrateCommand)
 from .dash_limit_oper import dash_app as dash_limit_oper
 from .dashapp1 import dash_app as dashapp1
 from .dashapp3 import dash_app as dashapp3
+
+import front_ex.reports
 # from .dash_osv_dev import dash_app as dash_osv_dev
 
 # Добавляем руты

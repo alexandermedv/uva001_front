@@ -29,7 +29,7 @@
                   <td>{{ row.roles }}</td>
                   <td>{{ current_user.roles }}</td>
                   <td>
-                    <a href="/reports/{{row.id}}" class = "btn btn-success btn-xs">Скачать</a>
+                    <a href="/reports/filter/{{row.instance}}" class = "btn btn-success btn-xs" method = "POST">Скачать</a>
                   </td>
               </tr>
             {% endif %}

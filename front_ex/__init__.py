@@ -104,7 +104,7 @@ from .dashapp1 import dash_app as dashapp1
 from .dashapp3 import dash_app as dashapp3
 # from .dash_osv_dev import dash_app as dash_osv_dev
 
-# Добавляем руты 
+# Добавляем руты
 import front_ex.routes
 
 # # Сборка в Middleware

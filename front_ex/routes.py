@@ -33,20 +33,17 @@ def render_limit_oper():
     """Дашборд по дебиторской задолженности и превышению лимита"""
     return render_template('/limit_oper/overview.html')
 
-
 @app.route('/dashapp1/')
 @login_required
 def render_dashapp1():
     """Дашборд по размеру и динамике недостачи"""
     return render_template('/dashapp1/overview.html')    
 
-
 @app.route('/dashboard3/')
 @login_required
 def render_dashapp3():
     """Дашборд по полномочиям в SAP"""
     return render_template('/dashapp3/overview.html')   
-
 
 @app.route('/report1/')
 @login_required
@@ -250,8 +247,7 @@ def index():
     """Первичная страница"""
     return render_template('index.html')
 
-
-# Действия пользователя
+#### Действия пользователя
 @app.route('/user/create_user', methods=['get', 'post'])
 @login_required
 @requires_roles('Администратор')
@@ -285,7 +281,6 @@ def create_user():
             return render_template('/user/create_user.html', form=form)
 
     return render_template('/user/create_user.html', title='create user', form=form)
-
 
 @app.route('/user/edit_user/<user>', methods=['get', 'post'])
 @login_required
@@ -327,7 +322,6 @@ def edit_user(user):
 
     return render_template('/user/edit_user.html', title='edit user', form = form, user = user.id)
 
-
 @app.route('/user/edit_password_user/<user>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Администратор')
@@ -350,7 +344,6 @@ def edit_password_user(user):
 
     return render_template('/user/edit_password_user.html', title='edit password user', form=form, user=user.id)
 
-
 @app.route('/user/delete_user/<user>', methods=['GET', 'POST'])
 @login_required
 @requires_roles('Администратор')
@@ -364,18 +357,16 @@ def delete_user(user):
 
     return redirect(url_for('users', user=current_user.id))
 
-
 @app.route('/user/users/<user>', methods=['GET', 'POST'])
 @login_required
-@requires_roles('Администратор')
+@requires_roles('Admin')
 def users(user=current_user):
     """Управление пользователями"""
     # if current_user.is_authenticated:
     users = User.query.order_by(User.id.asc()).all()
     cur_user = User.query.filter_by(id=user).first()
     return render_template('/user/users.html', users=users, user=cur_user)
-
-
+    
 @app.route('/user/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
@@ -393,7 +384,6 @@ def profile():
                     flash('Пароль изменен')
     return render_template('/user/profile.html', title='profile', form=form)
 
-
 @app.route('/logout')
 def logout():
     """Выход из системы"""
@@ -407,9 +397,11 @@ def logout():
 # @app.route('/index/<redirect>')
 def reports(id=None):
     if id:
-        return
+        report = Report.query.filter_by(active=True, id=id ).order_by(Report.id.asc()).first()
+        print(report.id)
+        return redirect('/reports/{instance}'.format(instance=report.instance))
+
     else:
         reports = Report.query.filter_by(active=True).order_by(Report.id.asc()).all()
-        print(current_user.get_id())
         # cur_report = User.query.filter_by(id=id).first()
         return render_template('/reports/reports.html', reports=reports)

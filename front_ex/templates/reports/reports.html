@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Список задач на загрузку данных {% endblock %}
+{% block title %} Реестр отчетов{% endblock %}
 
 {% block content %}
-    <h5>Сформировать запрос на загрузку данных</h5>
+    <!-- <h5>Сформировать запрос на загрузку данных</h5> -->
 
     <table class="table table-hover">
       <thead>
@@ -17,23 +17,24 @@
         </tr>
       </thead>
       <tbody>
-        {% for row in reports %}
-          {% if current_user.check_roles(row.roles) %}
-            <tr>
-                <td>{{ row.id }}</td>
-                <td>{{ row.instance }}</td>
-                <td>{{ row.name }}</td>
-                <td>{{ row.active }}</td>
-                <td>{{ row.description }}</td>
-                <td>{{ row.roles }}</td>
-                <td>{{ current_user.roles }}</td>
-                <td>
-                  <a href="/user/edit_user/{{row.id}}" class = "btn btn-success btn-xs">Скачать</a>
-                </td>
-            </tr>
-          {% endif %}
-        {% endfor %}
+        {% if current_user.is_authenticated %}
+          {% for row in reports %}
+            {% if current_user.check_roles(row.roles) %}
+              <tr>
+                  <td>{{ row.id }}</td>
+                  <td>{{ row.instance }}</td>
+                  <td>{{ row.name }}</td>
+                  <td>{{ row.active }}</td>
+                  <td>{{ row.description }}</td>
+                  <td>{{ row.roles }}</td>
+                  <td>{{ current_user.roles }}</td>
+                  <td>
+                    <a href="/reports/{{row.id}}" class = "btn btn-success btn-xs">Скачать</a>
+                  </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        {% endif %}        
       </tbody>
     </table>
-
 {% endblock %}

@@ -1,5 +1,7 @@
+# Инициализация Celery
 import os
-import os.path as op
+from os import path as op
+from flask import Flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 
@@ -45,7 +47,6 @@ babel = Babel(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = config.SECRET_KEY or os.randov
-
 db = SQLAlchemy(app)
 db.create_all()
 
@@ -92,6 +93,10 @@ admin.add_view(RedirectTaskView(name='Задачи'))
 
 # Встроенный API
 api = Api(app)
+migrate = Migrate(app, db, compare_type=True)
+
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
 
 # Сборка Dashboards
 from .dash_limit_oper import dash_app as dash_limit_oper
@@ -102,14 +107,17 @@ from .dashapp3 import dash_app as dashapp3
 # Добавляем руты
 import front_ex.routes
 
-# # Инициализируем отчеты
-# import front_ex.reports
+# # Сборка в Middleware
+# dispatch_app = DispatcherMiddleware(flask_app, {
+#     'limit_oper': dash_limit_oper.server,
+#     'dashapp1': dashapp1.server,
+#     'dashboard3': dashapp3.server
+#     # '/dash_osv_dev': dash_osv_dev.server  
+#     })
 
 # Сборка в Middleware
-dispatch_app = DispatcherMiddleware(app, {
+dispatch_app = DispatcherMiddleware(app.wsgi_app, {
     'limit_oper': dash_limit_oper.server,
     'dashapp1': dashapp1.server,
     'dashboard3': dashapp3.server
-    # '/dash_osv_dev': dash_osv_dev.server
     })
-    

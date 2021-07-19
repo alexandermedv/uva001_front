@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 import os
 import front_ex.config as config
 from .report1 import utils as report1
+from .glossary import utils as glossary
 from .report_equipment import utils as report_equipment
 import json
 import datetime
@@ -37,13 +38,27 @@ def render_limit_oper():
 @login_required
 def render_dashapp1():
     """Дашборд по размеру и динамике недостачи"""
-    return render_template('/dashapp1/overview.html')    
+    return render_template('/dashapp1/overview.html')
 
 @app.route('/dashboard3/')
 @login_required
 def render_dashapp3():
     """Дашборд по полномочиям в SAP"""
-    return render_template('/dashapp3/overview.html')   
+    return render_template('/dashapp3/overview.html')
+
+@app.route('/glossary/')
+@login_required
+def render_glossary():
+
+    glos = pd.DataFrame.from_dict(glossary.get_glossary())
+    pprint(glos)
+
+    return render_template('/glossary/glossary.html', title='glossary', items=glos[[
+        'Название', 'Определение']].to_dict(orient='records'))
+
+    return jsonify(
+                   my_table=json.loads(df1.to_json(orient="split"))["data"],
+                   columns=[{"title": str(col)} for col in json.loads(df1.to_json(orient="split"))["columns"]])
 
 @app.route('/report1/')
 @login_required

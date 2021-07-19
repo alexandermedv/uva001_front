@@ -1,0 +1,40 @@
+{% extends "base_sidebar_dash.html" %}
+
+
+{% block content %}
+    <Div id="dt" style="margin:20px; margin-top:70px">
+        <h1>Словарь терминов и сокращений</h1>
+        <table id="glossary" class="display" style="margin-left:0px" > 
+            <thead>
+                <tr>
+                    <th>Термин или сокращение</th>
+                    <th>Определение</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in items %}
+                <tr>
+                    <td>{{row.Название}}</td>
+                    <td>{{row.Определение}}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <script>
+            $(document).ready(function() {
+                $('#glossary').DataTable( {
+                    dom: 'Bflrtip',
+                    buttons: [
+                        'copyHtml5',
+                        'excelHtml5',
+                        'csvHtml5',
+                        'pdfHtml5'
+                    ],
+                    "scrollX": true,
+                    "pageLength": 20,
+                    "language": {"url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"}
+                    } );
+                } );
+        </script>
+    </Div>
+{% endblock %}

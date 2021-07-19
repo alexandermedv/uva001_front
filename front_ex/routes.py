@@ -202,7 +202,25 @@ def serverside_table():
                     resultlist = cursor.fetchall()
                     print('resultlist получен (не пустой поиск)')
 
+                sql = """
+                    SELECT *
+                    FROM information_schema.columns
+                    WHERE table_schema = %s
+                    AND table_name   = %s
+                    AND false"""
+                cursor.execute(sql, (schema_name, table_name))
+                columns = cursor.fetchall()
+                print('columns = ', columns)
+
                 data = []
+
+                # for row in resultlist:
+                #     d = {}
+                #     for col in columns:
+                #         d[col] = row[col]
+                #     data.append(d)
+
+
                 for row in resultlist:
                     data.append({
                         'equnr': row['equnr'],

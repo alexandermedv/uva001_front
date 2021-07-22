@@ -24,15 +24,18 @@
         
           <!-- Администрирование -->
           <ul class="nav navbar-nav navbar-right" style="font-size: 15px;">
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Администрирование<span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li style='margin-bottom: 5px; margin-top: 5px;'><a href="/user/create_user"><i class ="fa fa-plus fa-lg" style="margin-right: 5px;"></i> Создать пользователя</a></li>
-                <li><a href="/user/users/{{current_user.id}}">Управление пользователями</a></li>
-                <!-- <li role="separator" class="divider"></li>
-                <li><a href="#">Управление ролями</a></li> -->
-              </ul>
-            </li>
+              {% if current_user.check_roles(['admin']) %}
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Администрирование<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <!-- <li style='margin-bottom: 5px; margin-top: 5px;'><a href="/user/create_user"><i class ="fa fa-plus fa-lg" style="margin-right: 5px;"></i> Создать пользователя</a></li> -->
+                  <li><a href="/user/users/{{current_user.id}}">Управление пользователями и отчетами</a></li>
+                  <!-- <li role="separator" class="divider"></li>
+                  <li><a href="#">Управление ролями</a></li> -->
+                </ul>
+              </li>
+            {% endif %}
+
             <!-- Пользователь  -->
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle fa-lg"></i></a>

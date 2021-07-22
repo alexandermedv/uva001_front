@@ -1,30 +1,34 @@
 version: '3.5'
 services: 
     app_prod:
-        container_name: prod_restapi
+        container_name: prod_front_ex
         build:  
             context: .
             dockerfile: dockerfile.prod
-        command: gunicorn -w 1 -b 0.0.0.0:7002 wsgi_prod:app
+        
+        command: python wsgi_prod.py
+        
+        # command: gunicorn -w 1 -b 0.0.0.0:7002 wsgi_prod:app
         volumes: 
            - .:/usr/src/app/
         ports: 
-           - "127.0.0.1:7003:7002"
+        #    - "127.0.0.1:7003:7002"
+        - "7003:7002"
         environment: 
            - TZ=Europe/Moscow
         networks: 
            - net_nginx_prod
 
-    nginx_prod:
-        build: 
-            context: ./nginx
-            dockerfile: dockerfile.prod
-        ports:
-            - 7001:7001
-        depends_on:
-            - app_prod
-        networks: 
-            - net_nginx_prod
+    # nginx_prod:
+    #     build: 
+    #         context: ./nginx
+    #         dockerfile: dockerfile.prod
+    #     ports:
+    #         - 7001:7001
+    #     depends_on:
+    #         - app_prod
+    #     networks: 
+    #         - net_nginx_prod
 networks: 
     net_nginx_prod: 
         driver: bridge

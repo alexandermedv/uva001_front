@@ -17,8 +17,6 @@ class LoginForm(FlaskForm):
 class CreateUserForm(FlaskForm):
     """Форма создания пользователя"""
     email = EmailField('E-mail', validators=[DataRequired(), Email()], description="E-mail")
-    personnel_number = IntegerField("Табельный номер: ",
-        validators=[InputRequired(message='Введите табельный номер.')], description="Табельный номер")
     family_name = StringField("Фамилия: ",
         validators=[InputRequired(message='Введите фамилию'),
         Length(min=1, max=100, message='Длина фамилии должна быть от 1 до 100.')], description="Фамилия")

@@ -1,3 +1,4 @@
+import datetime
 from flask_wtf import FlaskForm
 from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin, current_user
@@ -9,6 +10,7 @@ from wtforms.validators import DataRequired, Length, InputRequired, Email, Numbe
 from wtforms.fields.html5 import DateField, EmailField
 from functools import wraps
 from flask_admin import BaseView, AdminIndexView, expose
+
 
 from . import db, login
 from .config.html_roles import html_access_roles
@@ -24,7 +26,6 @@ class User(db.Model, UserMixin):
     # __table_args = {'schema':'ver1'}
 
     id = db.Column(db.Integer, primary_key=True)
-    # personnel_number = db.Column(db.Integer)
     last_name = db.Column(db.Unicode(250))
     first_name = db.Column(db.Unicode(250))
     second_name = db.Column(db.Unicode(250))
@@ -33,7 +34,7 @@ class User(db.Model, UserMixin):
     email = db.Column('email', db.Unicode(250), nullable=False)
     active = db.Column(db.Unicode(250))
     password = db.Column(db.Unicode(200))
-    # role = db.Column(db.String(100), default='guest')
+    created = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
@@ -83,10 +84,20 @@ class User(db.Model, UserMixin):
     # Проверка пересечения по ролям
     def get_roles(self, *args):
         return self.roles
-    
+
+    def get_roles_names(self, *args):
+        roles = self.get_roles(*args)
+        roles_names = []
+        for role in roles:
+            roles_names.append(role.name)        
+        return roles_names
+
     def check_roles(self, object_roles):
-        print('set', set(self.get_roles()).intersection(object_roles))
-        return set(self.get_roles()).intersection(object_roles)    
+        print(self.get_roles_names())
+        return set(self.get_roles_names()).intersection(object_roles)    
+
+    def get_full_name(self):
+        return str(self.last_name) + ' ' + str(self.first_name)
 
 # def requires_roles(*roles):
 #     """Проверка роли"""
@@ -106,9 +117,8 @@ def requires_roles(*roles):
         @wraps(f)
         def wrapped(*args, **kwargs):
             # Если надется хоть одна роль на пересечении
-            if not set(current_user.get_roles(*args)).intersection(roles):
+            if not set(current_user.get_roles_names(*args)).intersection(roles[0]):
                 # Redirect the user to an unauthorized notice!
-                print(set(current_user.get_roles(*args)).intersection(roles))
                 return "Ваш аккаунт не имеет доступа к данной странице."
             return f(*args, **kwargs)
         return wrapped
@@ -123,6 +133,7 @@ class Role(db.Model):
     def __str__(self):
         return self.name
 
+
 #### Встраивание Flask Admin
 class UserModelView(ModelView):
     '''
@@ -135,7 +146,7 @@ class UserModelView(ModelView):
         if not self.is_accessible():
             return redirect(url_for('signin'))
 
-    column_list = ['id','last_name','first_name','email', 'active', 'roles', 'confirmed_at']
+    column_list = ['id','last_name','first_name','email', 'active', 'roles', 'created']
     form_columns = ('last_name','first_name','email', 'password2', 'active', 'roles')
 
     column_labels = dict(id="#", last_name='Фамилия',first_name='Имя', password='Пароль', active='Активно', \
@@ -159,7 +170,6 @@ class UserModelView(ModelView):
             raise 'Не указан пароль'
             
         if is_created:
-            model.confirmed_at = datetime.now()
             model.active = True
 
 class HomeIndexView(AdminIndexView):
@@ -182,10 +192,7 @@ class RedirectTaskView(BaseView):
     '''
     @expose('/')
     def index(self):
-        return self.render(
-            'tasks.html'
-        )
-
+        return redirect('/index')
 class RoleModelView(ModelView):
     '''
         Закладка Роль
@@ -199,6 +206,8 @@ class RoleModelView(ModelView):
             # return redirect(url_for('security.login'))
     column_list = ['id','name','description']
     column_labels = dict(id="#", name='Роль', description='Описание') 
+    
+    form_columns = ('id','name','description')
 
 # Реестр отчетов
 # Пользователи

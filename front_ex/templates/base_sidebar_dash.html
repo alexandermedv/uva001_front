@@ -56,8 +56,10 @@
               <li><a href="/dashboard3"><i class="fa fa-dashboard"></i>Полномочия в SAP</a></li>
               <li><a href="/report1"><i class="fa fa-dashboard"></i>Детали в статусе ДОСТ</a></li>
               <li><a href="/report_equipment"><i class="fa fa-dashboard"></i>Запчасти</a></li>
-              <li><a href="https://uvapgk.atlassian.net/jira/projects"><i class="fa fa-dashboard"></i>Jira</a></li>
-              <li><a href="https://gitlab.pgkweb.ru/"><i class="fa fa-dashboard"></i>Gitlab</a></li>
+              {% if current_user.check_roles(['admin']) %}
+                <li><a href="https://uvapgk.atlassian.net/jira/projects"><i class="fa fa-dashboard"></i>Jira</a></li>
+                <li><a href="https://gitlab.pgkweb.ru/"><i class="fa fa-dashboard"></i>Gitlab</a></li>
+              {% endif %}
           </ul>
         </div><!-- /.navbar-collapse -->
       </nav>  

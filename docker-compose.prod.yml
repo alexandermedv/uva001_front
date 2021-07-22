@@ -13,7 +13,7 @@ services:
            - .:/usr/src/app/
         ports: 
         #    - "127.0.0.1:7003:7002"
-        - "7003:7002"
+        - "7001:7002"
         environment: 
            - TZ=Europe/Moscow
         networks: 

@@ -3,7 +3,7 @@ import os
 class DefaultConfig():
     # Установка временной зоны для приложения и Docker
     USE_TZ = True
-    TIMEZONE = 'Europe/Moscow' 
+    TIMEZONE = 'Europe/Moscow'
     SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(32)
     # Пользовательские роли
     USER_ROLES = ['Admin','Аудитор','ПКУ','Запчасти']
@@ -22,7 +22,7 @@ class DevelopConfig(DefaultConfig):
     SAP_HOST =  os.environ.get('SAP_HOST_DEV')
     SAP_HOST_PORT = os.environ.get('SAP_HOST_PORT_DEV')
     SAP_HOST_USER = os.environ.get('SAP_HOST_USER_DEV')
-    SAP_HOST_PASSWORD = os.environ.get('SAP_HOST_PASSWORD_DEV') 
+    SAP_HOST_PASSWORD = os.environ.get('SAP_HOST_PASSWORD_DEV')
     # Настройки FLASK
     FLASK_PORT = os.environ.get('FLASK_PORT_DEV')
     # Front_end
@@ -59,7 +59,7 @@ class TestConfig(DefaultConfig):
     SAP_HOST = os.environ.get('SAP_HOST_PROD')
     SAP_HOST_PORT = os.environ.get('SAP_HOST_PORT_PROD')
     SAP_HOST_USER = os.environ.get('SAP_HOST_USER_PROD')
-    SAP_HOST_PASSWORD = os.environ.get('SAP_HOST_PASSWORD_PROD') 
+    SAP_HOST_PASSWORD = os.environ.get('SAP_HOST_PASSWORD_PROD')
     # Настройки FLASK
     FLASK_PORT = os.environ.get('FLASK_PORT_TEST')
 

@@ -37,7 +37,7 @@ def create_layout():
                              + '{0:,}'.format(round(engine_cons.execute(
                                  """SELECT round(sum("Сумма во внутренней валюте по дебе" -
                                  "Сумма во внутренней валюте по кред")) AS "Сальдо"
-                                 FROM sap_s4.osv_94""").fetchone()[0]/1000)).replace(',', ' ') +
+                                 FROM dashboard.osv_94""").fetchone()[0]/1000)).replace(',', ' ') +
                                 "** тыс. руб.",
                                         ),
                             style={"color": "#ffffff"},

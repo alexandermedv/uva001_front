@@ -9,9 +9,11 @@ import front_ex.config as config
 
 class LoginForm(FlaskForm):
     """Форма авторизации пользователя"""
-    email = StringField('E-mail', validators=[DataRequired()])
+    # email = StringField('E-mail', validators=[DataRequired()])
+    ldap_account = StringField('Аккаунт windows')
     password = PasswordField('Пароль', validators=[DataRequired()])
-    remember = BooleanField('Запомнить меня')
+    # Запоминать пароль не требуется
+    # remember = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
 class CreateUserForm(FlaskForm):

@@ -17,6 +17,8 @@ from pprint import pprint
 import flask
 import psycopg2
 
+from .ldap import ldap_authentication
+
 # Доступы по текущей сессии
 @login.user_loader
 def load_user(id):
@@ -225,18 +227,18 @@ def signin():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
+        login = form.ldap_account.data
         password = form.password.data
-        # print('email', form.email.data, 'password', form.password.data, 'remeber',form.remember.data)
-        user = User.query.filter_by(email=form.email.data).first()
-        if user: # and user.check_password(password):
-            login_user(user, remember=form.remember.data)
+        user = User.query.filter_by(ldap_account=login).first()
+        if user and ldap_authentication(login, password): # and user.check_password(password):
+            login_user(user)
+            # login_user(user, remember=form.remember.data)
             return redirect(url_for('index'))
         else:
             flash('Invalid username')
             return redirect(url_for('signin'))
     else: print('errors', form.errors)
     return render_template('/user/signin.html', title='Sign In', form=form)
-
 
 # Общие вводные
 @app.route('/index')

@@ -26,6 +26,10 @@ class User(db.Model, UserMixin):
     # __table_args = {'schema':'ver1'}
 
     id = db.Column(db.Integer, primary_key=True)
+    # personnel_number = db.Column(db.Integer)
+    # ldap login
+    # Сюда надо заводить Аккаунт Windows
+    ldap_account = db.Column(db.Unicode(250), nullable=False)
     last_name = db.Column(db.Unicode(250))
     first_name = db.Column(db.Unicode(250))
     second_name = db.Column(db.Unicode(250))
@@ -33,8 +37,9 @@ class User(db.Model, UserMixin):
     position = db.Column(db.Unicode(1000))
     email = db.Column('email', db.Unicode(250), nullable=False)
     active = db.Column(db.Unicode(250))
-    password = db.Column(db.Unicode(200))
-    created = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
+    # Пароль не требуется, поскольку он проверяется по LDAP
+    # password = db.Column(db.Unicode(200))
+    # role = db.Column(db.String(100), default='guest')
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 

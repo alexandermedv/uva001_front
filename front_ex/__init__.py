@@ -72,11 +72,8 @@ def create_user():
     db.create_all()
     user = User.query.first()
     if not user:
-        user = user_datastore.create_user(email='admin@admin', password='admin')
-        db.session.commit()
-        role = user_datastore.find_or_create_role('admin')
-        db.session.commit()
-        user_role = user_datastore.add_role_to_user(user='admin@admin', role='admin')
+        user_datastore.create_user(ldap_account='svc_fs-uva', email='svc_fs-uva@pgkweb.ru', active=True)
+        # user_datastore.create_user(email='admin@admin', password='admin')
         db.session.commit()
 
 # Create directory

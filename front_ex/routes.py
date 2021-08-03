@@ -17,14 +17,12 @@ from pprint import pprint
 import flask
 import psycopg2
 
-
 # Доступы по текущей сессии
 @login.user_loader
 def load_user(id):
     """Инициализация пользователя"""
     user = User.query.filter_by(id=id).first()
     return user
-
 
 # Руты к дэшбордам
 @app.route('/limit_oper/')

@@ -90,7 +90,7 @@ admin.add_view(UserModelView(User, db.session, name='Пользователи'))
 admin.add_view(RoleModelView(Role, db.session, name='Роли'))
 admin.add_view(ReportModelView(Report, db.session, name='Отчеты'))
 admin.add_view(fileadmin.FileAdmin(path , '/files/', name='Файлы'))
-admin.add_view(RedirectTaskView(name='Задачи'))
+admin.add_view(RedirectTaskView(name='Сервис УВА'))
 
 # Встроенный API
 api = Api(app)

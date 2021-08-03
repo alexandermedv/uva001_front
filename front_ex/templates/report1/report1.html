@@ -2,49 +2,73 @@
 
 
 {% block content %}
-    <Div id="dt" style="margin:20px; margin-top:70px">
-        <h1>Детали в статусе ДОСТ</h1>
-        <table id="report1" class="display" style="margin-left:0px" > 
-            <thead>
-                <tr>
-                    <th>ЕО</th>
-                    <th>Тип детали</th>
-                    <th>статус</th>
-                    <th>Дата создания</th>
-                    <th>Вагон</th>
-                    <th>Тип ЕО</th>
-                    <th>Дата последней операции</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for row in items %}
-                <tr>
-                    <td>{{row.equnr}}</td>
-                    <td>{{row.eartx}}</td>
-                    <td>{{row.status}}</td>
-                    <td>{{row.erdat}}</td>
-                    <td>{{row.hequi}}</td>
-                    <td>{{row.typtx}}</td>
-                    <td>{{row.last_oper_date}}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <div id="dt" style="margin:20px; margin-top:70px">
+            <p><h1>Список номерных запчастей</h1></p>
+            <div >
+                <table id='empTable' class='display dataTable' width='100%' style="margin-left:0px">   
+                </table>
+            </div>
+        </div>
         <script>
-            $(document).ready(function() {
-                $('#report1').DataTable( {
-                    dom: 'Bfrtip',
-                    buttons: [
-                        'copyHtml5',
-                        'excelHtml5',
-                        'csvHtml5',
-                        'pdfHtml5'
-                    ],
-                    "scrollX": true,
-                    "pageLength": 20,
-                    "language": {"url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"}
-                    } );
-                } );
+        $(document).ready(function() {
+         
+          
+            var empDataTable = $('#empTable').DataTable({
+                        'processing': true,
+                        'serverSide': true,
+                        'serverMethod': 'post',
+                        'ajax': {
+                            'url':'/_get_table_serverside',
+                            'data':{table_name: 'status_dost', schema_name: 'dashboard'
+                            },
+                        },
+                        "deferRender": true,
+                        'lengthMenu': [[20, 50, 100, 1000, 10000, 100000, -1], [20, 50, 100, 1000, 10000, 100000, "All"]],
+                        searching: true,
+                        scrollY: 680,
+                        scrollX: 1000,
+                        "scrollCollapse": true,
+                        searchDelay: 1000,
+                        scroller: {
+                            loadingIndicator: true
+                        },
+                        sort: false,
+                        "serverSide": true,
+                        'columns': [
+                            { data: 'equnr', title: 'Номер ЕО' },
+                            { data: 'eqktx', title: 'Описание ЕО' },
+                            { data: 'erdat', title: 'Дата создания'  },
+                            { data: 'ernam', title: 'Создал'  },
+                            { data: 'typtx', title: 'Тип ЕО'  },
+                            { data: 'eartx', title: 'Тип объекта'  },
+                            { data: 'maktx', title: 'Название материала'  },
+                            { data: 'mtbez', title: 'Вид материала'  },
+                            { data: 'wgbez', title: 'Группа материалов'  },
+                            { data: 'status', title: 'Статус'  },
+                            { data: 'hequi', title: 'Вагон'  },
+                            { data: 'last_oper_date', title: 'Дата последней операции'  }
+                        ],
+                        dom: 'Blfrtip',
+                        buttons: [
+                                'copyHtml5',
+                                'excelHtml5',
+                                'csvHtml5',
+                                {
+                                    extend: 'pdfHtml5',
+                                    orientation: 'landscape',
+                                    pageSize: 'LEGAL'
+                                },
+                                {
+                                    text: 'Выгрузка в фоновом режиме',
+                                    action: function ( e, dt, node, config ) {
+                                        alert( 'Button activated' );
+                                    }
+                                }
+                            ],
+                        "language": {"url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"}
+                    });
+         
+        });
+         
         </script>
-    </Div>
 {% endblock %}

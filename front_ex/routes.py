@@ -18,14 +18,12 @@ from pprint import pprint
 import flask
 import psycopg2
 
-
 # Доступы по текущей сессии
 @login.user_loader
 def load_user(id):
     """Инициализация пользователя"""
     user = User.query.filter_by(id=id).first()
     return user
-
 
 # Руты к дэшбордам
 @app.route('/limit_oper/')
@@ -297,13 +295,11 @@ def logout():
 
 # Отчетность
 @app.route('/reports/')
-@app.route('/reports/<id>', methods=['GET','POST'])
-# @app.route('/index/<redirect>')
+@app.route('/reports/<id>', methods=['GET'])
 def reports(id=None):
     if id:
         report = Report.query.filter_by(active=True, id=id ).order_by(Report.id.asc()).first()
-        print(report.id)
-        return redirect('/reports/{instance}'.format(instance=report.instance))
+        return redirect('/reports/filter/{instance}'.format(instance=report.instance))
 
     else:
         reports = Report.query.filter_by(active=True).order_by(Report.id.asc()).all()

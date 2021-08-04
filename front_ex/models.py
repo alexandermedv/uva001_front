@@ -11,6 +11,7 @@ from wtforms.fields.html5 import DateField, EmailField
 from functools import wraps
 from flask_admin import BaseView, AdminIndexView, expose
 
+
 from . import db, login
 from .config.html_roles import html_access_roles
 
@@ -84,10 +85,20 @@ class User(db.Model, UserMixin):
     # Проверка пересечения по ролям
     def get_roles(self, *args):
         return self.roles
-    
+
+    def get_roles_names(self, *args):
+        roles = self.get_roles(*args)
+        roles_names = []
+        for role in roles:
+            roles_names.append(role.name)        
+        return roles_names
+
     def check_roles(self, object_roles):
-        print('set', set(self.get_roles()).intersection(object_roles))
-        return set(self.get_roles()).intersection(object_roles)    
+        print(self.get_roles_names())
+        return set(self.get_roles_names()).intersection(object_roles)    
+
+    def get_full_name(self):
+        return str(self.last_name) + ' ' + str(self.first_name)
 
 # def requires_roles(*roles):
 #     """Проверка роли"""
@@ -107,9 +118,8 @@ def requires_roles(*roles):
         @wraps(f)
         def wrapped(*args, **kwargs):
             # Если надется хоть одна роль на пересечении
-            if not set(current_user.get_roles(*args)).intersection(roles):
+            if not set(current_user.get_roles_names(*args)).intersection(roles[0]):
                 # Redirect the user to an unauthorized notice!
-                print(set(current_user.get_roles(*args)).intersection(roles))
                 return "Ваш аккаунт не имеет доступа к данной странице."
             return f(*args, **kwargs)
         return wrapped
@@ -123,6 +133,7 @@ class Role(db.Model):
 
     def __str__(self):
         return self.name
+
 
 #### Встраивание Flask Admin
 class UserModelView(ModelView):
@@ -149,7 +160,6 @@ class UserModelView(ModelView):
     def on_model_change(self, form, model, is_created):
 
         if is_created:
-            model.confirmed_at = datetime.now()
             model.active = True
 
 class HomeIndexView(AdminIndexView):
@@ -189,6 +199,8 @@ class RoleModelView(ModelView):
             # return redirect(url_for('security.login'))
     column_list = ['id','name','description']
     column_labels = dict(id="#", name='Роль', description='Описание') 
+    
+    form_columns = ('id','name','description')
 
 # Реестр отчетов
 # Пользователи

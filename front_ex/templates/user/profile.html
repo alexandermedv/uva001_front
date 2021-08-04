@@ -21,8 +21,12 @@
     <div class="form_user">
         <form action="" method="post">
             {{ form.csrf_token() }}
-            <h3> Профиль аккаунта</h3>
+            <h4> Профиль учетной записи</h4>
             <hr>
+            <div class = "form-group">
+                {{ form.login.label() }}
+                {{ form.login(class_ = "form-control") }}
+            </div>
             <div class = "form-group">
                 {{ form.full_name.label() }}
                 {{ form.full_name(class_ = "form-control") }}
@@ -31,21 +35,7 @@
                 {{ form.email.label() }}
                 {{ form.email(class_ = "form-control") }}
             </div>
-            
-            <h4 style="margin-top: 25px; color: black;">Изменить пароль</h4>
-            <hr>
-            <div class = "form-group">
-                {{ form.password.label() }}
-                {{ form.password(class_ = "form-control") }}
-            </div>
-            <div class = "form-group">
-                {{ form.password_confirmation.label() }}
-                {{ form.password_confirmation(class_ = "form-control") }}
-            </div>
-            <div class = "form-group">
-                {{ form.change_password(class_ = "form-control") }}
-            </div>
-            <a style="color: red;">{{ form.errors }}</a>
+            <!-- <a style="color: red;">{{ form.errors }}</a> -->
         </form>
     </div>
 {% endblock %}

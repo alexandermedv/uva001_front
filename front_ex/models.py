@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from flask_wtf import FlaskForm
 from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin, current_user
@@ -26,15 +26,16 @@ class User(db.Model, UserMixin):
     # __table_args = {'schema':'ver1'}
 
     id = db.Column(db.Integer, primary_key=True)
+    # Сюда надо заводить Аккаунт Windows
+    ldap_account = db.Column(db.Unicode(250), nullable=False)
     last_name = db.Column(db.Unicode(250))
     first_name = db.Column(db.Unicode(250))
     second_name = db.Column(db.Unicode(250))
     dept_id = db.Column(db.Unicode(1000))
     position = db.Column(db.Unicode(1000))
     email = db.Column('email', db.Unicode(250), nullable=False)
-    active = db.Column(db.Unicode(250))
-    password = db.Column(db.Unicode(200))
-    created = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
+    active = db.Column(db.Boolean())
+    # Пароль не требуется, поскольку он проверяется по LDAP
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
@@ -52,7 +53,7 @@ class User(db.Model, UserMixin):
         return []
 
     def to_json(self):
-        return { "personnel_number": self.personnel_number,
+        return { 
             "last_name": self.last_name,
             "first_name": self.first_name,
             "second_name": self.second_name,
@@ -60,8 +61,8 @@ class User(db.Model, UserMixin):
             "position": self.position,
             "email": self.email,
             # "type": self.type,
-            "status": self.status, 
-            "role": self.role}
+            "active": self.active, 
+            "role": self.roles}
 
     def is_authenticated(self):
         return True
@@ -146,29 +147,18 @@ class UserModelView(ModelView):
         if not self.is_accessible():
             return redirect(url_for('signin'))
 
-    column_list = ['id','last_name','first_name','email', 'active', 'roles', 'created']
-    form_columns = ('last_name','first_name','email', 'password2', 'active', 'roles')
+    column_list = ['id', 'ldap_account', 'last_name','first_name', 'second_name', 'email', 'active', 'roles', 'confirmed_at']
+    form_columns = ('ldap_account','last_name','first_name','second_name','email', 'active', 'roles')
 
-    column_labels = dict(id="#", last_name='Фамилия',first_name='Имя', password='Пароль', active='Активно', \
+    column_labels = dict(id="#", ldap_account='Учетная запись', last_name='Фамилия',first_name='Имя', second_name='Отчество', active='Активно', \
         roles = 'Роли', confirmed_at='Дата с') 
 
-    column_searchable_list = ['last_name', 'email']
+    column_searchable_list = ['last_name', 'ldap_account', 'email']
 
     can_export = True
 
-    # Поле пароль на форме заменяется новым password2 и в завимости от заполненности принимется решение, хешировать новый пароль
-    form_excluded_columns = ['password']
-
-    form_extra_fields = {
-        'password2': PasswordField('Пароль')
-    }
-
     def on_model_change(self, form, model, is_created):
-        if form.password2.data is not None and form.password2.data != '':
-            model.password = generate_password_hash(form.password2.data)
-        elif is_created:
-            raise 'Не указан пароль'
-            
+
         if is_created:
             model.active = True
 
@@ -192,7 +182,10 @@ class RedirectTaskView(BaseView):
     '''
     @expose('/')
     def index(self):
-        return redirect('/index')
+        return self.render(
+            'index.html'
+        )
+
 class RoleModelView(ModelView):
     '''
         Закладка Роль

@@ -72,11 +72,8 @@ def create_user():
     db.create_all()
     user = User.query.first()
     if not user:
-        user = user_datastore.create_user(email='admin@admin', password='admin')
-        db.session.commit()
-        role = user_datastore.find_or_create_role('admin')
-        db.session.commit()
-        user_role = user_datastore.add_role_to_user(user='admin@admin', role='admin')
+        user_datastore.create_user(ldap_account='svc_fs-uva', email='svc_fs-uva@pgkweb.ru', active=True)
+        # user_datastore.create_user(email='admin@admin', password='admin')
         db.session.commit()
 
 # Create directory
@@ -93,7 +90,7 @@ admin.add_view(UserModelView(User, db.session, name='Пользователи'))
 admin.add_view(RoleModelView(Role, db.session, name='Роли'))
 admin.add_view(ReportModelView(Report, db.session, name='Отчеты'))
 admin.add_view(fileadmin.FileAdmin(path , '/files/', name='Файлы'))
-admin.add_view(RedirectTaskView(name='Сервис УВА'))
+admin.add_view(RedirectTaskView(name='На сайт'))
 
 # Встроенный API
 api = Api(app)
@@ -106,6 +103,8 @@ manager.add_command('db', MigrateCommand)
 from .dash_limit_oper import dash_app as dash_limit_oper
 from .dashapp1 import dash_app as dashapp1
 from .dashapp3 import dash_app as dashapp3
+
+import front_ex.reports
 # from .dash_osv_dev import dash_app as dash_osv_dev
 
 # Добавляем руты

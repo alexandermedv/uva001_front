@@ -13,12 +13,13 @@ services:
       build:  
          context: .
          dockerfile: dockerfile
-      command: python wsgi.py
+      command: python wsgi_dev.py
       # command: gunicorn -w 1 -b 0.0.0.0:7007 wsgi:app  
       volumes: 
          - .:/usr/src/app/
       ports: 
-         - "127.0.0.1:7008:7007"
+         # - "127.0.0.1:7008:7007"
+         - "7008:7007"
       # depends_on: 
       #    - redis   
       environment: 

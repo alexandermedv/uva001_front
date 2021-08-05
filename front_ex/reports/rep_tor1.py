@@ -51,7 +51,7 @@ class Report1_Form(FlaskForm):
     submit = SubmitField('Выгрузить')
 
 # front-end настройка запроса
-@app.route('/reports/tor_1', methods=['GET', 'POST'])
+@app.route('/reports/filter/tor_1', methods=['GET', 'POST'])
 def reports_report1(redirect=None):
     form = Report1_Form()
     # user = User.query.filter_by(id=id).first_or_404()
@@ -66,6 +66,7 @@ def reports_report1(redirect=None):
             .format(host=config.BACKEND_SERVICE_HOST\
             , port=config.FLASK_PORT, report='report1', datefrom=form.date_from.data, dateto=form.date_to.data)
         
+        print(redirect_url)
         try:
             return render_template('/reports/download.html',redirect_url=redirect_url)
         except Exception:

@@ -23,3 +23,6 @@ flask db migrate
 flask db upgrade
 
 docker-compose -f docker-compose.prod.yml up -d --build
+
+<!-- Internal LDAP USER -->
+user='svc_fs-uva', password='Hfesb#th45xao$qhjkc'

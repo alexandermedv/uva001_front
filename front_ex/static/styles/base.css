@@ -2,5 +2,6 @@
     margin-top: 50px;
   }
 
-
- 
+  table.dataTable tr td {
+    height: 10px;
+  }

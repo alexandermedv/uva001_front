@@ -88,8 +88,10 @@ def serverside_table():
     # print("Request data", flask.request.data)
     # print("Request form", flask.request.form)
     table_name = str(req['table_name'])
+    key = str(req['key'])
     schema_name = str(req['schema_name'])
     # print("table_name", table_name)
+    # print("key", key)
     # print("schema_name", schema_name)
 
     column_names = []
@@ -133,11 +135,12 @@ def serverside_table():
                     # print('likestrings', likestrings)
                     s = ''
                     for column in column_names:
-                        s += str(column) + ', '
+                        s += '"' + str(column) + '", '
                     s = s[:-2].replace("['index'], ", "")
                     # print('s =', s)
                     cols = s.replace("['", "")
                     cols = cols.replace("']", "")
+                    
                     # print('cols =', cols)
 
                     sql = """SELECT count(*) from """ + schema_name + '.' + table_name + """ WHERE
@@ -152,7 +155,7 @@ def serverside_table():
 
                 # Fetch records
                 if len(searchValue) < 3:
-                    sql = "SELECT * FROM " + schema_name + '.' + table_name + " ORDER BY equnr asc limit %s offset %s;"
+                    sql = 'SELECT * FROM ' + schema_name + '.' + table_name + ' ORDER BY "' + key + '" asc limit %s offset %s;'
                     cursor.execute(sql, (rowperpage, row))
                     resultlist = cursor.fetchall()
                     # print('resultlist получен (пустой поиск)')
@@ -180,14 +183,18 @@ def serverside_table():
                     AND table_name   = %s"""
                 cursor.execute(sql, (schema_name, table_name))
                 columns = cursor.fetchall()
+                # print('columns =', columns)
 
                 data = []
 
                 for row in resultlist:
                     d = {}
-                    for col in columns:
-                        d[col[0]] = row[col[0]]
+                    for col in column_names:
+                        d[col] = row[col]
+                    # print('d =', d)
                     data.append(d)
+
+                # print('data =', data[:5])
 
                 response = {
                     'draw': draw,
@@ -196,6 +203,8 @@ def serverside_table():
                     'column_names': column_names,
                     'aaData': data,
                 }
+
+                # print('response =', response)
 
                 return jsonify(response)
     except Exception as e:
@@ -261,3 +270,22 @@ def reports(id=None):
         reports = Report.query.filter_by(active=True).order_by(Report.id.asc()).all()
         # cur_report = User.query.filter_by(id=id).first()
         return render_template('/reports/reports.html', reports=reports)
+
+
+@app.route('/repairs/repair0/')
+@login_required
+def render_repair0():
+
+    return render_template("/repairs/repair0.html")
+
+
+@app.route('/repairs/repair1/')
+@login_required
+def render_repair1():
+    return render_template("/repairs/repair1.html")
+
+
+@app.route('/repairs/repair2/')
+@login_required
+def render_repair2():
+    return render_template("/repairs/repair2.html")

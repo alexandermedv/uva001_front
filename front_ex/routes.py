@@ -6,8 +6,6 @@ from . import app, db, login
 from .forms import LoginForm, ProfileForm
 from .models import User, requires_roles, Report
 from sqlalchemy import create_engine
-import os
-import front_ex.config as config
 from .report1 import utils as report1
 from .glossary import utils as glossary
 from .report_equipment import utils as report_equipment
@@ -212,7 +210,6 @@ def serverside_table():
     finally:
         cursor.close()
 
-
 # Общий роутинг
 @app.route('/', methods=['GET', 'POST'])
 def signin():
@@ -221,14 +218,15 @@ def signin():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        login = form.ldap_account.data
+        login = form.ldap_account.data  
         password = form.password.data
         user = User.query.filter_by(ldap_account=login).first()
         if user and ldap_authentication(login, password): 
             login_user(user)
             return redirect(url_for('index'))
+        # Переписать
         else:
-            flash('Invalid username')
+            flash('Аккаунт Windows, либо пароль указаны некорректно.')
             return redirect(url_for('signin'))
     else: print('errors', form.errors)
     return render_template('/user/signin.html', title='Sign In', form=form)

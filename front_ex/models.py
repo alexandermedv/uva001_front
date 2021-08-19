@@ -1,5 +1,3 @@
-from datetime import datetime
-from flask_wtf import FlaskForm
 from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin, current_user
 from flask import url_for, redirect, render_template, flash, request
@@ -12,8 +10,8 @@ from functools import wraps
 from flask_admin import BaseView, AdminIndexView, expose
 
 
-from . import db, login
-from .config.html_roles import html_access_roles
+from . import db
+from .roles import html_access_roles
 
 # Связь роли с пользователем
 roles_users = db.Table(
@@ -47,7 +45,6 @@ class User(db.Model, UserMixin):
         return self.roles
     
     def get_role_by_html_element(*args):
-        print('args', args[1])
         if args:
             return html_access_roles.get(args[1])
         return []
@@ -94,8 +91,15 @@ class User(db.Model, UserMixin):
         return roles_names
 
     def check_roles(self, object_roles):
-        print(self.get_roles_names())
         return set(self.get_roles_names()).intersection(object_roles)    
+
+    def check_dash_roles(self, dash_id):
+        dash = Dash.query.filter_by(instance = dash_id).first()
+        if dash and dash.active:
+            dash_roles = dash.get_roles_names()
+            check = set(self.get_roles_names()).intersection(dash_roles)
+            return check
+        return False
 
     def get_full_name(self):
         return str(self.last_name) + ' ' + str(self.first_name)
@@ -202,6 +206,69 @@ class RoleModelView(ModelView):
     
     form_columns = ('id','name','description')
 
+# Реестр дэшбордов
+# Пользователи
+roles_dashes = db.Table(
+    'roles_dashes',
+    db.Column('dash_id', db.Integer(), db.ForeignKey('dash.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
+
+class Dash(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    instance = db.Column(db.String(255))
+    name = db.Column(db.String(255))
+    active = db.Column(db.Boolean())
+    description = db.Column(db.String(255))
+    roles = db.relationship('Role', secondary=roles_dashes,
+                            backref=db.backref('dashes', lazy='dynamic'))
+
+    # Flask-Login integration
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
+
+    # Required for administrative interface
+    def __unicode__(self):
+        return self.name
+    
+    def __str__(self):
+        return self.id
+    
+    # Роли доступа к дешборду
+    def get_roles(self):
+        return self.roles
+    
+    def get_roles_names(self, *args):
+        roles = self.get_roles(*args)
+        roles_names = []
+        for role in roles:
+            roles_names.append(role.name)        
+        return roles_names
+class DashModelView(ModelView):
+    '''
+        Закладка Дэщборды
+    '''
+    def is_accessible(self):
+        return (current_user.is_active , current_user.is_authenticated)
+    
+    def _handle_view(self, name):
+        if not self.is_accessible():
+            return redirect(url_for('signin'))
+        
+    column_list = ['id','instance','name','active','description','roles']
+    form_columns = ['instance', 'name','active','description', 'roles']
+    
+    column_labels = dict(id="#",instance='Код',name='Наименование',active='Активно',description='Описание') 
+
 # Реестр отчетов
 # Пользователи
 roles_reports = db.Table(
@@ -209,7 +276,6 @@ roles_reports = db.Table(
     db.Column('report_id', db.Integer(), db.ForeignKey('report.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 )
-
 class Report(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     instance = db.Column(db.String(255))
@@ -242,7 +308,6 @@ class Report(db.Model, UserMixin):
     # Роли доступа к отчету
     def get_access_roles(self):
         return self.roles
-
 class ReportModelView(ModelView):
     '''
         Закладка Отчеты

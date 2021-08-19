@@ -1,3 +1,4 @@
+import os
 from front_ex import create_user
 import json
 from flask import render_template, request, jsonify, redirect
@@ -21,8 +22,6 @@ from flask import send_file
 from . import app
 from .utils import TagListField
 from . import api
-# Уточнить по чему в данном случае не работает относительная ссылка
-import front_ex.config as config
 
 
 from .utils import get_sap_s4_con_str, get_postgre_con_str
@@ -63,8 +62,8 @@ def reports_report1(redirect=None):
         #         , port=config.FLASK_PORT, report='report1', datefrom=form.date_from.data, dateto=form.date_to.data)
 
         redirect_url = "http://{host}:{port}/api/{report}?datefrom={datefrom}&dateto={dateto}"\
-            .format(host=config.BACKEND_SERVICE_HOST\
-            , port=config.FLASK_PORT, report='report1', datefrom=form.date_from.data, dateto=form.date_to.data)
+            .format(host=os.environ['BACKEND_SERVICE_HOST']\
+            , port=os.environ["FLASK_PORT"], report='report1', datefrom=form.date_from.data, dateto=form.date_to.data)
         
         print(redirect_url)
         try:
@@ -92,9 +91,9 @@ class Report11(Resource):
         engine_sap_s4 = create_engine(get_sap_s4_con_str(), max_identifier_length=128)
         engine_postgre = create_engine(get_postgre_con_str(), max_identifier_length=128, encoding='utf-8')
 
-        if config.DEBUG:
+        if os.environ['FLASK_DEBUG']:
             print('1. Загрузка данных по ТОР')
-
+    
         sql = """ 
             select t.auart "Вид заказа"
                 ,t.autyp "Тип заказа"

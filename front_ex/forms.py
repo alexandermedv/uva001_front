@@ -5,8 +5,6 @@ from wtforms.validators import DataRequired, Length, InputRequired, Email, Numbe
 from wtforms.fields.html5 import DateField, EmailField
 from wtforms.widgets import TextInput
 
-import front_ex.config as config 
-
 class LoginForm(FlaskForm):
     """Форма авторизации пользователя"""
     # email = StringField('E-mail', validators=[DataRequired()])

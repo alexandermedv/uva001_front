@@ -51,7 +51,9 @@
               <!-- Cписок дэшей -->
               <li><a href="/glossary"><i class="fa fa-dashboard"></i>Словарь терминов</a></li>
               <li><a href="/reports/"><i class="fa fa-dashboard"></i>Отчеты</a></li>
-              <li><a href="/limit_oper"><i class="fa fa-dashboard"></i>Дебиторская задолженность</a></li>
+              {% if current_user.check_dash_roles('limit_oper') %}
+                <li><a href="/limit_oper"><i class="fa fa-dashboard"></i>Дебиторская задолженность</a></li>
+              {% endif %}
               <li><a href="/dashapp1"><i class="fa fa-dashboard"></i>Недостача запчастей</a></li>
               <li><a href="/dashboard3"><i class="fa fa-dashboard"></i>Полномочия в SAP</a></li>
               <li><a href="/repairs/repair0"><i class="fa fa-dashboard"></i>Реестр ремонтов</a></li>

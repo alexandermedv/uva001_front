@@ -218,7 +218,7 @@ def signin():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        login = form.ldap_account.data  
+        login = form.ldap_account.data.lower()  
         password = form.password.data
         user = User.query.filter_by(ldap_account=login).first()
         if user and ldap_authentication(login, password): 

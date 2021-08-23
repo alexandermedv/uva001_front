@@ -11,7 +11,6 @@ from flask_admin import BaseView, AdminIndexView, expose
 
 
 from . import db
-from .roles import html_access_roles
 
 # Связь роли с пользователем
 roles_users = db.Table(
@@ -87,11 +86,11 @@ class User(db.Model, UserMixin):
         roles = self.get_roles(*args)
         roles_names = []
         for role in roles:
-            roles_names.append(role.name)        
+            roles_names.append(role.name.lower())        
         return roles_names
 
     def check_roles(self, object_roles):
-        return set(self.get_roles_names()).intersection(object_roles)    
+        return set(self.get_roles_names()).intersection()    
 
     def check_dash_roles(self, dash_id):
         dash = Dash.query.filter_by(instance = dash_id).first()
@@ -100,6 +99,14 @@ class User(db.Model, UserMixin):
             check = set(self.get_roles_names()).intersection(dash_roles)
             return check
         return False
+
+    def check_report_roles(self, report_id):
+        report = Report.query.filter_by(instance = report_id).first()
+        if report and report.active:
+            report_roles = report.get_roles_names()
+            check = set(self.get_roles_names()).intersection(report_roles)
+            return check
+        return False    
 
     def get_full_name(self):
         return str(self.last_name) + ' ' + str(self.first_name)
@@ -251,7 +258,7 @@ class Dash(db.Model, UserMixin):
         roles = self.get_roles(*args)
         roles_names = []
         for role in roles:
-            roles_names.append(role.name)        
+            roles_names.append(role.name.lower())        
         return roles_names
 class DashModelView(ModelView):
     '''
@@ -305,9 +312,16 @@ class Report(db.Model, UserMixin):
     def __str__(self):
         return self.id
     
-    # Роли доступа к отчету
-    def get_access_roles(self):
+    def get_roles(self):
         return self.roles
+    
+    def get_roles_names(self, *args):
+        roles = self.get_roles(*args)
+        roles_names = []
+        for role in roles:
+            roles_names.append(role.name.lower())        
+        return roles_names
+
 class ReportModelView(ModelView):
     '''
         Закладка Отчеты

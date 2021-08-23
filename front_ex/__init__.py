@@ -1,7 +1,8 @@
 # Инициализация Celery
 import os
 from os import path as op
-from flask import Flask
+from flask import Flask, redirect, url_for, request
+from flask_login.utils import login_url
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 
@@ -55,8 +56,13 @@ manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
 # Логирование 
+# app.config['SECURITY_LOGIN_USER_TEMPLATE'] = 'user/signin.html'
 login = LoginManager()
 login.init_app(app)
+
+@login.unauthorized_handler      
+def unauthorized_callback():            
+    return redirect(url_for('signin', next=request.endpoint)) 
 
 from .models import User,Role,HomeIndexView,UserModelView,RoleModelView,ReportModelView,RedirectTaskView,Report,DashModelView,Dash 
 

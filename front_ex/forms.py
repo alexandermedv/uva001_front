@@ -7,12 +7,16 @@ from wtforms.widgets import TextInput
 
 class LoginForm(FlaskForm):
     """Форма авторизации пользователя"""
-    # email = StringField('E-mail', validators=[DataRequired()])
+
     ldap_account = StringField('Аккаунт windows')
     password = PasswordField('Пароль', validators=[DataRequired()])
-    # Запоминать пароль не требуется
-    # remember = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
+    
+    # Неиспользуемые объекты
+    # email = StringField('E-mail')
+    # remember = BooleanField('Запомнить меня')
+    # next = StringField('Next')
+
 class ProfileForm(FlaskForm):
     """Форма профиля пользователя"""
     login = StringField('Учетная запись', render_kw={'readonly': True})

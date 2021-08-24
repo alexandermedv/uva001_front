@@ -225,11 +225,6 @@ def signin():
 def redirect_login():
     return redirect(url_for('signin'))
 
-@app.route('/login', methods=['GET', 'POST'])
-def get_login():
-    print('get_login')
-    return {}
-
 @app.route('/index')
 @login_required
 def index():

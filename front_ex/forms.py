@@ -4,6 +4,7 @@ from wtforms import SubmitField, TextAreaField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Length, InputRequired, Email, NumberRange, EqualTo
 from wtforms.fields.html5 import DateField, EmailField
 from wtforms.widgets import TextInput
+from flask_security.forms import LoginForm
 
 class LoginForm(FlaskForm):
     """Форма авторизации пользователя"""
@@ -13,9 +14,9 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Войти')
     
     # Неиспользуемые объекты
-    # email = StringField('E-mail')
-    # remember = BooleanField('Запомнить меня')
-    # next = StringField('Next')
+    email = StringField('E-mail')
+    remember = BooleanField('Запомнить меня')
+    next = StringField('Next')
 
 class ProfileForm(FlaskForm):
     """Форма профиля пользователя"""

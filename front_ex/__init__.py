@@ -2,7 +2,6 @@
 import os
 from os import path as op
 from flask import Flask, redirect, url_for, request
-from flask_login.utils import login_url
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 
@@ -11,10 +10,9 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from flask_login import UserMixin, LoginManager
 from flask_admin import Admin 
 
-from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required, current_user
+from flask_security import Security, SQLAlchemyUserDatastore, current_user, login_required
 from flask_admin.contrib import fileadmin
 
 # Добавление русской локали
@@ -24,7 +22,6 @@ from flask_babelex import Babel
 from flask_restful import Api 
 
 from .forms import LoginForm
-
 # Добавляем логирование пользователей и роли
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -55,21 +52,14 @@ migrate = Migrate(app, db, compare_type=True)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
-# Логирование 
-# app.config['SECURITY_LOGIN_USER_TEMPLATE'] = 'user/signin.html'
-login = LoginManager()
-login.init_app(app)
-
-@login.unauthorized_handler      
-def unauthorized_callback():            
-    return redirect(url_for('signin', next=request.endpoint)) 
-
 from .models import User,Role,HomeIndexView,UserModelView,RoleModelView,ReportModelView,RedirectTaskView,Report,DashModelView,Dash 
 
 # Добавляем админку
 # Добавление ролевой модели из Flask_Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore, login_form=LoginForm)
+security = Security()
+app.config['SECURITY_MSG_LOGIN'] = ('Для просмотра сайта требуется авторизоваться', 'info')
+security.init_app(app=app, datastore = user_datastore)
 
 # декоратор под первого пользователя
 @app.before_first_request

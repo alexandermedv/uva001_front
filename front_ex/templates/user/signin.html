@@ -17,7 +17,7 @@
                     <p class="mt-5 mb-3 text-muted" style ="margin-top: 30px;">Аналитическая система УВА. 2021</p>
                     {% with messages = get_flashed_messages() %}
                         {% if messages %}
-                            {% for message in messages %}
+                            {% for message in messages[:1] %}
                                 <div>
                                     <p><font color ="red">{{ message }}</font></p>
                                 </div>

@@ -9,7 +9,6 @@ from wtforms.fields.html5 import DateField, EmailField
 from functools import wraps
 from flask_admin import BaseView, AdminIndexView, expose
 
-
 from . import db
 
 # Связь роли с пользователем
@@ -45,7 +44,7 @@ class User(db.Model, UserMixin):
     
     def get_role_by_html_element(*args):
         if args:
-            return html_access_roles.get(args[1])
+            return ['admin']
         return []
 
     def to_json(self):

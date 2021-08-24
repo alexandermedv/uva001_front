@@ -202,7 +202,6 @@ def serverside_table():
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
     """Вход в систему"""
-    print(request.args['next'])
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = LoginForm()
@@ -212,7 +211,9 @@ def signin():
         user = User.query.filter_by(ldap_account=login).first()
         if user and ldap_authentication(login, password): 
             login_user(user)
-            return redirect(request.args['next'] or url_for('index'))
+            if 'next' in request.args:
+                return redirect(request.args['next'])
+            return redirect(url_for('index'))
         # Переписать
         else:
             flash('Аккаунт Windows, либо пароль указаны некорректно.')

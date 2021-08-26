@@ -26,5 +26,5 @@ USER root
 # run entrypoint.sh
 # ENTRYPOINT ["sh", "/usr/src/app/entrypoint.sh"]
 
-EXPOSE 7007
+EXPOSE 7102
 # EXPOSE {FLASK_PORT_PROD}

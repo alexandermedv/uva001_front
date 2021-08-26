@@ -1,9 +1,7 @@
-import front_ex.config as config
 from sqlalchemy import create_engine
 import pandas as pd
 import json
 from pprint import pprint
-import os
 
 
 def get_glossary():

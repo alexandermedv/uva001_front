@@ -1,7 +1,7 @@
 # Инициализация Celery
 import os
 from os import path as op
-from flask import Flask
+from flask import Flask, redirect, url_for, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 
@@ -10,10 +10,9 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from flask_login import UserMixin, LoginManager
 from flask_admin import Admin 
 
-from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required, current_user
+from flask_security import Security, SQLAlchemyUserDatastore, current_user, login_required
 from flask_admin.contrib import fileadmin
 
 # Добавление русской локали
@@ -22,17 +21,15 @@ from flask_babelex import Babel
 # Встроенные API
 from flask_restful import Api 
 
-from . import config
 from .forms import LoginForm
-
 # Добавляем логирование пользователей и роли
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
 app = Flask(__name__)
 app.config.update(
-    USE_TZ = config.USE_TZ,
-    TIMEZONE = config.TIMEZONE,   
+    USE_TZ = os.environ['USE_TZ'],
+    TIMEZONE = os.environ['TIMEZONE'],   
 )
 
 #### Добавляет шаблон Bootstrap
@@ -44,9 +41,9 @@ app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Moscow'
 babel = Babel(app)
 
 # Добавляем базы данных и логин-менеджер
-app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = config.SECRET_KEY or os.randov
+app.config['SECRET_KEY'] = os.urandom(24)
 db = SQLAlchemy(app)
 db.create_all()
 
@@ -55,16 +52,14 @@ migrate = Migrate(app, db, compare_type=True)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
-# Логирование 
-login = LoginManager()
-login.init_app(app)
-
-from .models import User,Role,HomeIndexView,UserModelView,RoleModelView,ReportModelView,RedirectTaskView,Report 
+from .models import User,Role,HomeIndexView,UserModelView,RoleModelView,ReportModelView,RedirectTaskView,Report,DashModelView,Dash 
 
 # Добавляем админку
 # Добавление ролевой модели из Flask_Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore, login_form=LoginForm)
+security = Security()
+app.config['SECURITY_MSG_LOGIN'] = ('Для просмотра сайта требуется авторизоваться', 'info')
+security.init_app(app=app, datastore = user_datastore)
 
 # декоратор под первого пользователя
 @app.before_first_request
@@ -88,6 +83,7 @@ admin = Admin(app, name = 'Администрирование', template_mode='b
     index_view=HomeIndexView(name='Обзор', endpoint='admin.user', url='/admin'))
 admin.add_view(UserModelView(User, db.session, name='Пользователи'))
 admin.add_view(RoleModelView(Role, db.session, name='Роли'))
+admin.add_view(DashModelView(Dash, db.session, name='Дэшборды'))
 admin.add_view(ReportModelView(Report, db.session, name='Отчеты'))
 admin.add_view(fileadmin.FileAdmin(path , '/files/', name='Файлы'))
 admin.add_view(RedirectTaskView(name='На сайт'))
@@ -104,19 +100,11 @@ from .dash_limit_oper import dash_app as dash_limit_oper
 from .dashapp1 import dash_app as dashapp1
 from .dashapp3 import dash_app as dashapp3
 
+
+# Добавляем руты и таски
+import front_ex.routes
 import front_ex.reports
 # from .dash_osv_dev import dash_app as dash_osv_dev
-
-# Добавляем руты
-import front_ex.routes
-
-# # Сборка в Middleware
-# dispatch_app = DispatcherMiddleware(flask_app, {
-#     'limit_oper': dash_limit_oper.server,
-#     'dashapp1': dashapp1.server,
-#     'dashboard3': dashapp3.server
-#     # '/dash_osv_dev': dash_osv_dev.server  
-#     })
 
 # Сборка в Middleware
 dispatch_app = DispatcherMiddleware(app.wsgi_app, {

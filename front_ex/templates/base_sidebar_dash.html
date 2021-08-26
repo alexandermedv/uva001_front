@@ -41,7 +41,7 @@
           <div class="row" style="margin-left: 0; margin-right: 0">
             <a class="navbar-left" href="https://portal/Pages/default.aspx" style="padding: 5px 5px;">
               <img src="{{ url_for('static', filename='images/logo_pgk.png') }}" height="40px" position="center"></a>
-            <a class="navbar-right" style="padding: 5px 5px; margin-right: 10px; margin-top: 10px; font-size: 15px; color: black" height="40px"> СЕРВИС УВА</a>
+            <a class="navbar-right" href = "/index" style="padding: 5px 5px; margin-right: 10px; margin-top: 10px; font-size: 15px; color: black" height="40px"> СЕРВИС УВА</a>
           </div>
         </div>
 
@@ -51,18 +51,40 @@
               <!-- Cписок дэшей -->
               <li><a href="/glossary"><i class="fa fa-dashboard"></i>Словарь терминов</a></li>
               <li><a href="/reports/"><i class="fa fa-dashboard"></i>Отчеты</a></li>
-              <li><a href="/limit_oper"><i class="fa fa-dashboard"></i>Дебиторская задолженность</a></li>
+              {% if current_user.check_dash_roles('limit_oper') %}
+                <li><a href="/limit_oper"><i class="fa fa-dashboard"></i>Дебиторская задолженность</a></li>
+              {% endif %}
+              {% if current_user.check_dash_roles('dashapp1') %}
               <li><a href="/dashapp1"><i class="fa fa-dashboard"></i>Недостача запчастей</a></li>
+              {% endif %}
+              {% if current_user.check_dash_roles('dashboard3') %}
               <li><a href="/dashboard3"><i class="fa fa-dashboard"></i>Полномочия в SAP</a></li>
+              {% endif %}
+              {% if current_user.check_report_roles('repair0') %}
               <li><a href="/repairs/repair0"><i class="fa fa-dashboard"></i>Реестр ремонтов</a></li>
+              {% endif %}
+              {% if current_user.check_report_roles('repair1') %}
               <li><a href="/repairs/repair1"><i class="fa fa-dashboard"></i>Некачественные ТОР</a></li>
+              {% endif %}
+              {% if current_user.check_report_roles('repair2') %}
               <li><a href="/repairs/repair2"><i class="fa fa-dashboard"></i>Некачественные ДР и КР</a></li>
+              {% endif %}
+              {% if current_user.check_report_roles('repair7') %}             
               <li><a href="/repairs/repair7"><i class="fa fa-dashboard"></i>Двойное создание заказов ТОРО</a></li>
+              {% endif %}
+              {% if current_user.check_report_roles('repair11') %}    
               <li><a href="/repairs/repair11"><i class="fa fa-dashboard"></i>Не выполненные вовремя плановые ремонты</a></li>
+              {% endif %}
+              {% if current_user.check_report_roles('report1') %}                  
               <li><a href="/report1"><i class="fa fa-dashboard"></i>Детали в статусе ДОСТ</a></li>
+              {% endif %}
+              {% if current_user.check_report_roles('report_equipment') %}  
               <li><a href="/report_equipment"><i class="fa fa-dashboard"></i>Запчасти</a></li>
-              {% if current_user.check_roles(['admin']) %}
+              {% endif %} 
+              {% if current_user.check_dash_roles('jira') %}
                 <li><a href="https://uvapgk.atlassian.net/jira/projects"><i class="fa fa-dashboard"></i>Jira</a></li>
+              {% endif %}
+              {% if current_user.check_dash_roles('gitlab') %}
                 <li><a href="https://gitlab.pgkweb.ru/"><i class="fa fa-dashboard"></i>Gitlab</a></li>
               {% endif %}
           </ul>
@@ -95,15 +117,4 @@
         });
     })(jQuery);
   </script>
-
-   <!-- <script>
-      ;(function($){
-          $(document).ready(function(){
-              $('iframe').width( $(window).width() - 241+"px");
-              $(window).resize(function(){
-                  $('iframe').width($(this).width());
-              });
-          });
-      })(jQuery);
-    </script> -->
 {% endblock %}

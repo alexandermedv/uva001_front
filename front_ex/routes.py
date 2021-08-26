@@ -1,31 +1,18 @@
-from flask_login import current_user, login_required, login_user, logout_user
-from flask import url_for, redirect, render_template, flash, request, jsonify
-import pandas as pd
-
-from . import app, db, login
-from .forms import LoginForm, ProfileForm
-from .models import User, requires_roles, Report
-from sqlalchemy import create_engine
-import os
-import front_ex.config as config
-from .report1 import utils as report1
-from .glossary import utils as glossary
-from .report_equipment import utils as report_equipment
 import json
-import datetime
-import requests
 from pprint import pprint
 import flask
 import psycopg2
+from flask import url_for, redirect, render_template, flash, request, jsonify
+from flask_security import login_required, current_user, login_user, logout_user
+import pandas as pd
 
+from . import app, db
+from .forms import LoginForm, ProfileForm
+from .models import User, requires_roles, Report
+from sqlalchemy import create_engine
+from .report1 import utils as report1
+from .glossary import utils as glossary
 from .ldap import ldap_authentication
-
-# Доступы по текущей сессии
-@login.user_loader
-def load_user(id):
-    """Инициализация пользователя"""
-    user = User.query.filter_by(id=id).first()
-    return user
 
 # Руты к дэшбордам
 @app.route('/limit_oper/')
@@ -212,28 +199,32 @@ def serverside_table():
     finally:
         cursor.close()
 
-
-# Общий роутинг
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/signin', methods=['GET', 'POST'])
 def signin():
     """Вход в систему"""
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        login = form.ldap_account.data
+        login = form.ldap_account.data.lower()  
         password = form.password.data
         user = User.query.filter_by(ldap_account=login).first()
         if user and ldap_authentication(login, password): 
             login_user(user)
+            if 'next' in request.args:
+                return redirect(request.args['next'])
             return redirect(url_for('index'))
+        # Переписать
         else:
-            flash('Invalid username')
+            flash('Аккаунт Windows, либо пароль указаны некорректно.')
             return redirect(url_for('signin'))
-    else: print('errors', form.errors)
     return render_template('/user/signin.html', title='Sign In', form=form)
 
 # Общие вводные
+@app.route('/')
+def redirect_login():
+    return redirect(url_for('signin'))
+
 @app.route('/index')
 @login_required
 def index():
@@ -252,6 +243,7 @@ def profile():
         return render_template('/user/profile.html', title='profile', form=form)
 
 @app.route('/logout')
+@login_required
 def logout():
     """Выход из системы"""
     logout_user()
@@ -261,6 +253,7 @@ def logout():
 # Отчетность
 @app.route('/reports/')
 @app.route('/reports/<id>', methods=['GET'])
+@login_required
 def reports(id=None):
     if id:
         report = Report.query.filter_by(active=True, id=id ).order_by(Report.id.asc()).first()
@@ -275,15 +268,12 @@ def reports(id=None):
 @app.route('/repairs/repair0/')
 @login_required
 def render_repair0():
-
     return render_template("/repairs/repair0.html")
-
 
 @app.route('/repairs/repair1/')
 @login_required
 def render_repair1():
     return render_template("/repairs/repair1.html")
-
 
 @app.route('/repairs/repair2/')
 @login_required

@@ -5,19 +5,16 @@ import os
 from .. import engine_cons
 from sqlalchemy import create_engine
 
+from ..utils import get_sap_s4_con_str
+
 
 def get_connection_sap():
-    connection_hana = pyhdb.connect(
-            host = config.SAP_HOST ,
-            port = config.SAP_HOST_PORT,
-            user = config.SAP_HOST_USER,
-            password = config.SAP_HOST_PASSWORD
-            )
+    connection_hana = pyhdb.connect(get_sap_s4_con_str)
     return connection_hana
 
 def get_connection_postgre_string():
     """Строка подключения к postgre тест"""
-    return config.POSTGRE_DB
+    return os.environ['POSTGRE_URL_DASH']
 
 def get_conflict1_data():
     """Выгрузка данных по конфликту 1"""

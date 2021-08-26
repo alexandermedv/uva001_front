@@ -1,0 +1,95 @@
+{% extends "base_sidebar_dash.html" %}
+
+
+{% block content %}
+        <div id="dt" style="margin:20px; margin-top:70px">
+            <p><h1>Потенциально некачественные ТОР (повторные ТОР по тому же коду отцепки)</h1></p>
+            <div >
+                <table id='empTable' class='display dataTable' width='100%' style="margin-left:0px">   
+                </table>
+            </div>
+        </div>
+        <script>
+        $(document).ready(function() {
+         
+          
+            var empDataTable = $('#empTable').DataTable({
+                        'processing': true,
+                        'serverSide': true,
+                        'serverMethod': 'post',
+                        'ajax': {
+                            'url':'/_get_table_serverside',
+                            'data':{table_name: 'repairs_aggr',
+                                    key: 'Заказ ТОРО',
+                                    schema_name: 'dashboard'
+                            },
+                        },
+                        "deferRender": true,
+                        'lengthMenu': [[20, 50, 100, 1000, 10000, 100000, -1], [20, 50, 100, 1000, 10000, 100000, "All"]],
+                        searching: true,
+                        scrollY: 680,
+                        scrollX: 1000,
+                        "scrollCollapse": true,
+                        searchDelay: 1000,
+                        scroller: {
+                            loadingIndicator: true
+                        },
+                        sort: false,
+                        "serverSide": true,
+                        'columns': [
+                            { data: "Заказ ТОРО", title: "Заказ ТОРО" },
+                            { data: "Вид работы ТОРО", title: "Вид работы ТОРО" },
+                            { data: "Название ВРТ", title: "Название ВРТ" },
+                            { data: "Ед. оборудования", title: "Ед. оборудования" },
+                            { data: "Название объекта/номер вагона", title: "Название объекта/номер вагона" },
+                            { data: "Тип собственности ГВЦ", title: "Тип собственности ГВЦ" },
+                            { data: "Текст типа собственности ГВЦ", title: "Текст типа собственности ГВЦ" },
+                            { data: "Наименование собственника", title: "Наименование собственника" },
+                            { data: "РПС", title: "РПС" },
+                            { data: "Текст РПС", title: "Текст РПС" },
+                            { data: "Вн. номер объекта", title: "Вн. номер объекта" },
+                            { data: "Тип собственности", title: "Тип собственности" },
+                            { data: "Текст типа собственности", title: "Текст типа собственности" },
+                            { data: "Вид управления по договору", title: "Вид управления по договору" },
+                            { data: "Текст вида управления по договору", title: "Текст вида управления по договору" },
+                            { data: "Дата последнего ДР", title: "Дата последнего ДР" },
+                            { data: "Дата последнего КР", title: "Дата последнего КР" },
+                            { data: "Дата следующего планового ремонта", title: "Дата следующего планового ремонта" },
+                            { data: "Вид следующего планового ремонта", title: "Вид следующего планового ремонта" },
+                            { data: "Текст след. планового ремонта", title: "Текст след. планового ремонта" },
+                            { data: "Описание", title: "Описание" },
+                            { data: "Договор RCM", title: "Договор RCM" },
+                            { data: "ВРП", title: "ВРП" },
+                            { data: "Дата перевода в НРП", title: "Дата перевода в НРП" },
+                            { data: "Дата перевода в РП", title: "Дата перевода в РП" },
+                            { data: "Код неисравности", title: "Код неисравности" },
+                            { data: "Текст причины возникновения неисп", title: "Текст причины возникновения неисп" },
+                            { data: "Код повреждения", title: "Код повреждения" },
+                            { data: "Код повреждения_текст", title: "Код повреждения_текст" },
+                            { data: "Пользовательский статус", title: "Пользовательский статус" },
+                            { data: "Сумма", title: "Сумма" }
+                        ],
+                        dom: 'Blfrtip',
+                        buttons: [
+                                'copyHtml5',
+                                'excelHtml5',
+                                'csvHtml5',
+                                {
+                                    extend: 'pdfHtml5',
+                                    orientation: 'landscape',
+                                    pageSize: 'LEGAL'
+                                },
+                                {
+                                    text: 'Выгрузка в фоновом режиме',
+                                    action: function ( e, dt, node, config ) {
+                                        alert( 'Button activated' );
+                                    }
+                                }
+                            ],
+                        "language": {"url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"}
+                    });
+         
+        });
+         
+        </script>
+{% endblock %}

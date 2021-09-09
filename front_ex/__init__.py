@@ -11,7 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from flask_login import UserMixin, LoginManager
-from flask_admin import Admin 
+from flask_admin import Admin
 
 from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required, current_user
 from flask_admin.contrib import fileadmin
@@ -20,7 +20,7 @@ from flask_admin.contrib import fileadmin
 from flask_babelex import Babel
 
 # Встроенные API
-from flask_restful import Api 
+from flask_restful import Api
 
 from . import config
 from .forms import LoginForm
@@ -31,8 +31,8 @@ from flask_login import LoginManager
 
 app = Flask(__name__)
 app.config.update(
-    USE_TZ = config.USE_TZ,
-    TIMEZONE = config.TIMEZONE,   
+    USE_TZ=config.USE_TZ,
+    TIMEZONE=config.TIMEZONE,
 )
 
 #### Добавляет шаблон Bootstrap
@@ -55,7 +55,7 @@ migrate = Migrate(app, db, compare_type=True)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
-# Логирование 
+# Логирование
 login = LoginManager()
 login.init_app(app)
 
@@ -103,6 +103,7 @@ manager.add_command('db', MigrateCommand)
 from .dash_limit_oper import dash_app as dash_limit_oper
 from .dashapp1 import dash_app as dashapp1
 from .dashapp3 import dash_app as dashapp3
+from .dashapp5 import dash_app as dashapp5
 
 import front_ex.reports
 # from .dash_osv_dev import dash_app as dash_osv_dev
@@ -122,5 +123,6 @@ import front_ex.routes
 dispatch_app = DispatcherMiddleware(app.wsgi_app, {
     'limit_oper': dash_limit_oper.server,
     'dashapp1': dashapp1.server,
-    'dashboard3': dashapp3.server
+    'dashboard3': dashapp3.server,
+    'dashapp5': dashapp5.server
     })

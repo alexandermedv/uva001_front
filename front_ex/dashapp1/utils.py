@@ -90,7 +90,7 @@ def get_osv_data(start_date, end_date, debug = False):
 				h.cumsum_count
             FROM dashboard.osv_94
                 LEFT JOIN dashboard.material
-                    ON dashboard.osv_94."Материал" = '00000000'||dashboard.material."Код материала"
+                    ON dashboard.osv_94."Материал" = dashboard.material."Код материала"
 				LEFT JOIN (
 					SELECT  "Дата проводки",
 							"Название бизнес-сферы",
@@ -115,7 +115,7 @@ def get_osv_data(start_date, end_date, debug = False):
 								  rows between unbounded preceding and current row) AS cumsum_det_type
 					FROM dashboard.osv_94
 						LEFT JOIN dashboard.material
-							ON dashboard.osv_94."Материал" = '00000000'||dashboard.material."Код материала"
+							ON dashboard.osv_94."Материал" = dashboard.material."Код материала"
 					GROUP BY "Дата проводки",
 							 "Группа материалов"
 				) b
@@ -180,7 +180,7 @@ def get_osv_data(start_date, end_date, debug = False):
 			  					  rows between unbounded preceding and current row) AS cumsum_det_type_count
 						FROM dashboard.osv_94
 							LEFT JOIN dashboard.material
-								ON dashboard.osv_94."Материал" = '00000000'||dashboard.material."Код материала"
+								ON dashboard.osv_94."Материал" = dashboard.material."Код материала"
 						GROUP BY "Дата проводки",
 							 	 "Группа материалов"
 				) f
@@ -229,7 +229,7 @@ def get_osv_data(start_date, end_date, debug = False):
 							max("Дата проводки") AS initial_date
 					FROM dashboard.osv_94
 						LEFT JOIN dashboard.material
-							ON dashboard.osv_94."Материал" = '00000000'||dashboard.material."Код материала"
+							ON dashboard.osv_94."Материал" = dashboard.material."Код материала"
 					WHERE TO_DATE("Дата проводки", 'YYYYMMDD') < '%s' 
 					GROUP BY "Название бизнес-сферы",
 							"Группа материалов",

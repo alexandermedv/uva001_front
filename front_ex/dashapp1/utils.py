@@ -1,8 +1,7 @@
 """Выгрузка данных и вспомогательные функции"""
+import os
 import datetime as dt
-
 import pandas as pd
-import front_ex.config as config
 from sqlalchemy import create_engine
 #from app import engine_analysis, engine_cons
 
@@ -49,7 +48,7 @@ def get_osv_detail_by_dates(start_date, end_date, debug = False):
     if debug:
         print(sql)
     # return pd.read_sql(sql, con=engine_cons, params={"dstart":start_date,"dfinish":end_date})
-    return pd.read_sql(sql, con=create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
 
 # Выгрузка куба данных операций по счету 94* за выбранный период

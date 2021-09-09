@@ -4,17 +4,20 @@ from wtforms import SubmitField, TextAreaField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Length, InputRequired, Email, NumberRange, EqualTo
 from wtforms.fields.html5 import DateField, EmailField
 from wtforms.widgets import TextInput
-
-import front_ex.config as config 
+from flask_security.forms import LoginForm
 
 class LoginForm(FlaskForm):
     """Форма авторизации пользователя"""
-    # email = StringField('E-mail', validators=[DataRequired()])
+
     ldap_account = StringField('Аккаунт windows')
     password = PasswordField('Пароль', validators=[DataRequired()])
-    # Запоминать пароль не требуется
-    # remember = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
+    
+    # Неиспользуемые объекты
+    email = StringField('E-mail')
+    remember = BooleanField('Запомнить меня')
+    next = StringField('Next')
+
 class ProfileForm(FlaskForm):
     """Форма профиля пользователя"""
     login = StringField('Учетная запись', render_kw={'readonly': True})

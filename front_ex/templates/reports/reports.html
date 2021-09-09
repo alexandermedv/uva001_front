@@ -1,5 +1,6 @@
-{% extends "base.html" %}
-{% block title %} Реестр отчетов{% endblock %}
+{% extends "base_sidebar_dash.html" %}
+
+{% block title %}<li><a style = "color:#bc4e4e">Реестр отчетов</a></li>{% endblock %}
 
 {% block content %}
     <!-- <h5>Сформировать запрос на загрузку данных</h5> -->
@@ -10,10 +11,7 @@
           <th scope="col">#</th>
           <th scope="col">Код отчета</th>
           <th scope="col">Название</th>
-          <th scope="col">Активно</th>
           <th scope="col">Описание</th>
-          <th scope="col">Роли отчетов</th>
-          <th scope="col">Роли пользователя</th>
         </tr>
       </thead>
       <tbody>
@@ -24,10 +22,7 @@
                   <td>{{ row.id }}</td>
                   <td>{{ row.instance }}</td>
                   <td>{{ row.name }}</td>
-                  <td>{{ row.active }}</td>
                   <td>{{ row.description }}</td>
-                  <td>{{ row.roles }}</td>
-                  <td>{{ current_user.roles }}</td>
                   <td>
                     <a href="/reports/filter/{{row.instance}}" class = "btn btn-success btn-xs" method = "POST">Скачать</a>
                   </td>

@@ -17,7 +17,6 @@ docker-compose up -d --build
 <!--Запуск Prod -->
 Инициализация базы данных:
 export FLASK_APP=wsgi_prod.py
-export FLASK_ENV=Prod
 
 flask db migrate
 flask db upgrade

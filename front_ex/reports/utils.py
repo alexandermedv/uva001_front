@@ -1,7 +1,7 @@
 
+import os
 from wtforms import Field
 from wtforms.widgets import TextInput
-
 from io import StringIO
 import csv
 
@@ -22,12 +22,12 @@ class TagListField(Field):
             self.data = []
 
 def get_postgre_con_str():
-    """Строка подключения к postgre тест"""
-    return "postgresql://locadm:Temp001@msc199-sdb04.domain.local:8036/uva_cons"
+    """Строка подключения к postgre базе с данными"""
+    return os.environ['POSTGRE_URL_DASH']
 
 def get_sap_s4_con_str():
     """Строка подключения к S4 тест"""
-    return "hana+pyhdb://PGKAUDIT:Rfh,jyfhf21@sap-db-s4q.sap.tc:30115"
+    return os.environ['SAP_HOST_S4']
 
 # -- Подключение
 def psql_insert_copy(table, conn, keys, data_iter):

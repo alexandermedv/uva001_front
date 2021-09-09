@@ -81,12 +81,17 @@
               {% endif %}
               {% if current_user.check_report_roles('report_equipment') %}  
               <li><a href="/report_equipment"><i class="fa fa-dashboard"></i>Запчасти</a></li>
+              {% endif %}
+              {% if current_user.check_report_roles('report_resellers') %}  
               <li><a href="/resellers"><i class="fa fa-dashboard"></i>Посредники (отчет)</a></li>
+              {% endif %}
+              {% if current_user.check_report_roles('resellers') %}  
               <li><a href="/resellers_dash"><i class="fa fa-dashboard"></i>Посредники (дашборд)</a></li>
+              {% endif %}
               {% if current_user.check_roles(['admin']) %}
                 <li><a href="https://uvapgk.atlassian.net/jira/projects"><i class="fa fa-dashboard"></i>Jira</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('gitlab') %}
+              {% if current_user.check_roles(['admin']) %}
                 <li><a href="https://gitlab.pgkweb.ru/"><i class="fa fa-dashboard"></i>Gitlab</a></li>
               {% endif %}
           </ul>

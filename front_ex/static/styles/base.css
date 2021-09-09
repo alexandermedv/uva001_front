@@ -1,7 +1,14 @@
   body {
-    margin-top: 50px;
+    margin-top: 20px;
   }
 
   table.dataTable tr td {
     height: 10px;
   }
+
+  /* .truncate {
+    max-width:200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  } */

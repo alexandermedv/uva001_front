@@ -16,6 +16,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+  <script src="https://cdn.datatables.net/plug-ins/1.11.0/dataRender/ellipsis.js"></script>
 {% endblock %}
 
 {% block navbar_header %}
@@ -80,8 +81,9 @@
               {% endif %}
               {% if current_user.check_report_roles('report_equipment') %}  
               <li><a href="/report_equipment"><i class="fa fa-dashboard"></i>Запчасти</a></li>
-              {% endif %} 
-              {% if current_user.check_dash_roles('jira') %}
+              <li><a href="/resellers"><i class="fa fa-dashboard"></i>Посредники (отчет)</a></li>
+              <li><a href="/resellers_dash"><i class="fa fa-dashboard"></i>Посредники (дашборд)</a></li>
+              {% if current_user.check_roles(['admin']) %}
                 <li><a href="https://uvapgk.atlassian.net/jira/projects"><i class="fa fa-dashboard"></i>Jira</a></li>
               {% endif %}
               {% if current_user.check_dash_roles('gitlab') %}

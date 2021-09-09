@@ -33,6 +33,12 @@ def render_dashapp3():
     """Дашборд по полномочиям в SAP"""
     return render_template('/dashapp3/overview.html')
 
+@app.route('/resellers_dash/')
+@login_required
+def render_dashapp5():
+    """Дашборд по посредникам"""
+    return render_template('/dashapp5/overview.html')
+
 @app.route('/glossary/')
 @login_required
 def render_glossary():
@@ -59,14 +65,7 @@ def render_report1():
 @app.route('/report_equipment/')
 @login_required
 def render_report_equipment():
-    # start = datetime.datetime.now()
-    # df1 = report_equipment.get_equipment()
-    # print(df1[['equnr', 'eqktx', 'erdat', 'ernam', 'typtx', 'eartx', 'maktx', 'mtbez', 'wgbez', 'status', 'hequi', 'last_oper_date']])
-    # end = datetime.datetime.now()
-    # print('df loading took: ', end-start)
-    # # data = requests.get('/_get_table')
-    # # print(data.json())
-    # return render_template('/report_equipment/report_equipment.html', title='report_equipment')
+
     return render_template("/report_equipment/report_equipment.html")
 
 @app.route("/_get_table_serverside", methods=["POST", "GET"])
@@ -88,6 +87,7 @@ def serverside_table():
     # print("column_names", column_names)
 
     try:
+        # Убрать хардкод!
         with psycopg2.connect(user="locadm",
                                 password="Temp001",
                                 host="msc199-sdb04.domain.local",
@@ -127,7 +127,7 @@ def serverside_table():
                     # print('s =', s)
                     cols = s.replace("['", "")
                     cols = cols.replace("']", "")
-                    
+
                     # print('cols =', cols)
 
                     sql = """SELECT count(*) from """ + schema_name + '.' + table_name + """ WHERE
@@ -279,3 +279,14 @@ def render_repair1():
 @login_required
 def render_repair2():
     return render_template("/repairs/repair2.html")
+
+
+@app.route('/resellers/')
+@login_required
+def render_resellers():
+    return render_template("/resellers/resellers.html")
+
+
+@app.route('/resellers_table/')
+def render_resellers_table():
+    return render_template("/resellers/resellers_table.html")

@@ -8,7 +8,7 @@ from .. import app
 #, db, engine_cons
 
 dash_app = Dash(__name__, server=app,
-                url_base_pathname='/dashboard3/',
+                url_base_pathname='/dashboard3_dash/',
                 suppress_callback_exceptions=True)
 dash_app.config.update(app.config)
 dash_app.layout = html.Div()
@@ -28,7 +28,7 @@ from .pages import layout
 def display_page(pathname):
     """Выбор шаблона"""
     print(pathname)
-    if pathname == "/dashboard3/":
+    if pathname == "/dashboard3_dash/":
         layout_dash = layout.create_layout()
         return layout_dash
         #page_4.create_layout(dash_app)

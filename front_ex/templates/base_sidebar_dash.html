@@ -51,7 +51,7 @@
           <ul class="nav navbar-nav">
               <!-- Cписок дэшей -->
               <li><a href="/glossary"><i class="fa fa-dashboard"></i>Словарь терминов</a></li>
-              <li><a href="/reports/"><i class="fa fa-dashboard"></i>Отчеты</a></li>
+              <!-- <li><a href="/reports/"><i class="fa fa-dashboard"></i>Отчеты</a></li> -->
               {% if current_user.check_dash_roles('limit_oper') %}
                 <li><a href="/limit_oper"><i class="fa fa-dashboard"></i>Дебиторская задолженность</a></li>
               {% endif %}
@@ -70,9 +70,9 @@
               {% if current_user.check_report_roles('repair2') %}
               <li><a href="/repairs/repair2"><i class="fa fa-dashboard"></i>Некачественные ДР и КР</a></li>
               {% endif %}
-              {% if current_user.check_report_roles('repair7') %}             
+              <!-- {% if current_user.check_report_roles('repair7') %}             
               <li><a href="/repairs/repair7"><i class="fa fa-dashboard"></i>Двойное создание заказов ТОРО</a></li>
-              {% endif %}
+              {% endif %} -->
               {% if current_user.check_report_roles('repair11') %}    
               <li><a href="/repairs/repair11"><i class="fa fa-dashboard"></i>Не выполненные вовремя плановые ремонты</a></li>
               {% endif %}

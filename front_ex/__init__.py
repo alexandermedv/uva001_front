@@ -57,7 +57,7 @@ manager.add_command('db', MigrateCommand)
 # login = LoginManager()
 # login.init_app(app)
 
-from .models import User,Role,HomeIndexView,UserModelView,RoleModelView,ReportModelView,RedirectTaskView,Report 
+from .models import User,Role,Dash,HomeIndexView,UserModelView,RoleModelView,ReportModelView,RedirectTaskView,Report,DashModelView 
 
 # Добавляем админку
 # Добавление ролевой модели из Flask_Security
@@ -88,7 +88,7 @@ admin = Admin(app, name = 'Администрирование', template_mode='b
     index_view=HomeIndexView(name='Обзор', endpoint='admin.user', url='/admin'))
 admin.add_view(UserModelView(User, db.session, name='Пользователи'))
 admin.add_view(RoleModelView(Role, db.session, name='Роли'))
-# admin.add_view(DashModelView(Dash, db.session, name='Дэшборды'))
+admin.add_view(DashModelView(Dash, db.session, name='Дэшборды'))
 admin.add_view(ReportModelView(Report, db.session, name='Отчеты'))
 admin.add_view(fileadmin.FileAdmin(path , '/files/', name='Файлы'))
 admin.add_view(RedirectTaskView(name='На сайт'))

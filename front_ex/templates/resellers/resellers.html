@@ -1,0 +1,97 @@
+{% extends "base_sidebar_dash.html" %}
+
+
+{% block content %}
+        <div id="dt" style="margin:20px; margin-top:70px">
+            <p><h1>Посредники и связи между компаниями</h1></p>
+            <div >
+                <table id='empTable' class='display dataTable' width='100%' style="margin-left:0px">   
+                </table>
+            </div>
+        </div>
+        <script>
+        $(document).ready(function() {
+         
+          
+            var empDataTable = $('#empTable').DataTable({
+                columnDefs: [ {
+                targets: "_all",
+                render: $.fn.dataTable.render.ellipsis( 20 )
+              } ],
+                    'processing': true,
+                    'serverSide': true,
+                    'serverMethod': 'post',
+                    'ajax': {
+                        'url':'/_get_table_serverside',
+                        'data':{table_name: 'resellers_results',
+                                key: 'Грузоотправитель',
+                                schema_name: 'dashboard'
+                        },
+                    },
+                    "deferRender": true,
+                    'lengthMenu': [[20, 50, 100, 1000, 10000, 100000, -1], [20, 50, 100, 1000, 10000, 100000, "All"]],
+                    searching: true,
+                    scrollY: '68vh',
+                    scrollX: 1000,
+                    "scrollCollapse": true,
+                    searchDelay: 1000,
+                    scroller: {
+                        loadingIndicator: true,
+                    },
+                    sort: false,
+                    "serverSide": true,
+                    'columns': [
+                        { data: "Грузоотправитель", title: "Грузоотправитель" },
+                        { data: "Название грузоотправителя", title: "Название грузоотправителя" },
+                        { data: "ОКПО грузоотправителя", title: "ОКПО грузоотправителя" },
+                        { data: "ИНН грузоотправителя", title: "ИНН грузоотправителя" },
+                        { data: "Холдинг грузоотправителя", title: "Холдинг грузоотправителя" },
+                        { data: "ИНН холдинга грузоотправителя", title: "ИНН холдинга грузоотправителя" },
+                        { data: "ОКПО холдинга грузоотправителя", title: "ОКПО холдинга грузоотправителя" },
+                        { data: "Грузополучатель", title: "Грузополучатель" },
+                        { data: "Название грузополучателя", title: "Название грузополучателя" },
+                        { data: "ОКПО грузополучателя", title: "ОКПО грузополучателя" },
+                        { data: "ИНН грузополучателя", title: "ИНН грузополучателя" },
+                        { data: "Холдинг грузополучателя", title: "Холдинг грузополучателя" },
+                        { data: "ИНН холдинга грузополучателя", title: "ИНН холдинга грузополучателя" },
+                        { data: "ОКПО холдинга грузополучателя", title: "ОКПО холдинга грузополучателя" },
+                        { data: "Заказчик", title: "Заказчик" },
+                        { data: "Название заказчика", title: "Название заказчика" },
+                        { data: "ОКПО заказчика", title: "ОКПО заказчика" },
+                        { data: "ИНН заказчика", title: "ИНН заказчика" },
+                        { data: "Холдинг заказчика", title: "Холдинг заказчика" },
+                        { data: "ИНН холдинга заказчика", title: "ИНН холдинга заказчика" },
+                        { data: "ОКПО холдинга заказчика", title: "ОКПО холдинга заказчика" },
+                        { data: "Количество рейсов", title: "Количество рейсов" },
+                        { data: "Связь отправитель-заказчик", title: "Связь отправитель-заказчик" },
+                        { data: "Связь получатель-заказчик", title: "Связь получатель-заказчик" },
+                        { data: "Отправитель и получатель в холдин", title: "Отправитель и получатель в холдин" },
+                        { data: "Отправитель и заказчик в холдинге", title: "Отправитель и заказчик в холдинге" },
+                        { data: "Получатель и заказчик в холдинге", title: "Получатель и заказчик в холдинге" },
+                        { data: "Холдинг?", title: "Холдинг?" },
+                        { data: "Результат анализа", title: "Результат анализа" }
+                    ],
+                    dom: 'Blfrtip',
+                    buttons: [
+                            'copyHtml5',
+                            'excelHtml5',
+                            'csvHtml5',
+                            {
+                                extend: 'pdfHtml5',
+                                orientation: 'landscape',
+                                pageSize: 'LEGAL'
+                            },
+                            {
+                                text: 'Выгрузка в фоновом режиме',
+                                action: function ( e, dt, node, config ) {
+                                    alert( 'Button activated' );
+                                }
+                            }
+                        ],
+                    "language": {"url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json"}
+                });
+         
+        });
+         
+        </script>
+{% endblock %}

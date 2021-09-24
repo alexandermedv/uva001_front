@@ -1,0 +1,38 @@
+version: '3.5'
+services: 
+   test_app:
+      container_name: test_front
+      build:  
+         context: .
+         dockerfile: dockerfile.dev
+      command: python wsgi_test.py
+      # command: gunicorn -w 1 -b 0.0.0.0:7007 wsgi:app  
+      volumes: 
+         - .:/usr/src/app/
+      ports: 
+         # - "127.0.0.1:7008:7007"
+         - "7101:7102"
+      # depends_on: 
+      #    - redis   
+      environment: 
+         - TZ=Europe/Moscow
+      networks: 
+         - test_net_nginx      
+   
+   # dev_nginx:
+   #    build:
+   #       context: ./nginx
+   #       dockerfile: dockerfile
+   #    ports:
+   #          - 7101:7101
+   #    depends_on:
+   #          - dev_app    
+   #    networks: 
+   #       - dev_net_nginx
+networks: 
+   test_net_nginx: 
+      driver: bridge
+      ipam:
+         config:
+           - subnet: 13.9.1.0/16
+            

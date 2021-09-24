@@ -10,7 +10,8 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from flask_admin import Admin 
+from flask_login import UserMixin, LoginManager
+from flask_admin import Admin
 
 from flask_security import Security, SQLAlchemyUserDatastore, current_user, login_required
 from flask_admin.contrib import fileadmin
@@ -19,18 +20,18 @@ from flask_admin.contrib import fileadmin
 from flask_babelex import Babel
 
 # Встроенные API
-from flask_restful import Api 
+from flask_restful import Api
 
-from .forms import LoginForm
+# from .forms import LoginForm
 # Добавляем логирование пользователей и роли
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
 app = Flask(__name__)
-app.config.update(
-    USE_TZ = os.environ['USE_TZ'],
-    TIMEZONE = os.environ['TIMEZONE'],   
-)
+# app.config.update(
+#     USE_TZ = os.environ['USE_TZ'],
+#     TIMEZONE = os.environ['TIMEZONE'],   
+# )
 
 #### Добавляет шаблон Bootstrap
 Bootstrap(app)
@@ -52,7 +53,11 @@ migrate = Migrate(app, db, compare_type=True)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
-from .models import User,Role,HomeIndexView,UserModelView,RoleModelView,ReportModelView,RedirectTaskView,Report,DashModelView,Dash 
+# Логирование
+# login = LoginManager()
+# login.init_app(app)
+
+from .models import User,Role,Dash,HomeIndexView,UserModelView,RoleModelView,ReportModelView,RedirectTaskView,Report,DashModelView 
 
 # Добавляем админку
 # Добавление ролевой модели из Flask_Security
@@ -99,6 +104,7 @@ manager.add_command('db', MigrateCommand)
 from .dash_limit_oper import dash_app as dash_limit_oper
 from .dashapp1 import dash_app as dashapp1
 from .dashapp3 import dash_app as dashapp3
+from .dashapp5 import dash_app as dashapp5
 
 
 # Добавляем руты и таски
@@ -110,5 +116,6 @@ import front_ex.reports
 dispatch_app = DispatcherMiddleware(app.wsgi_app, {
     'limit_oper': dash_limit_oper.server,
     'dashapp1': dashapp1.server,
-    'dashboard3': dashapp3.server
+    'dashboard3': dashapp3.server,
+    'dashapp5': dashapp5.server
     })

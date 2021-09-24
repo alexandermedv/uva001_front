@@ -684,16 +684,18 @@ def render_content(start_date, end_date, tab, filial, detail_type,
             df0_left = df0_left[df0_left['Наименование склада'].isin([warehouse])]
 
         #if not df0.empty:
-
+        print('df0 =', df0)
         df1_left = df0_left.groupby('Группа материалов').sum()
         df1_left['Группа материалов'] = df1_left.index
         df1_left = df1_left.reset_index(drop=True)
         df1_left = df1_left[['Группа материалов', 'Дебет', 'Кредит', 'Количество_дебет', 'Количество_кредит']]
+        print('df1_left = ', df1_left)
 
         df1 = df0.groupby('Группа материалов').sum()
         df1['Группа материалов'] = df1.index
         df1 = df1.reset_index(drop=True)
         df1 = df1[['Группа материалов', 'Дебет', 'Кредит', 'Количество_дебет', 'Количество_кредит']]
+        print('df1 =', df1)
 
         df_merged = df1_left.merge(df1, on=['Группа материалов'], how='outer')
         df_merged = df_merged.fillna(0)
@@ -704,6 +706,7 @@ def render_content(start_date, end_date, tab, filial, detail_type,
         df_merged['Оборот, шт.'] = df_merged['Количество_дебет_y'] - df_merged['Количество_кредит_y']
         df_merged['Исходящее сальдо, шт.'] = df_merged['Входящее сальдо, шт.'] + df_merged['Оборот, шт.']
         df_merged = df_merged[['Группа материалов', 'Входящее сальдо', 'Оборот', 'Исходящее сальдо', 'Входящее сальдо, шт.', 'Оборот, шт.', 'Исходящее сальдо, шт.']]
+        print('df_merged =', df_merged)
 
         # df1 = df0.groupby('Группа материалов').sum()
         # df1['Группа материалов'] = df1.index

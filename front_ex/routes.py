@@ -5,6 +5,7 @@ import psycopg2
 from flask import url_for, redirect, render_template, flash, request, jsonify
 from flask_security import login_required, current_user, login_user, logout_user
 import pandas as pd
+from sqlalchemy import func
 
 from . import app, db
 from .forms import LoginForm, ProfileForm
@@ -208,7 +209,7 @@ def signin():
     if form.validate_on_submit():
         login = form.ldap_account.data.lower()  
         password = form.password.data
-        user = User.query.filter_by(ldap_account=login).first()
+        user = User.query.filter(func.lower(User.ldap_account)==login).first()
         if user and ldap_authentication(login, password): 
             login_user(user)
             if 'next' in request.args:

@@ -11,7 +11,7 @@ def get_branch_names(start_date, end_date, gruz, rod):
     sql = '''
         SELECT DISTINCT "Наименование филиала"
         FROM dashboard.resellers_cube
-        WHERE TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+        WHERE TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
                     AND "Название груза ЕТСНГ" IN %s
                     AND "Род подвижного состава" IN %s
                     AND "Результат анализа" = 'Посредник'
@@ -28,7 +28,7 @@ def get_all_branch_names(start_date, end_date):
     sql = '''
         SELECT DISTINCT "Наименование филиала"
         FROM dashboard.resellers_cube
-        WHERE TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+        WHERE TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
         ORDER BY "Наименование филиала" ASC
     ''' % (start_date, end_date)
 
@@ -42,7 +42,7 @@ def get_cargo_names(start_date, end_date, branches, rod):
     sql = '''
         SELECT DISTINCT "Название груза ЕТСНГ"
         FROM dashboard.resellers_cube
-        WHERE TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+        WHERE TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
                     AND "Наименование филиала" IN %s
                     AND "Род подвижного состава" IN %s
                     AND "Результат анализа" = 'Посредник'
@@ -58,7 +58,7 @@ def get_all_cargo_names(start_date, end_date):
     sql = '''
         SELECT DISTINCT "Название груза ЕТСНГ"
         FROM dashboard.resellers_cube
-        WHERE TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+        WHERE TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
         ORDER BY "Название груза ЕТСНГ" ASC
     ''' % (start_date, end_date)
 
@@ -71,7 +71,7 @@ def get_rps(start_date, end_date, branches, gruz):
     sql = '''
         SELECT DISTINCT "Род подвижного состава"
         FROM dashboard.resellers_cube
-        WHERE TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+        WHERE TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
                     AND "Наименование филиала" IN %s
                     AND "Название груза ЕТСНГ" IN %s
                     AND "Результат анализа" = 'Посредник'
@@ -87,7 +87,7 @@ def get_all_rps(start_date, end_date):
     sql = '''
         SELECT DISTINCT "Род подвижного состава"
         FROM dashboard.resellers_cube
-        WHERE TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+        WHERE TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
         ORDER BY "Род подвижного состава" ASC
     ''' % (start_date, end_date)
 
@@ -98,7 +98,7 @@ def get_all_rps(start_date, end_date):
 def get_max_date():
     """Максимальная дата в выгрузке"""
     sql = '''
-    SELECT MAX(TO_DATE("Дата заказа", 'YYYYMMDD'))
+    SELECT MAX(TO_DATE("Дата раскредитования", 'YYYYMMDD'))
     FROM dashboard.resellers_cube
     '''
     # return engine_cons.execute(sql).fetchone()[0]
@@ -126,7 +126,7 @@ def get_top_resellers(start_date, end_date, branches, gruz, rod, sorting):
                     sum("Стоимость") AS "Стоимость"
                 FROM dashboard.resellers_cube f
                 WHERE "Результат анализа" = 'Посредник'
-                    AND TO_DATE(f."Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+                    AND TO_DATE(f."Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
                     AND "Наименование филиала" IN %s
                     AND "Название груза ЕТСНГ" IN %s
                     AND "Род подвижного состава" IN %s
@@ -134,9 +134,10 @@ def get_top_resellers(start_date, end_date, branches, gruz, rod, sorting):
                     f."Результат анализа") c
             ON a."Заказчик" = c."Заказчик"
         WHERE a."Заказчик" IS NOT NULL
+            AND c."Результат анализа" = 'Посредник'
             AND c."Количество" > 30
             AND c."Стоимость" IS NOT NULL
-            AND TO_DATE(a."Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+            AND TO_DATE(a."Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
             AND a."Наименование филиала" IN %s
             AND a."Название груза ЕТСНГ" IN %s
             AND a."Род подвижного состава" IN %s
@@ -174,7 +175,7 @@ def get_resellers_by_branches(start_date, end_date, branches, gruz, rod, sorting
     #             sum("Количество рейсов") AS "Количество рейсов",
     #             sum("Стоимость") AS ""
     #         FROM dashboard.resellers_cube
-    #         WHERE TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+    #         WHERE TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
     #             AND "Наименование филиала" IN %s
     #             AND "Название груза ЕТСНГ" IN %s
     #             AND "Род подвижного состава" IN %s
@@ -184,7 +185,7 @@ def get_resellers_by_branches(start_date, end_date, branches, gruz, rod, sorting
     #             sum("Количество рейсов") AS "Количество посреднических рейсов"
     #         FROM dashboard.resellers_cube
     #         WHERE "Результат анализа" = 'Посредник'
-    #             AND TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+    #             AND TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
     #             AND "Наименование филиала" IN %s
     #             AND "Название груза ЕТСНГ" IN %s
     #             AND "Род подвижного состава" IN %s
@@ -215,7 +216,7 @@ def get_resellers_by_branches(start_date, end_date, branches, gruz, rod, sorting
                     sum("Стоимость") AS "Стоимость"
                 FROM dashboard.resellers_cube f
                 WHERE "Результат анализа" = 'Посредник'
-                    AND TO_DATE(f."Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+                    AND TO_DATE(f."Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
                     AND "Наименование филиала" IN %s
                     AND "Название груза ЕТСНГ" IN %s
                     AND "Род подвижного состава" IN %s
@@ -226,7 +227,7 @@ def get_resellers_by_branches(start_date, end_date, branches, gruz, rod, sorting
         WHERE a."Сбытовая организация" IS NOT NULL
             AND c."Количество" > 30
             AND c."Стоимость" IS NOT NULL
-            AND TO_DATE(a."Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+            AND TO_DATE(a."Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
             AND a."Наименование филиала" IN %s
             AND a."Название груза ЕТСНГ" IN %s
             AND a."Род подвижного состава" IN %s
@@ -264,7 +265,7 @@ def get_resellers_by_rps(start_date, end_date, branches, gruz, rod, sorting):
                     sum("Стоимость") AS "Стоимость"
                 FROM dashboard.resellers_cube f
                 WHERE "Результат анализа" = 'Посредник'
-                    AND TO_DATE(f."Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+                    AND TO_DATE(f."Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
                     AND "Наименование филиала" IN %s
                     AND "Название груза ЕТСНГ" IN %s
                     AND "Род подвижного состава" IN %s
@@ -274,7 +275,7 @@ def get_resellers_by_rps(start_date, end_date, branches, gruz, rod, sorting):
         WHERE a."Сбытовая организация" IS NOT NULL
             AND c."Количество" > 30
             AND c."Стоимость" IS NOT NULL
-            AND TO_DATE(a."Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+            AND TO_DATE(a."Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
             AND a."Наименование филиала" IN %s
             AND a."Название груза ЕТСНГ" IN %s
             AND a."Род подвижного состава" IN %s
@@ -313,7 +314,7 @@ def get_resellers_cargo(start_date, end_date, branches, gruz, rod, sorting):
                     sum("Стоимость") AS "Стоимость"
                 FROM dashboard.resellers_cube f
                 WHERE "Результат анализа" = 'Посредник'
-                    AND TO_DATE(f."Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+                    AND TO_DATE(f."Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
                     AND "Наименование филиала" IN %s
                     AND "Название груза ЕТСНГ" IN %s
                     AND "Род подвижного состава" IN %s
@@ -324,7 +325,7 @@ def get_resellers_cargo(start_date, end_date, branches, gruz, rod, sorting):
         WHERE a."Сбытовая организация" IS NOT NULL
             AND c."Количество" > 30
             AND c."Стоимость" IS NOT NULL
-            AND TO_DATE(a."Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+            AND TO_DATE(a."Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
             AND a."Наименование филиала" IN %s
             AND a."Название груза ЕТСНГ" IN %s
             AND a."Род подвижного состава" IN %s
@@ -351,7 +352,7 @@ def get_resellers_count(start_date, end_date, branches, gruz, rod):
         SELECT sum("Количество рейсов") AS "Количество"
         FROM dashboard.resellers_cube
         WHERE "Результат анализа" = 'Посредник'
-            AND TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+            AND TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
             AND "Наименование филиала" IN %s
             AND "Название груза ЕТСНГ" IN %s
             AND "Род подвижного состава" IN %s
@@ -368,7 +369,7 @@ def get_resellers_share(start_date, end_date, branches, gruz, rod):
         SELECT sum("Количество рейсов")::int AS "Количество посреднических рейсов"
         FROM dashboard.resellers_cube
         WHERE "Результат анализа" = 'Посредник'
-            AND TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+            AND TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
             AND "Наименование филиала" IN %s
             AND "Название груза ЕТСНГ" IN %s
             AND "Род подвижного состава" IN %s
@@ -376,15 +377,13 @@ def get_resellers_share(start_date, end_date, branches, gruz, rod):
     sql2 = '''
         SELECT sum("Количество рейсов")::int AS "Количество рейсов"
         FROM dashboard.resellers_cube
-        WHERE TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+        WHERE TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
         AND "Наименование филиала" IN %s
         AND "Название груза ЕТСНГ" IN %s
         AND "Род подвижного состава" IN %s
     ''' % (start_date, end_date, branches, gruz, rod)
     df1 = pd.read_sql(sql1, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
-    print(df1)
     df2 = pd.read_sql(sql2, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
-    print(df2)
 
     if df1['Количество посреднических рейсов'][0] and df2['Количество рейсов'][0]:
         return str(round(float(df1['Количество посреднических рейсов'][0])/float(df2['Количество рейсов'][0])*100, 2)) + '%'
@@ -399,7 +398,7 @@ def get_resellers_table(start_date, end_date, branches, gruz, rod):
     sql = '''
         SELECT *
         FROM dashboard.resellers_cube
-        WHERE TO_DATE("Дата заказа", 'YYYYMMDD') BETWEEN '%s' AND '%s'
+        WHERE TO_DATE("Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
             AND "Результат анализа" = 'Посредник'
             AND "Наименование филиала" IN %s
             AND "Название груза ЕТСНГ" IN %s
@@ -420,7 +419,7 @@ def get_resellers_dynamics(start_date, end_date, branches, gruz, rod):
             round(a."Количество рейсов"/b."Количество рейсов"*100, 2) AS "Доля посред рейсов в шт",
             round(a."Стоимость"::numeric/b."Стоимость"::numeric*100, 2) AS "Доля посред рейсов в руб" 
         FROM (
-        (SELECT date(date_trunc('month', TO_DATE("Дата заказа",'YYYYMMDD'))) AS "Начало месяца",
+        (SELECT date(date_trunc('month', TO_DATE("Дата раскредитования",'YYYYMMDD'))) AS "Начало месяца",
             sum("Количество рейсов") AS "Количество рейсов",
             round(sum("Стоимость")) AS "Стоимость"
         FROM dashboard.resellers_cube
@@ -428,18 +427,18 @@ def get_resellers_dynamics(start_date, end_date, branches, gruz, rod):
             AND "Наименование филиала" IN %s
             AND "Название груза ЕТСНГ" IN %s
             AND "Род подвижного состава" IN %s
-        GROUP BY date(date_trunc('month', TO_DATE("Дата заказа",'YYYYMMDD')))
-        ORDER BY date(date_trunc('month', TO_DATE("Дата заказа",'YYYYMMDD'))) DESC) a
+        GROUP BY date(date_trunc('month', TO_DATE("Дата раскредитования",'YYYYMMDD')))
+        ORDER BY date(date_trunc('month', TO_DATE("Дата раскредитования",'YYYYMMDD'))) DESC) a
             LEFT JOIN (
-                SELECT date(date_trunc('month', TO_DATE("Дата заказа",'YYYYMMDD'))) AS "Начало месяца",
+                SELECT date(date_trunc('month', TO_DATE("Дата раскредитования",'YYYYMMDD'))) AS "Начало месяца",
                     sum("Количество рейсов") AS "Количество рейсов",
                     round(sum("Стоимость")) AS "Стоимость"
                 FROM dashboard.resellers_cube
                 WHERE "Наименование филиала" IN %s
                     AND "Название груза ЕТСНГ" IN %s
                     AND "Род подвижного состава" IN %s
-                GROUP BY date(date_trunc('month', TO_DATE("Дата заказа",'YYYYMMDD')))
-                ORDER BY date(date_trunc('month', TO_DATE("Дата заказа",'YYYYMMDD'))) DESC
+                GROUP BY date(date_trunc('month', TO_DATE("Дата раскредитования",'YYYYMMDD')))
+                ORDER BY date(date_trunc('month', TO_DATE("Дата раскредитования",'YYYYMMDD'))) DESC
             ) b
             ON a."Начало месяца" = b."Начало месяца"
         )
@@ -457,30 +456,30 @@ def get_resellers_dynamics(start_date, end_date, branches, gruz, rod):
         #     round(a."Количество рейсов"/b."Количество рейсов"*100, 2) AS "Доля посред рейсов в шт",
         #     round(a."Стоимость"::numeric/b."Стоимость"::numeric*100, 2) AS "Доля посред рейсов в руб" 
         # FROM (
-        # (SELECT TO_DATE("Дата заказа",'YYYYMMDD') AS "Дата",
-        #     (SELECT min(TO_DATE("Дата заказа",'YYYYMMDD')) FROM dashboard.resellers_cube) + 
-        #     (TO_DATE("Дата заказа",'YYYYMMDD') - (SELECT min(TO_DATE("Дата заказа",'YYYYMMDD')) FROM dashboard.resellers_cube))/7*7 AS "Начало недели",
-        #     date(date_trunc('month', TO_DATE("Дата заказа",'YYYYMMDD'))) AS "Начало месяца",
+        # (SELECT TO_DATE("Дата раскредитования",'YYYYMMDD') AS "Дата",
+        #     (SELECT min(TO_DATE("Дата раскредитования",'YYYYMMDD')) FROM dashboard.resellers_cube) + 
+        #     (TO_DATE("Дата раскредитования",'YYYYMMDD') - (SELECT min(TO_DATE("Дата раскредитования",'YYYYMMDD')) FROM dashboard.resellers_cube))/7*7 AS "Начало недели",
+        #     date(date_trunc('month', TO_DATE("Дата раскредитования",'YYYYMMDD'))) AS "Начало месяца",
         #     sum("Количество рейсов") AS "Количество рейсов",
         #     round(sum("Стоимость")) AS "Стоимость"
         # FROM dashboard.resellers_cube
         # WHERE "Результат анализа" = 'Посредник'
-        # GROUP BY TO_DATE("Дата заказа",'YYYYMMDD'),
-        #     (TO_DATE("Дата заказа",'YYYYMMDD') - (SELECT min(TO_DATE("Дата заказа",'YYYYMMDD')) FROM dashboard.resellers_cube))/7*7,
-        #     date(date_trunc('month', TO_DATE("Дата заказа",'YYYYMMDD')))
-        # ORDER BY TO_DATE("Дата заказа",'YYYYMMDD') DESC) a
+        # GROUP BY TO_DATE("Дата раскредитования",'YYYYMMDD'),
+        #     (TO_DATE("Дата раскредитования",'YYYYMMDD') - (SELECT min(TO_DATE("Дата раскредитования",'YYYYMMDD')) FROM dashboard.resellers_cube))/7*7,
+        #     date(date_trunc('month', TO_DATE("Дата раскредитования",'YYYYMMDD')))
+        # ORDER BY TO_DATE("Дата раскредитования",'YYYYMMDD') DESC) a
         #     LEFT JOIN (
-        #         SELECT TO_DATE("Дата заказа",'YYYYMMDD') AS "Дата",
-        #             (SELECT min(TO_DATE("Дата заказа",'YYYYMMDD')) FROM dashboard.resellers_cube) + 
-        #             (TO_DATE("Дата заказа",'YYYYMMDD') - (SELECT min(TO_DATE("Дата заказа",'YYYYMMDD')) FROM dashboard.resellers_cube))/7*7 AS "Начало недели",
-        #             date(date_trunc('month', TO_DATE("Дата заказа",'YYYYMMDD'))) AS "Начало месяца",
+        #         SELECT TO_DATE("Дата раскредитования",'YYYYMMDD') AS "Дата",
+        #             (SELECT min(TO_DATE("Дата раскредитования",'YYYYMMDD')) FROM dashboard.resellers_cube) + 
+        #             (TO_DATE("Дата раскредитования",'YYYYMMDD') - (SELECT min(TO_DATE("Дата раскредитования",'YYYYMMDD')) FROM dashboard.resellers_cube))/7*7 AS "Начало недели",
+        #             date(date_trunc('month', TO_DATE("Дата раскредитования",'YYYYMMDD'))) AS "Начало месяца",
         #             sum("Количество рейсов") AS "Количество рейсов",
         #             round(sum("Стоимость")) AS "Стоимость"
         #         FROM dashboard.resellers_cube
-        #         GROUP BY TO_DATE("Дата заказа",'YYYYMMDD'),
-        #             (TO_DATE("Дата заказа",'YYYYMMDD') - (SELECT min(TO_DATE("Дата заказа",'YYYYMMDD')) FROM dashboard.resellers_cube))/7*7,
-        #             date(date_trunc('month', TO_DATE("Дата заказа",'YYYYMMDD')))
-        #         ORDER BY TO_DATE("Дата заказа",'YYYYMMDD') DESC
+        #         GROUP BY TO_DATE("Дата раскредитования",'YYYYMMDD'),
+        #             (TO_DATE("Дата раскредитования",'YYYYMMDD') - (SELECT min(TO_DATE("Дата раскредитования",'YYYYMMDD')) FROM dashboard.resellers_cube))/7*7,
+        #             date(date_trunc('month', TO_DATE("Дата раскредитования",'YYYYMMDD')))
+        #         ORDER BY TO_DATE("Дата раскредитования",'YYYYMMDD') DESC
         #     ) b
         #     ON a."Дата" = b."Дата"
         # )

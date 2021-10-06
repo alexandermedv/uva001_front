@@ -53,8 +53,8 @@ def create_layout():
                         min_date_allowed=date(2000, 1, 1),
                         max_date_allowed=date(2050, 1, 1),
                         initial_visible_month=date(2021, 4, 1),
-                        start_date=date(2021, 4, 1),
-                        end_date=date(2021, 6, 30),
+                        start_date=date(2021, 1, 1),
+                        end_date=date(2021, 9, 30),
                         # end_date=get_max_date().strftime("%m.%d.%Y"),
                         # end_date=datetime.datetime.now().strftime("%m.%d.%Y"),
                         number_of_months_shown = 3,
@@ -217,14 +217,16 @@ def create_layout():
                     dcc.Dropdown(
                         id="dashboard5-dropdown4",
                         options=[
-                            {'label': 'Количество, шт.', 'value': 'Количество'},
+                            {'label': 'Количество посред рейсов, шт.', 'value': 'Количество посреднических рейсов'},
                             {'label': 'Доля по количеству', 'value': 'Доля по количеству'},
-                            {'label': 'Сумма, руб.', 'value': 'Сумма, руб.'},
+                            {'label': 'Количество, шт.', 'value': 'Количество рейсов'},
+                            {'label': 'Сумма посред рейсов, руб.', 'value': 'Сумма посреднических рейсов, руб.'},
                             {'label': 'Доля по сумме', 'value': 'Доля по сумме'},
+                            {'label': 'Сумма, руб.', 'value': 'Сумма, руб.'},
                         ],
-                        value='Количество',
+                        value='Количество посреднических рейсов',
                         clearable=False,
-                        className='two columns',
+                        className='three columns',
 
                     )
 

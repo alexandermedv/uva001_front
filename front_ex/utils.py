@@ -2,7 +2,9 @@
 import time, os
 from io import StringIO
 import csv
+from datetime import datetime
 from sqlalchemy import create_engine
+from flask_security import login_required, current_user, login_user, logout_user
 
 from . import app
 
@@ -65,3 +67,27 @@ def completeness_check(tables, engine_sap_s4, engine_postgre, schema):
         return print('Проверка полноты данных успешно выполнена')
     else:
         return print('Проверка полноты не выполнена, данные искажены, утеряны или задублированы')
+
+def logger(path):
+
+    def _logger(old_function):
+
+        def new_function(*args, **kwargs):
+
+            with open(path, 'a') as file:
+                if current_user.is_authenticated:
+                    file.write(f'Логин: {current_user.ldap_account}\n')
+                else:
+                    file.write(f'Логин: неавторизованный пользователь\n')
+                file.write(f'Дата и время: {str(datetime.now())}\n')
+                file.write(f'Вызвана функция: {old_function.__name__}\n')
+                file.write('-------------------------------------------' + '\n')
+
+            result = old_function(*args, **kwargs)
+
+            return result
+
+        new_function.__name__ = old_function.__name__
+        return new_function
+
+    return _logger

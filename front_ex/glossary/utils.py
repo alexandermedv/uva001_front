@@ -8,6 +8,5 @@ def get_glossary():
     """Открытие файла со словарем"""
     with open('./front_ex/glossary/data.json') as json_file:
         data = json.load(json_file)
-        pprint(data)
 
     return data

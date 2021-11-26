@@ -51,6 +51,30 @@ def render_dashapp5():
     return render_template('/dashapp5/overview.html')
 
 
+@app.route('/monitoring_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp6_monitoring():
+    """Дашборд по мониторингу"""
+    return render_template('/dashapp6_monitoring/overview.html')
+
+
+@app.route('/repairs_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp7_repairs():
+    """Дашборд по ремонтам"""
+    return render_template('/dashapp7_repairs/overview.html')
+
+
+@app.route('/empty_transportations_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp8_empty_transportations():
+    """Дашборд по порожним рейсам"""
+    return render_template('/dashapp8_empty_transportations/overview.html')
+
+
 @app.route('/glossary/')
 @login_required
 @logger(os.environ['USER_ACTIONS_FILE'])

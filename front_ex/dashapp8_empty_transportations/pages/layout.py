@@ -23,12 +23,11 @@ def create_layout():
             html.Div([
                 html.Div(
                     [
-                        html.H5("Отчет по анализу грузовой базы на предмет наличия посредников"),
+                        html.H5("Отчет о нарушении срока доставки порожних вагонов ПАО ПГК"),
                         html.Br([]),
                         html.P("\
-                            Данный отчет содержит информацию о количестве рейсов, выполненных с участием посредников.\
-                            Отчет построен на основе данных о рейсах в SAP TM. Также использованы данные о заказчиках из SAP S/4.\
-                            Данные о связях между компаниями выгружены из внешнего источника Spark-interfax (демо-версия API).",
+                            Данный отчет содержит информацию о количестве порожних рейсов.\
+                            Отчет построен на основе данных о рейсах в SAP TM. Также использованы данные о заказчиках из SAP S/4.",
                             style={"color": "#ffffff"},
                             className="row",
                         ),
@@ -65,7 +64,7 @@ def create_layout():
                     className='four columns'),
 
                     html.Div(
-                        html.Output('Количество посреднических рейсов:'),
+                        html.Output('Количество порожних рейсов:'),
                     className='two columns',
                     style={"display": "flex",
                         "align-items": "center",
@@ -73,28 +72,7 @@ def create_layout():
                             }),
                     html.Div(
                         html.B(
-                            html.Output(id='resellers_amount'),
-                            ),
-                    className='two columns',
-                                style={"border-style": "groove",
-                                    "border-radius": "5px",
-                                    "height": "38px",
-                                    "display": "flex",
-                                    "align-items": "center",
-                                    "justify-content": "center"
-                                    }
-                    ),
-
-                    html.Div(
-                        html.Output('Доля посреднических рейсов:'),
-                    className='two columns',
-                    style={"display": "flex",
-                        "align-items": "center",
-                        "height": "38px"
-                            }),
-                    html.Div(
-                        html.B(
-                            html.Output(id='resellers_share'),
+                            html.Output(id='empty_trans_amount'),
                             ),
                     className='two columns',
                                 style={"border-style": "groove",
@@ -106,16 +84,39 @@ def create_layout():
                                     }
                     ),
                     
+                    html.Div(
+                        html.Output('РПС:'),
+                        id = 'name3',
+                        className='two columns',
+                        style={"display": "flex",
+                        "align-items": "center",
+                        "justify-content": "center",
+                        "height": "38px"
+                            }
+                            ),
+                    dcc.Dropdown(
+                        id="dashboard5-dropdown3",
+                        value='Все РПС',
+                        clearable=False,
+                        className='two columns',
+                        style={"display": "block",
+                            "justify-content": "center"}),
+
+                    ],),
+
+                ], className="row",
+                ),
+
                     # html.Div(
-                    #     html.Output('Всего рейсов за период:'),
-                    # className='five columns',
+                    #     html.Output('Доля посреднических рейсов:'),
+                    # className='two columns',
                     # style={"display": "flex",
                     #     "align-items": "center",
                     #     "height": "38px"
                     #         }),
                     # html.Div(
                     #     html.B(
-                    #         html.Output(id='transportations_count'),
+                    #         html.Output(id='resellers_share'),
                     #         ),
                     # className='two columns',
                     #             style={"border-style": "groove",
@@ -125,7 +126,7 @@ def create_layout():
                     #                 "align-items": "center",
                     #                 "justify-content": "center"
                     #                 }
-                    #         ),
+                    # ),
                 ],)
             ], className="row",
             ),
@@ -155,24 +156,24 @@ def create_layout():
                         #multi=True,
                         className='four columns'),
 
-                    html.Div(
-                        html.Output('Группа грузов:'),
-                        id = 'name2',
-                        className='two columns',
-                        style={"display": "flex",
-                        "align-items": "center",
-                        "justify-content": "center",
-                        "height": "38px"
-                            }
-                            ),
-                    dcc.Dropdown(
-                            id="dashboard5-dropdown2",
-                            value='Все грузы',
-                            clearable=False,
-                            style={"display": "block",
-                                "justify-content": "center"},
-                            className='two columns',
-                                ),
+                    # html.Div(
+                    #     html.Output('Группа грузов:'),
+                    #     id = 'name2',
+                    #     className='two columns',
+                    #     style={"display": "flex",
+                    #     "align-items": "center",
+                    #     "justify-content": "center",
+                    #     "height": "38px"
+                    #         }
+                    #         ),
+                    # dcc.Dropdown(
+                    #         id="dashboard5-dropdown2",
+                    #         value='Все грузы',
+                    #         clearable=False,
+                    #         style={"display": "block",
+                    #             "justify-content": "center"},
+                    #         className='two columns',
+                    #             ),
 
                     html.Div(
                         html.Output('РПС:'),

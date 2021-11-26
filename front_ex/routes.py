@@ -6,6 +6,7 @@ from flask import url_for, redirect, render_template, flash, request, jsonify
 from flask_security import login_required, current_user, login_user, logout_user
 import pandas as pd
 from sqlalchemy import func
+import os
 
 from . import app, db
 from .forms import LoginForm, ProfileForm
@@ -14,34 +15,69 @@ from sqlalchemy import create_engine
 from .report1 import utils as report1
 from .glossary import utils as glossary
 from .ldap import ldap_authentication
+from .utils import logger
+
 
 # Руты к дэшбордам
 @app.route('/limit_oper/')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_limit_oper():
     """Дашборд по дебиторской задолженности и превышению лимита"""
     return render_template('/limit_oper/overview.html')
 
+
 @app.route('/dashapp1/')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_dashapp1():
     """Дашборд по размеру и динамике недостачи"""
     return render_template('/dashapp1/overview.html')
 
+
 @app.route('/dashboard3/')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_dashapp3():
     """Дашборд по полномочиям в SAP"""
     return render_template('/dashapp3/overview.html')
 
+
 @app.route('/resellers_dash/')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_dashapp5():
     """Дашборд по посредникам"""
     return render_template('/dashapp5/overview.html')
 
+
+@app.route('/monitoring_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp6_monitoring():
+    """Дашборд по мониторингу"""
+    return render_template('/dashapp6_monitoring/overview.html')
+
+
+@app.route('/repairs_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp7_repairs():
+    """Дашборд по ремонтам"""
+    return render_template('/dashapp7_repairs/overview.html')
+
+
+@app.route('/empty_transportations_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp8_empty_transportations():
+    """Дашборд по порожним рейсам"""
+    return render_template('/dashapp8_empty_transportations/overview.html')
+
+
 @app.route('/glossary/')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_glossary():
 
     glos = pd.DataFrame.from_dict(glossary.get_glossary())
@@ -53,8 +89,10 @@ def render_glossary():
                    my_table=json.loads(df1.to_json(orient="split"))["data"],
                    columns=[{"title": str(col)} for col in json.loads(df1.to_json(orient="split"))["columns"]])
 
+
 @app.route('/report1/')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_report1():
     df1 = report1.get_details_dost()
     print(df1)
@@ -65,11 +103,14 @@ def render_report1():
 
 @app.route('/report_equipment/')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_report_equipment():
 
     return render_template("/report_equipment/report_equipment.html")
 
+
 @app.route("/_get_table_serverside", methods=["POST", "GET"])
+@logger(os.environ['USER_ACTIONS_FILE'])
 def serverside_table():
     req = flask.request.form
     # print("Request data", flask.request.data)
@@ -200,7 +241,9 @@ def serverside_table():
     finally:
         cursor.close()
 
+
 @app.route('/signin', methods=['GET', 'POST'])
+@logger(os.environ['USER_ACTIONS_FILE'])
 def signin():
     """Вход в систему"""
     if current_user.is_authenticated:
@@ -221,19 +264,25 @@ def signin():
             return redirect(url_for('signin'))
     return render_template('/user/signin.html', title='Sign In', form=form)
 
+
 # Общие вводные
 @app.route('/')
+@logger(os.environ['USER_ACTIONS_FILE'])
 def redirect_login():
     return redirect(url_for('signin'))
 
+
 @app.route('/index')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def index():
     """Первичная страница"""
     return render_template('index.html')
     
+
 @app.route('/user/profile', methods=['GET', 'POST'])
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def profile():
     """Профиль пользователя"""
     if current_user.is_authenticated:
@@ -243,8 +292,10 @@ def profile():
         form.email.data = current_user.email
         return render_template('/user/profile.html', title='profile', form=form)
 
+
 @app.route('/logout')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def logout():
     """Выход из системы"""
     logout_user()
@@ -255,6 +306,7 @@ def logout():
 @app.route('/reports/')
 @app.route('/reports/<id>', methods=['GET'])
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def reports(id=None):
     if id:
         report = Report.query.filter_by(active=True, id=id ).order_by(Report.id.asc()).first()
@@ -268,26 +320,34 @@ def reports(id=None):
 
 @app.route('/repairs/repair0/')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_repair0():
     return render_template("/repairs/repair0.html")
 
+
 @app.route('/repairs/repair1/')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_repair1():
     return render_template("/repairs/repair1.html")
 
+
 @app.route('/repairs/repair2/')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_repair2():
     return render_template("/repairs/repair2.html")
 
 
 @app.route('/resellers/')
 @login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_resellers():
     return render_template("/resellers/resellers.html")
 
 
 @app.route('/resellers_table/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
 def render_resellers_table():
     return render_template("/resellers/resellers_table.html")

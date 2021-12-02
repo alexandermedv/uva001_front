@@ -174,7 +174,7 @@ def render_content(tab, start_date, end_date, railway):
                             "layout": go.Layout(
                                 autosize=True,
                                 barmode = 'stack', 
-                                title_text='Динамика по оценке пени, руб.',
+                                title_text='Динамика пени за просрочку <br> (оценкa без учета времени простоя в ТОР), руб.',
                                 # Рассчет при условии 6% от рассчитанной суммы тарифа, но не более 50%
                                 # margin={"r": 0, "t": 50, "b": 20, "l": 70, },
                                 annotations = [dict(showarrow=False, text='test', font=dict(size=10),  x=0.5,  y=-0.5, xref='paper', yref='paper', xshift=-1

@@ -50,8 +50,12 @@
         <div class="side-menu-container">
           <ul class="nav navbar-nav">
               <!-- Cписок дэшей -->
+              {% if current_user.check_report_roles('glossary') %}
               <li><a href="/glossary"><i class="fa fa-dashboard"></i>Словарь терминов</a></li>
+              {% endif %}
+              {% if current_user.check_report_roles('reports') %}
               <li><a href="/reports/"><i class="fa fa-dashboard"></i>Отчеты</a></li>
+              {% endif %}
               {% if current_user.check_dash_roles('limit_oper') %}
                 <li><a href="/limit_oper"><i class="fa fa-dashboard"></i>Дебиторская задолженность</a></li>
               {% endif %}
@@ -88,10 +92,19 @@
               {% if current_user.check_dash_roles('resellers') %}  
               <li><a href="/resellers_dash"><i class="fa fa-dashboard"></i>Посредники (дашборд)</a></li>
               {% endif %}
-              {% if current_user.check_roles(['admin']) %}
+              {% if current_user.check_dash_roles('monitoring') %}  
+              <li><a href="/monitoring_dash"><i class="fa fa-dashboard"></i>Мониторинг</a></li>
+              {% endif %}
+              {% if current_user.check_dash_roles('repairs') %}  
+              <li><a href="/repairs_dash"><i class="fa fa-dashboard"></i>Ремонты (дашборд)</a></li>
+              {% endif %}
+              {% if current_user.check_dash_roles('empty_transportations') %}  
+              <li><a href="/empty_transportations_dash"><i class="fa fa-dashboard"></i>Порожние рейсы (дашборд)</a></li>
+              {% endif %}
+              {% if current_user.check_report_roles('admin') %}
                 <li><a href="https://uvapgk.atlassian.net/jira/projects"><i class="fa fa-dashboard"></i>Jira</a></li>
               {% endif %}
-              {% if current_user.check_roles(['admin']) %}
+              {% if current_user.check_report_roles('admin') %}
                 <li><a href="https://gitlab.pgkweb.ru/"><i class="fa fa-dashboard"></i>Gitlab</a></li>
               {% endif %}
           </ul>

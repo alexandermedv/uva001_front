@@ -105,6 +105,9 @@ from .dash_limit_oper import dash_app as dash_limit_oper
 from .dashapp1 import dash_app as dashapp1
 from .dashapp3 import dash_app as dashapp3
 from .dashapp5 import dash_app as dashapp5
+from .dashapp6_monitoring import dash_app as dashapp6_monitoring
+from .dashapp7_repairs import dash_app as dashapp7_repairs
+from .dashapp8_empty_transportations import dash_app as dashapp8_empty_transportations
 
 
 # Добавляем руты и таски
@@ -117,5 +120,8 @@ dispatch_app = DispatcherMiddleware(app.wsgi_app, {
     'limit_oper': dash_limit_oper.server,
     'dashapp1': dashapp1.server,
     'dashboard3': dashapp3.server,
-    'dashapp5': dashapp5.server
+    'dashapp5': dashapp5.server,
+    'dashapp6': dashapp6_monitoring.server,
+    'dashapp7': dashapp7_repairs.server,
+    'dashapp8': dashapp8_empty_transportations.server
     })

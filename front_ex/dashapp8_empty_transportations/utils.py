@@ -28,16 +28,19 @@ def get_trans_empty_all():
 
 def get_trans_empty_by_railway_delay():
     sql = '''
-        select "Дорога назначения", "Кол-во вагонорейсов с просрочкой", "Всего вагонорейсов" from (
-            select "Дорога назначения", 
-                sum(case when t."Превышение даты истечение срока д" = 'Не удовлетворяет' then "Кол-во вагонорейсов" end) 
+        select "Дорога назначения", "Дор. назн.", "Кол-во вагонорейсов с просрочкой", "Всего вагонорейсов" from (
+            select "Дорога назначения", max(ra.file) as "Дор. назн.",
+                sum(case when t."Превышение даты истечение срока д" = 'Не удовлетворяет' then "Кол-во вагонорейсов" else 0 end) 
                     as "Кол-во вагонорейсов с просрочкой",
                 sum("Кол-во вагонорейсов") as "Всего вагонорейсов"
 		            from dashboard.dash_transport_empty t 
 			            left join sap_s4.rails_mapping ra
 				            on t."Дорога назначения" = ra."db"
-			            left join sap_s4.rails_mapping rd
-				            on t."Дорога отправления" = rd."db"
+                             where (lower("Плательщик") like '%пгк%' 
+						        or lower("Грузоотправитель") like '%пгк' 
+						        or lower("Получатель") like '%пгк')
+                             group by t."Дорога назначения"
+                                order by sum(case when t."Превышение даты истечение срока д" = 'Не удовлетворяет' then "Кол-во вагонорейсов" else 0 end) 
         ) t
     ''' 
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
@@ -46,10 +49,16 @@ def get_trans_empty_by_railway_delay():
 
 def get_trans_empty_by_railway_penalty():
     sql = '''
-        select "Дорога назначения", sum("Оценка пени") as "Оценка пени"
+        select "Дорога назначения", max(ra.file) as "Дор. назн.", sum("Оценка пени") as "Оценка пени"
 	        from dashboard.dash_transport_empty t 
-		        where t."Превышение даты истечение срока д" = 'Не удовлетворяет'
-			        group by t."Дорога назначения"
+            	left join sap_s4.rails_mapping ra
+				    on t."Дорога назначения" = ra."db"
+                    where t."Превышение даты истечение срока д" = 'Не удовлетворяет'
+                        and (lower("Плательщик") like '%пгк%' 
+						        or lower("Грузоотправитель") like '%пгк' 
+						        or lower("Получатель") like '%пгк')
+                            group by t."Дорога назначения"	
+                                order by sum("Оценка пени")				
     '''
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     df = pd.read_sql(sql, con)
@@ -57,15 +66,22 @@ def get_trans_empty_by_railway_penalty():
 
 def get_trans_empty_by_railway_mean_delay():
     sql = '''
-        select "Дорога назначения", sum("Дней просрочки, суток") / count(*)
+        select "Дорога назначения", max(ra.file) as "Дор. назн.", avg("Дней просрочки, суток") --/ count(*)
                 as "Средняя просрочка, сут"
 	        from dashboard.dash_transport_empty t 
-		        where t."Превышение даты истечение срока д" = 'Не удовлетворяет'
-			        group by t."Дорога назначения"
+                left join sap_s4.rails_mapping ra
+				    on t."Дорога назначения" = ra."db"
+		            where t."Превышение даты истечение срока д" = 'Не удовлетворяет'
+                            and (lower("Плательщик") like '%пгк%' 
+						        or lower("Грузоотправитель") like '%пгк' 
+						        or lower("Получатель") like '%пгк')
+			                    group by t."Дорога назначения"
+                                    order by avg("Дней просрочки, суток")
     '''
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     df = pd.read_sql(sql, con)
     return df
+
 # Закладка динамика
 def get_trans_empty_by_type():
     sql = '''

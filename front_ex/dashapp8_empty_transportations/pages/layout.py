@@ -13,6 +13,7 @@ import front_ex.config as config
 #import pandas as pd
 
 #from flask_app import engine_analysis, engine_cons
+from ..utils import get_trans_empty_by_railway_penalty
 
 def create_layout():
     """Создание шаблона"""
@@ -63,48 +64,63 @@ def create_layout():
                         start_date_placeholder_text='Начало периода',
                         end_date_placeholder_text='Конец периода',
                     className='four columns'),
-
                     html.Div(
-                        html.Output('Количество порожних рейсов:'),
-                    className='two columns',
-                    style={"display": "flex",
-                        "align-items": "center",
-                        "height": "38px"
-                            }),
-                    html.Div(
-                        html.B(
-                            html.Output(id='resellers_amount'),
-                            ),
-                    className='two columns',
-                                style={"border-style": "groove",
-                                    "border-radius": "5px",
-                                    "height": "38px",
-                                    "display": "flex",
-                                    "align-items": "center",
-                                    "justify-content": "center"
-                                    }
+                        html.Output('Дорога:'),
+                        id = 'name1',
+                        className='one column',
+                        style={"display": "flex", "align-items": "center", "height": "38px", "justify-content": "center", 
+                            'font-size' : '100%'},
                     ),
+                    dcc.Dropdown(
+                        id="dashboard8-dropdown1-in-railway",
+                        value='Все дороги',
+                        clearable=False,
+                        style={"display": "block",
+                            "justify-content": "center"},
+                        options=[{'label': i, 'value': i} for i in get_trans_empty_by_railway_penalty()['Дорога назначения'].unique()],
+                        #multi=True,
+                    className='four columns'),
+                    # html.Div(
+                    #     html.Output('Количество порожних рейсов:'),
+                    # className='two columns',
+                    # style={"display": "flex",
+                    #     "align-items": "center",
+                    #     "height": "38px"
+                    #         }),
+                    # html.Div(
+                    #     html.B(
+                    #         html.Output(id='resellers_amount'),
+                    #         ),
+                    # className='two columns',
+                    #             style={"border-style": "groove",
+                    #                 "border-radius": "5px",
+                    #                 "height": "38px",
+                    #                 "display": "flex",
+                    #                 "align-items": "center",
+                    #                 "justify-content": "center"
+                    #                 }
+                    # ),
 
-                    html.Div(
-                        html.Output('Доля порожних рейсов:'),
-                    className='two columns',
-                    style={"display": "flex",
-                        "align-items": "center",
-                        "height": "38px"
-                            }),
-                    html.Div(
-                        html.B(
-                            html.Output(id='resellers_share'),
-                            ),
-                    className='two columns',
-                                style={"border-style": "groove",
-                                    "border-radius": "5px",
-                                    "height": "38px",
-                                    "display": "flex",
-                                    "align-items": "center",
-                                    "justify-content": "center"
-                                    }
-                    ),
+                    # html.Div(
+                    #     html.Output('Доля порожних рейсов:'),
+                    # className='two columns',
+                    # style={"display": "flex",
+                    #     "align-items": "center",
+                    #     "height": "38px"
+                    #         }),
+                    # html.Div(
+                    #     html.B(
+                    #         html.Output(id='resellers_share'),
+                    #         ),
+                    # className='two columns',
+                    #             style={"border-style": "groove",
+                    #                 "border-radius": "5px",
+                    #                 "height": "38px",
+                    #                 "display": "flex",
+                    #                 "align-items": "center",
+                    #                 "justify-content": "center"
+                    #                 }
+                    # ),
                     
                     # html.Div(
                     #     html.Output('Всего рейсов за период:'),
@@ -130,72 +146,72 @@ def create_layout():
             ], className="row",
             ),
 
-            # Row 3 - 2-й ряд фильтров
-            html.Div(
-                html.Br(),
-                style={"height":"5px"}),
-            html.Div([
-                dbc.Navbar([
-                    html.Div(
-                        html.Output('Дорога:'),
-                        id = 'name1',
-                        className='one column',
-                        style={"display": "flex",
-                        "align-items": "center",
-                        "height": "38px",
-                        "justify-content": "center"
-                            }
-                            ),
-                    dcc.Dropdown(
-                        id="dashboard8-dropdown1-in-railway",
-                        value='Все филиалы',
-                        clearable=False,
-                        style={"display": "block",
-                            "justify-content": "center"},
-                        #multi=True,
-                        className='four columns'),
+            # # Row 3 - 2-й ряд фильтров
+            # html.Div(
+            #     html.Br(),
+            #     style={"height":"5px"}),
+            # html.Div([
+            #     dbc.Navbar([
+            #         html.Div(
+            #             html.Output('Дорога:'),
+            #             id = 'name1',
+            #             className='one column',
+            #             style={"display": "flex",
+            #             "align-items": "center",
+            #             "height": "38px",
+            #             "justify-content": "center"
+            #                 }
+            #                 ),
+            #         dcc.Dropdown(
+            #             id="dashboard8-dropdown1-in-railway",
+            #             value='Все филиалы',
+            #             clearable=False,
+            #             style={"display": "block",
+            #                 "justify-content": "center"},
+            #             #multi=True,
+            #             className='four columns'),
 
-                    # html.Div(
-                    #     html.Output('Группа грузов:'),
-                    #     id = 'name2',
-                    #     className='two columns',
-                    #     style={"display": "flex",
-                    #     "align-items": "center",
-                    #     "justify-content": "center",
-                    #     "height": "38px"
-                    #         }
-                    #         ),
-                    # dcc.Dropdown(
-                    #         id="dashboard5-dropdown2",
-                    #         value='Все грузы',
-                    #         clearable=False,
-                    #         style={"display": "block",
-                    #             "justify-content": "center"},
-                    #         className='two columns',
-                    #             ),
+            #         # html.Div(
+            #         #     html.Output('Группа грузов:'),
+            #         #     id = 'name2',
+            #         #     className='two columns',
+            #         #     style={"display": "flex",
+            #         #     "align-items": "center",
+            #         #     "justify-content": "center",
+            #         #     "height": "38px"
+            #         #         }
+            #         #         ),
+            #         # dcc.Dropdown(
+            #         #         id="dashboard5-dropdown2",
+            #         #         value='Все грузы',
+            #         #         clearable=False,
+            #         #         style={"display": "block",
+            #         #             "justify-content": "center"},
+            #         #         className='two columns',
+            #         #             ),
 
-                    # html.Div(
-                    #     html.Output('РПС:'),
-                    #     id = 'name3',
-                    #     className='two columns',
-                    #     style={"display": "flex",
-                    #     "align-items": "center",
-                    #     "justify-content": "center",
-                    #     "height": "38px"
-                    #         }
-                    #         ),
-                    # dcc.Dropdown(
-                    #     id="dashboard5-dropdown3",
-                    #     value='Все РПС',
-                    #     clearable=False,
-                    #     className='two columns',
-                    #     style={"display": "block",
-                    #         "justify-content": "center"}),
+            #         # html.Div(
+            #         #     html.Output('РПС:'),
+            #         #     id = 'name3',
+            #         #     className='two columns',
+            #         #     style={"display": "flex",
+            #         #     "align-items": "center",
+            #         #     "justify-content": "center",
+            #         #     "height": "38px"
+            #         #         }
+            #         #         ),
+            #         # dcc.Dropdown(
+            #         #     id="dashboard5-dropdown3",
+            #         #     value='Все РПС',
+            #         #     clearable=False,
+            #         #     className='two columns',
+            #         #     style={"display": "block",
+            #         #         "justify-content": "center"}),
 
-                    ],),
+            #         ],),
 
-                ], className="row",
-                ),
+            #     ], className="row",
+            #     ),
 
             # 3 ряд фильтров
 

@@ -320,6 +320,84 @@ def render_content(tab):
                         config={"displayModeBar": False},
                     ),
                 ], className="six columns"),
+
+                # html.Div([
+                #     dcc.Graph(
+                #         id="dashboard6-graph2",
+                #         figure={
+                #             "data": [
+                #                 go.Waterfall(
+                #                     x=["Мониторинг на 01.04.2021", "Выявлено по проверкам 2021", "Сняты с контроля на 01.09.2021", "Мониторинг на 01.09.2021"],
+                #                     y=[61, 30, -43, 48],
+                #                     text=x1_text,
+                #                     hoverinfo='skip',
+                #                     hovertemplate=
+                #                         """Риск: Низкий <br>Количество недостатков: %{text}""",
+                #                     name='',
+                #                     orientation='h',
+                #                     textposition='auto',
+                #                     marker={
+                #                         "color": "#7bee00",
+                #                         "line": {
+                #                             "color": "rgb(255, 255, 255)",
+                #                             "width": 2,
+                #                         },
+                #                     },
+                #                 ),
+                #                 go.Bar(
+                #                     x=x2_data,
+                #                     y=y2_data,
+                #                     text=x2_text,
+                #                     hoverinfo='skip',
+                #                     hovertemplate=
+                #                         """Риск: Средний <br>Количество недостатков: %{text}""",
+                #                     name='',
+                #                     orientation='h',
+                #                     textposition='auto',
+                #                     marker={
+                #                         "color": "#feee05",
+                #                         "line": {
+                #                             "color": "rgb(255, 255, 255)",
+                #                             "width": 2,
+                #                         },
+                #                     },
+                #                 ),
+                #                 go.Bar(
+                #                     x=x3_data,
+                #                     y=y3_data,
+                #                     text=x3_text,
+                #                     hoverinfo='skip',
+                #                     hovertemplate=
+                #                         """Риск: Высокий <br>Количество недостатков: %{text}""",
+                #                     name='',
+                #                     orientation='h',
+                #                     textposition='auto',
+                #                     marker={
+                #                         "color": "#fe410c",
+                #                         "line": {
+                #                             "color": "rgb(255, 255, 255)",
+                #                             "width": 2,
+                #                         },
+                #                     },
+                #                 ),
+                #             ],
+                #             "layout": go.Layout(
+                #                 autosize=True,
+                #                 barmode='stack',
+                #                 title_text='Количество открытых недостатков, шт.',
+                #                 margin={
+                #                                     "r": 0,
+                #                                     "t": 50,
+                #                                     "b": 20,
+                #                                     "l": 150,
+                #                 },
+
+                #             ),
+
+                #         },
+                #         config={"displayModeBar": False},
+                #     ),
+                # ], className="six columns"),
     #             html.Div([
     #                 dcc.Graph(
     #                     id="dashboard5-graph2",

@@ -66,7 +66,8 @@ def get_trans_empty_by_railway_penalty():
 
 def get_trans_empty_by_railway_mean_delay():
     sql = '''
-        select "Дорога назначения", max(ra.file) as "Дор. назн.", avg("Дней просрочки, суток") --/ count(*)
+        select "Дорога назначения", max(ra.file) as "Дор. назн."
+            , sum("Дней просрочки, суток")/sum("Кол-во вагонорейсов") --avg("Дней просрочки, суток") / count(*)
                 as "Средняя просрочка, сут"
 	        from dashboard.dash_transport_empty t 
                 left join sap_s4.rails_mapping ra
@@ -88,7 +89,8 @@ def get_trans_empty_by_type():
        select   
             case "Превышение даты истечение срока д" 
                 when 'Удовлетворяет' then 'Без просрочки'
-                when 'Не удовлетворяет' then 'С просрочкой' 
+                when 'Не удовлетворяет' then 'С просрочкой'
+                when 'Нет данных' then 'Нет данных для оценки' 
                 else "Превышение даты истечение срока д" end as "Тип"
             , sum("Кол-во вагонорейсов") as "Кол-во вагонорейсов" 
                 from dashboard.dash_transport_empty f 
@@ -103,26 +105,28 @@ def get_trans_empty_by_type():
 
 def get_trans_empty_by_money(): 
     sql = '''
-	   select 
-            case "Превышение даты истечение срока д" 
-                when 'Удовлетворяет' then 'Без просрочки'
-                when 'Не удовлетворяет' then 'С просрочкой' 
-                else "Превышение даты истечение срока д" end as "Тип"
-            , sum("Рассчитанная сумма") as "Рассчитанная сумма"  
-	        from dashboard.dash_transport_empty f where "Превышение даты истечение срока д" != 'Нет данных'
-                    and (lower("Плательщик") like '%пгк%' 
-						or lower("Грузоотправитель") like '%пгк' 
-						or lower("Получатель") like '%пгк')
-		            group by "Превышение даты истечение срока д"
-		union all	
-		select
-		   'Оценка пени' as "Тип"
-			, sum("Оценка пени") as "Рассчитанная сумма" 
-	        from dashboard.dash_transport_empty f where "Превышение даты истечение срока д" = 'Не удовлетворяет'
-                    and (lower("Плательщик") like '%пгк%' 
-						or lower("Грузоотправитель") like '%пгк' 
-						or lower("Получатель") like '%пгк')
-		            group by "Превышение даты истечение срока д"
+        select "Тип", "Рассчитанная сумма" from (
+            select 
+                    case "Превышение даты истечение срока д" 
+                        when 'Удовлетворяет' then 'Без просрочки'
+                        when 'Не удовлетворяет' then 'Сумма тарифа для расчёта пени' 
+                        else "Превышение даты истечение срока д" end as "Тип"
+                    , sum("Рассчитанная сумма") as "Рассчитанная сумма"  
+                    from dashboard.dash_transport_empty f where "Превышение даты истечение срока д" != 'Нет данных'
+                            and (lower("Плательщик") like '%пгк%' 
+                                or lower("Грузоотправитель") like '%пгк' 
+                                or lower("Получатель") like '%пгк')
+                            group by "Превышение даты истечение срока д"
+                union all	
+                select
+                'Оценка пени' as "Тип"
+                    , sum("Оценка пени") as "Рассчитанная сумма" 
+                    from dashboard.dash_transport_empty f where "Превышение даты истечение срока д" = 'Не удовлетворяет'
+                            and (lower("Плательщик") like '%пгк%' 
+                                or lower("Грузоотправитель") like '%пгк' 
+                                or lower("Получатель") like '%пгк')
+                            group by "Превышение даты истечение срока д"
+                ) t where "Тип" != 'Без просрочки'
     '''
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     df = pd.read_sql(sql, con)

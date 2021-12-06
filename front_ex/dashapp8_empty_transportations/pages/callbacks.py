@@ -33,6 +33,13 @@ def update_dropdown1(start_date, end_date, tab):
     print({'label': i, 'value': i} for i in trans_empty_by_railway_penalty['Дорога назначения'].unique())
     return [{'label': i, 'value': i} for i in trans_empty_by_railway_penalty['Дорога назначения'].unique()]
 
+# Скрытие фильтра по дорогам по выбору закладки 
+@dash_app.callback(Output('dashboard8-dropdown1-in-railway', 'style'), [Input('dashboard8-tabs', 'value'),])
+def hide_graph(input):
+    if input != 'tab-2':
+        return {'display':'block'}
+    else:
+        return {'display':'none'}
 # Построение содержимого выбранной закладки
 @dash_app.callback(Output('tab-content', 'children'),
                    [Input('dashboard8-tabs', 'value'),
@@ -128,7 +135,7 @@ def render_content(tab, start_date, end_date, railway):
                             "layout": go.Layout(
                                 autosize=True,
                                 barmode = 'stack', 
-                                title_text='Динамика превышения превышение срока доставки вагонов.',
+                                title_text='Кол-во порожних вагонорейсов помесячно, ваг.',
                                 margin={"r": 0, "t": 50, "b": 20, "l": 70, },
                             ),
                         },
@@ -144,7 +151,7 @@ def render_content(tab, start_date, end_date, railway):
                         id="dash8-tab1-pie2",
                         figure={
                             "data": [go.Pie(labels=trans_empty_by_money['Тип'], values=trans_empty_by_money['Рассчитанная сумма'], 
-                             marker={"colors": ["#97151c", "#808080", "#D3D3D3"]},
+                             marker={"colors": ["#97151c", "#808080", "#D3D3D3", ]},
                             #  темно-синий "#191970",
                              hoverinfo='skip',
                              hovertemplate = '%{label} - %{text}',

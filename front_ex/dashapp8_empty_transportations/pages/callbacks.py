@@ -40,6 +40,15 @@ def hide_graph(input):
         return {'display':'block'}
     else:
         return {'display':'none'}
+
+# Скрытие фильтра по дорогам по выбору закладки 
+@dash_app.callback(Output('name1', 'style'), [Input('dashboard8-tabs', 'value'),])
+def hide_graph(input):
+    if input != 'tab-2':
+        return {'display':'block'}
+    else:
+        return {'display':'none'}
+
 # Построение содержимого выбранной закладки
 @dash_app.callback(Output('tab-content', 'children'),
                    [Input('dashboard8-tabs', 'value'),

@@ -145,7 +145,8 @@ def get_trans_empty_by_type_month():
                     where lower("Плательщик") like '%пгк%' 
 						or lower("Грузоотправитель") like '%пгк' 
 						or lower("Получатель") like '%пгк'
-		                group by "Месяц", "Превышение даты истечение срока д"
+		                    group by "Месяц", "Превышение даты истечение срока д"   
+                               -- order by "Месяц", "Превышение даты истечение срока д" desc       
     '''
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     df = pd.read_sql(sql, con)

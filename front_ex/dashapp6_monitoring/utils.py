@@ -725,3 +725,39 @@ def get_outcoming_ap():
     result = con.execute(sql).fetchone()[0]
 
     return result
+
+
+def get_ap_issues():
+    """Недостатки и планы мероприятий"""
+
+    sql = '''
+        SELECT b."Subject" AS "Issue_Subject",
+            b."Creator" AS "Issue_Creator",
+            b."CreateDate" AS "Issue_CreateDate",
+            b."Finding" AS "Issue_Finding",
+            b."Background" AS "Issue_Background",
+            b."FindGroup" AS "Issue_FindGroup",
+            b."FindType" AS "Issue_FindType",
+            b."Recom" AS "Issue_Recom",
+            a."Subject" AS "Ap_Subject",
+            a."Creator" AS "Ap_Creator",
+            a."APEDate" AS "Ap_APEDate",
+            a."APEDate_W" AS "Ap_APEDate_W",
+            a."APADate" AS "Ap_APADate",
+            a."APDate" AS "Ap_APDate",
+            a."APStatus" AS "Ap_APStatus",
+            a."Mresp" AS "Ap_Mresp"
+        FROM dashboard.actplans a 
+            LEFT JOIN dashboard.issues b
+                ON a."OrigID" = b."IDFld"
+            LEFT JOIN dashboard.activities h
+            	ON b."AuditID" = h."GuiIDFld"
+        WHERE h."IDFld" <> '2021 Тест'
+			AND h."IDFld" <> '2021 Тест 2 - 1'
+			AND b."Subject" IS NOT NULL
+    '''
+
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    df1 = pd.read_sql(sql, con)
+
+    return df1

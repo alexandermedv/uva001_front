@@ -448,7 +448,7 @@ def get_resellers_table(start_date, end_date, branches, gruz, rod):
 #     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
 
-def get_monitoring():
+def get_get_open_ap_by_groups():
     """Выгрузка данных для мониторинга"""
 
     sql = '''
@@ -493,9 +493,235 @@ def get_monitoring():
             ON a."IDFld" = i."OrigID"
             
         WHERE i.open_actplans IS NOT NULL
+            AND h."IDFld" <> '2021 Тест'
+			AND h."IDFld" <> '2021 Тест 2 - 1'
+			AND "Subject" IS NOT NULL
         ) z
         GROUP BY z.issue_group,
             z.issue_risk_level
     '''
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    df1 = pd.read_sql(sql, con)
+
+    return df1
+
+
+def get_incoming_ap():
+    """Входящие остатки по недостаткам"""
+
+    sql = '''
+        SELECT count(*)
+        FROM (
+        SELECT a.*,
+            c."Language3" AS issue_group, 
+            e."Language3" AS issue_type,
+            g."Language3" AS issue_risk_level,
+            h."IDFld",
+            i.open_actplans
+        FROM dashboard.issues a
+        LEFT JOIN dashboard.udfvalue b
+            ON a."FindGroup" = b."UDFValueID"
+        LEFT JOIN dashboard.languageaa c
+            ON b."LanguageID"::text = c."IDFld"::text
+                AND c."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.udfvalue d
+            ON a."FindType" = d."UDFValueID"
+        LEFT JOIN dashboard.languageaa e
+            ON d."LanguageID"::text = e."IDFld"::text
+                AND e."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.udfvalue f
+            ON a."FindRisk" = f."UDFValueID"
+        LEFT JOIN dashboard.languageaa g
+            ON f."LanguageID"::text = g."IDFld"::text
+                AND g."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.activities h
+            ON a."AuditID" = h."GuiIDFld"
+
+        LEFT JOIN (
+            SELECT "OrigID", count(*) AS open_actplans
+            FROM dashboard.actplans
+            WHERE "APADate" IS NULL
+            GROUP BY "OrigID"
+            ) i
+            ON a."IDFld" = i."OrigID"
+            
+        WHERE h."IDFld" <> '2021 Тест'
+			AND h."IDFld" <> '2021 Тест 2 - 1'
+			AND "Subject" IS NOT NULL
+			AND h."IDFld" = '2021 Недостатки прошлых периодов (ранее 2021 года)'
+        ) z
+    '''
+
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    result = con.execute(sql).fetchone()[0]
+
+    return result
+
+
+def get_increase_ap():
+    """Добавленные за период недостатки"""
+
+    sql = '''
+        SELECT count(*)
+        FROM (
+        SELECT a.*,
+            c."Language3" AS issue_group, 
+            e."Language3" AS issue_type,
+            g."Language3" AS issue_risk_level,
+            h."IDFld",
+            i.open_actplans
+        FROM dashboard.issues a
+        LEFT JOIN dashboard.udfvalue b
+            ON a."FindGroup" = b."UDFValueID"
+        LEFT JOIN dashboard.languageaa c
+            ON b."LanguageID"::text = c."IDFld"::text
+                AND c."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.udfvalue d
+            ON a."FindType" = d."UDFValueID"
+        LEFT JOIN dashboard.languageaa e
+            ON d."LanguageID"::text = e."IDFld"::text
+                AND e."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.udfvalue f
+            ON a."FindRisk" = f."UDFValueID"
+        LEFT JOIN dashboard.languageaa g
+            ON f."LanguageID"::text = g."IDFld"::text
+                AND g."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.activities h
+            ON a."AuditID" = h."GuiIDFld"
+
+        LEFT JOIN (
+            SELECT "OrigID", count(*) AS open_actplans
+            FROM dashboard.actplans
+            WHERE "APADate" IS NULL
+            GROUP BY "OrigID"
+            ) i
+            ON a."IDFld" = i."OrigID"
+            
+        WHERE h."IDFld" <> '2021 Тест'
+			AND h."IDFld" <> '2021 Тест 2 - 1'
+			AND "Subject" IS NOT NULL
+			AND h."IDFld" <> '2021 Недостатки прошлых периодов (ранее 2021 года)'
+        ) z
+    '''
+
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    result = con.execute(sql).fetchone()[0]
+
+    return result
+
+
+def get_decrease_ap():
+    """Закрытые за период недостатки"""
+
+    sql = '''
+        SELECT count(*)
+        FROM (
+        SELECT a.*,
+            c."Language3" AS issue_group, 
+            e."Language3" AS issue_type,
+            g."Language3" AS issue_risk_level,
+            h."IDFld",
+            i.open_actplans
+        FROM dashboard.issues a
+        LEFT JOIN dashboard.udfvalue b
+            ON a."FindGroup" = b."UDFValueID"
+        LEFT JOIN dashboard.languageaa c
+            ON b."LanguageID"::text = c."IDFld"::text
+                AND c."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.udfvalue d
+            ON a."FindType" = d."UDFValueID"
+        LEFT JOIN dashboard.languageaa e
+            ON d."LanguageID"::text = e."IDFld"::text
+                AND e."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.udfvalue f
+            ON a."FindRisk" = f."UDFValueID"
+        LEFT JOIN dashboard.languageaa g
+            ON f."LanguageID"::text = g."IDFld"::text
+                AND g."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.activities h
+            ON a."AuditID" = h."GuiIDFld"
+
+        LEFT JOIN (
+            SELECT "OrigID", count(*) AS open_actplans
+            FROM dashboard.actplans
+            WHERE "APADate" IS NULL
+            GROUP BY "OrigID"
+            ) i
+            ON a."IDFld" = i."OrigID"
+            
+        WHERE h."IDFld" <> '2021 Тест'
+			AND h."IDFld" <> '2021 Тест 2 - 1'
+			AND "Subject" IS NOT NULL
+            AND i.open_actplans IS NULL
+        ) z
+    '''
+
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    result = con.execute(sql).fetchone()[0]
+
+    return result
+
+
+def get_outcoming_ap():
+    """Исходящие остатки недостатков за период"""
+
+    sql = '''
+        SELECT count(*)
+        FROM (
+        SELECT a.*,
+            c."Language3" AS issue_group, 
+            e."Language3" AS issue_type,
+            g."Language3" AS issue_risk_level,
+            h."IDFld",
+            i.open_actplans
+        FROM dashboard.issues a
+        LEFT JOIN dashboard.udfvalue b
+            ON a."FindGroup" = b."UDFValueID"
+        LEFT JOIN dashboard.languageaa c
+            ON b."LanguageID"::text = c."IDFld"::text
+                AND c."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.udfvalue d
+            ON a."FindType" = d."UDFValueID"
+        LEFT JOIN dashboard.languageaa e
+            ON d."LanguageID"::text = e."IDFld"::text
+                AND e."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.udfvalue f
+            ON a."FindRisk" = f."UDFValueID"
+        LEFT JOIN dashboard.languageaa g
+            ON f."LanguageID"::text = g."IDFld"::text
+                AND g."Description" = 'UDF'
+                
+        LEFT JOIN dashboard.activities h
+            ON a."AuditID" = h."GuiIDFld"
+
+        LEFT JOIN (
+            SELECT "OrigID", count(*) AS open_actplans
+            FROM dashboard.actplans
+            WHERE "APADate" IS NULL
+            GROUP BY "OrigID"
+            ) i
+            ON a."IDFld" = i."OrigID"
+            
+        WHERE h."IDFld" <> '2021 Тест'
+			AND h."IDFld" <> '2021 Тест 2 - 1'
+			AND "Subject" IS NOT NULL
+            AND i.open_actplans IS NOT NULL
+        ) z
+    '''
+
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    result = con.execute(sql).fetchone()[0]
+
+    return result

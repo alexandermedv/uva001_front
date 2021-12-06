@@ -17,7 +17,7 @@ from ..pages import dash_app
 # from ..utils import get_top_resellers, get_resellers_share, get_resellers_cargo
 # from ..utils import get_all_branch_names, get_all_cargo_names, get_all_rps
 # from ..utils import get_resellers_dynamics
-from ..utils import get_monitoring
+from ..utils import get_get_open_ap_by_groups, get_incoming_ap, get_increase_ap, get_decrease_ap, get_outcoming_ap
 
 
 # # Количество посреднических рейсов за выбранный период
@@ -203,7 +203,7 @@ def render_content(tab):
         """Вкладка Мониторинг"""
 
         print('Запуск вкладки 1')
-        df1 = get_monitoring()
+        df1 = get_get_open_ap_by_groups()
         print('df1 =', df1)
         # df1 = get_monitoring().sort_values(by=s, ascending=True)
 
@@ -220,6 +220,17 @@ def render_content(tab):
         x3_data = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str).tolist()
         x3_text = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str)
         y3_data = df1['issue_group'][df1['issue_risk_level']=='Высокий'].tolist()
+
+
+        incoming_ap = get_incoming_ap()
+        increase_ap = get_increase_ap()
+        decrease_ap = get_decrease_ap()
+        outcoming_ap = get_outcoming_ap()
+
+        print('incoming_ap =', incoming_ap)
+        print('increase_ap =', increase_ap)
+        print('decrease_ap =', decrease_ap)
+        print('outcoming_ap =', outcoming_ap)
 
     #     x2_data = df1['Доля посреднических рейсов'].astype(str).tolist()
     #     x2_text = df1['Доля посреднических рейсов'].astype(str) + "%"
@@ -321,83 +332,43 @@ def render_content(tab):
                     ),
                 ], className="six columns"),
 
-                # html.Div([
-                #     dcc.Graph(
-                #         id="dashboard6-graph2",
-                #         figure={
-                #             "data": [
-                #                 go.Waterfall(
-                #                     x=["Мониторинг на 01.04.2021", "Выявлено по проверкам 2021", "Сняты с контроля на 01.09.2021", "Мониторинг на 01.09.2021"],
-                #                     y=[61, 30, -43, 48],
-                #                     text=x1_text,
-                #                     hoverinfo='skip',
-                #                     hovertemplate=
-                #                         """Риск: Низкий <br>Количество недостатков: %{text}""",
-                #                     name='',
-                #                     orientation='h',
-                #                     textposition='auto',
-                #                     marker={
-                #                         "color": "#7bee00",
-                #                         "line": {
-                #                             "color": "rgb(255, 255, 255)",
-                #                             "width": 2,
-                #                         },
-                #                     },
-                #                 ),
-                #                 go.Bar(
-                #                     x=x2_data,
-                #                     y=y2_data,
-                #                     text=x2_text,
-                #                     hoverinfo='skip',
-                #                     hovertemplate=
-                #                         """Риск: Средний <br>Количество недостатков: %{text}""",
-                #                     name='',
-                #                     orientation='h',
-                #                     textposition='auto',
-                #                     marker={
-                #                         "color": "#feee05",
-                #                         "line": {
-                #                             "color": "rgb(255, 255, 255)",
-                #                             "width": 2,
-                #                         },
-                #                     },
-                #                 ),
-                #                 go.Bar(
-                #                     x=x3_data,
-                #                     y=y3_data,
-                #                     text=x3_text,
-                #                     hoverinfo='skip',
-                #                     hovertemplate=
-                #                         """Риск: Высокий <br>Количество недостатков: %{text}""",
-                #                     name='',
-                #                     orientation='h',
-                #                     textposition='auto',
-                #                     marker={
-                #                         "color": "#fe410c",
-                #                         "line": {
-                #                             "color": "rgb(255, 255, 255)",
-                #                             "width": 2,
-                #                         },
-                #                     },
-                #                 ),
-                #             ],
-                #             "layout": go.Layout(
-                #                 autosize=True,
-                #                 barmode='stack',
-                #                 title_text='Количество открытых недостатков, шт.',
-                #                 margin={
-                #                                     "r": 0,
-                #                                     "t": 50,
-                #                                     "b": 20,
-                #                                     "l": 150,
-                #                 },
+                html.Div([
+                    dcc.Graph(
+                        id="dashboard6-graph2",
+                        figure={
+                            "data": [
+                                go.Waterfall(
+                                    measure = ['relative', 'relative', 'relative', 'relative'],
+                                    x=["Мониторинг на 01.04.2021", "Выявлено по проверкам 2021", "Сняты с контроля на 01.09.2021", "Мониторинг на 01.09.2021"],
+                                    y=[incoming_ap, increase_ap, (-1)*decrease_ap, (-1)*outcoming_ap],
+                                    # y=[49, 43, -23, -69],
+                                    textposition = "outside",
+                                    text=[incoming_ap, increase_ap, (-1)*decrease_ap, (-1)*outcoming_ap],
+                                    hoverinfo='skip',
+                                    hovertemplate=
+                                        """Количество недостатков: %{text}""",
+                                    name='Недостатки',
+                                    orientation='v',
+                                ),
+                                
+                            ],
+                            "layout": go.Layout(
+                                autosize=True,
+                                barmode='stack',
+                                title_text='Изменение количества открытых недостатков, шт.',
+                                margin={
+                                                    "r": 0,
+                                                    "t": 50,
+                                                    "b": 20,
+                                                    "l": 150,
+                                },
 
-                #             ),
+                            ),
 
-                #         },
-                #         config={"displayModeBar": False},
-                #     ),
-                # ], className="six columns"),
+                        },
+                        config={"displayModeBar": False},
+                    ),
+                ], className="six columns"),
     #             html.Div([
     #                 dcc.Graph(
     #                     id="dashboard5-graph2",

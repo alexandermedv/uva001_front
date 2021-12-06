@@ -28,8 +28,12 @@ def create_layout():
                         html.Br([]),
                         html.P("\
                             Данный отчет содержит информацию о количестве порожних рейсов.\
-                            Отчет построен на основе данных SAP TM по внутренним перевозкам. \n \
-                            *Расчёт отклонения срока доставки производился без учета затрат времени на ТОР.",
+                            Отчет построен на основе данных SAP TM по внутренним перевозкам." ,
+                            style={"color": "#ffffff"},
+                            className="row",
+                        ),
+                        html.Br(),
+                        html.P("*Расчёт отклонения срока доставки производился без учета затрат времени на ТОР.",
                             style={"color": "#ffffff"},
                             className="row",
                         ),
@@ -44,11 +48,8 @@ def create_layout():
                     html.Div(
                         html.Output('Дата:'),
                         className='one column',
-                        style={"display": "flex",
-                        "align-items": "center",
-                        "height": "38px"
-                            }
-                            ),
+                        style={"display": "flex", "align-items": "center", "height": "38px"}
+                    ),
                     dcc.DatePickerRange(
                         id='dashboard8-date-picker-range',
                         min_date_allowed=date(2000, 1, 1),
@@ -63,7 +64,8 @@ def create_layout():
                         display_format='DD.MM.YYYY',
                         start_date_placeholder_text='Начало периода',
                         end_date_placeholder_text='Конец периода',
-                    className='four columns'),
+                        className='four columns'
+                    ),
                     html.Div(
                         html.Output('Дорога:'),
                         id = 'name1',
@@ -73,75 +75,13 @@ def create_layout():
                     ),
                     dcc.Dropdown(
                         id="dashboard8-dropdown1-in-railway",
-                        value='Все дороги',
+                        value='',
                         clearable=False,
                         style={"display": "block",
                             "justify-content": "center"},
-                        options=[{'label': i, 'value': i} for i in get_trans_empty_by_railway_penalty()['Дорога назначения'].unique()],
+                        options=[{'label': i, 'value': i} for i in [''] + get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
                         #multi=True,
-                    className='four columns'),
-                    # html.Div(
-                    #     html.Output('Количество порожних рейсов:'),
-                    # className='two columns',
-                    # style={"display": "flex",
-                    #     "align-items": "center",
-                    #     "height": "38px"
-                    #         }),
-                    # html.Div(
-                    #     html.B(
-                    #         html.Output(id='resellers_amount'),
-                    #         ),
-                    # className='two columns',
-                    #             style={"border-style": "groove",
-                    #                 "border-radius": "5px",
-                    #                 "height": "38px",
-                    #                 "display": "flex",
-                    #                 "align-items": "center",
-                    #                 "justify-content": "center"
-                    #                 }
-                    # ),
-
-                    # html.Div(
-                    #     html.Output('Доля порожних рейсов:'),
-                    # className='two columns',
-                    # style={"display": "flex",
-                    #     "align-items": "center",
-                    #     "height": "38px"
-                    #         }),
-                    # html.Div(
-                    #     html.B(
-                    #         html.Output(id='resellers_share'),
-                    #         ),
-                    # className='two columns',
-                    #             style={"border-style": "groove",
-                    #                 "border-radius": "5px",
-                    #                 "height": "38px",
-                    #                 "display": "flex",
-                    #                 "align-items": "center",
-                    #                 "justify-content": "center"
-                    #                 }
-                    # ),
-                    
-                    # html.Div(
-                    #     html.Output('Всего рейсов за период:'),
-                    # className='five columns',
-                    # style={"display": "flex",
-                    #     "align-items": "center",
-                    #     "height": "38px"
-                    #         }),
-                    # html.Div(
-                    #     html.B(
-                    #         html.Output(id='transportations_count'),
-                    #         ),
-                    # className='two columns',
-                    #             style={"border-style": "groove",
-                    #                 "border-radius": "5px",
-                    #                 "height": "38px",
-                    #                 "display": "flex",
-                    #                 "align-items": "center",
-                    #                 "justify-content": "center"
-                    #                 }
-                    #         ),
+                        className='four columns'),
                 ],)
             ], className="row",
             ),

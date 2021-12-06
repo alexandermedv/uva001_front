@@ -30,8 +30,8 @@ from ..utils import external_railway
 def update_dropdown1(start_date, end_date, tab):
     """Список значений по дорогам"""
     trans_empty_by_railway_penalty = get_trans_empty_by_railway_penalty()
-    print({'label': i, 'value': i} for i in trans_empty_by_railway_penalty['Дорога назначения'].unique())
-    return [{'label': i, 'value': i} for i in trans_empty_by_railway_penalty['Дорога назначения'].unique()]
+    # print({'label': i, 'value': i} for i in [''] + trans_empty_by_railway_penalty['Дорога назначения'].unique().tolist())
+    return [{'label': i, 'value': i} for i in [''] + trans_empty_by_railway_penalty['Дорога назначения'].unique().tolist()]
 
 # Скрытие фильтра по дорогам по выбору закладки 
 @dash_app.callback(Output('dashboard8-dropdown1-in-railway', 'style'), [Input('dashboard8-tabs', 'value'),])
@@ -59,16 +59,16 @@ def hide_graph(input):
 def render_content(tab, start_date, end_date, railway):
     """Построение содержимого выбранной закладки"""
 
-    start_date = pd.to_datetime(start_date)
-    end_date = pd.to_datetime(end_date)
+    # start_date = pd.to_datetime(start_date)
+    # end_date = pd.to_datetime(end_date)
     
     if tab == 'tab-1':
         """Динамика"""
         # Закладка динамика
-        trans_empty_by_type = get_trans_empty_by_type()
-        trans_empty_by_money = get_trans_empty_by_money()
-        trans_empty_by_type_month = get_trans_empty_by_type_month()
-        trans_empty_by_money_month = get_trans_empty_by_money_month()
+        trans_empty_by_type = get_trans_empty_by_type(railway=railway, start_date=start_date, end_date=end_date)
+        trans_empty_by_money = get_trans_empty_by_money(railway=railway, start_date=start_date, end_date=end_date)
+        trans_empty_by_type_month = get_trans_empty_by_type_month(railway=railway, start_date=start_date, end_date=end_date)
+        trans_empty_by_money_month = get_trans_empty_by_money_month(railway=railway, start_date=start_date, end_date=end_date)
         
         content = html.Div([
             # Первая линия
@@ -78,7 +78,7 @@ def render_content(tab, start_date, end_date, railway):
                         id="dash8-tab-1-pie1",
                         figure={
                             "data": [go.Pie(labels=trans_empty_by_type['Тип'], values=trans_empty_by_type["Кол-во вагонорейсов"],
-                                marker={"colors": ["#191970", "#97151c", "#D3D3D3"]}, 
+                                marker={"colors": ["#D3D3D3",  "#97151c", "#191970",]}, 
                                 # hovertext=trans_empty_by_type["Кол-во вагонорейсов"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
                                 hoverinfo='skip',
                                 hovertemplate = '%{label} - %{text}',

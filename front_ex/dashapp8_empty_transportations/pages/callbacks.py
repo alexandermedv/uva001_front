@@ -98,26 +98,6 @@ def render_content(tab, start_date, end_date, railway):
                         id="dash8-tab-1-graph1",
                         figure={
                             "data": [
-                                # go.Bar(
-                                #     x=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'Без просрочки']["Месяц"].tolist(),
-                                #     y=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'Без просрочки']["Кол-во вагонорейсов"].tolist(),
-                                #     text=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'Без просрочки']["Кол-во вагонорейсов"]\
-                                #         .map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
-                                #     hoverinfo='skip',
-                                #     hovertemplate=
-                                #     """Кол-во вагонорейсов без просрочки: %{text}""",
-                                #     name = 'Без просрочки',
-                                #     # trans_empty_by_type_month['Тип'],
-                                #     orientation='v',
-                                #     textposition='auto',
-                                #     marker={
-                                #         "color": "#D3D3D3",
-                                #         "line": {
-                                #             "color": "rgb(255, 255, 255)",
-                                #             "width": 2,
-                                #         },
-                                #     },
-                                # ),
                                 go.Bar(
                                     x=trans_empty_by_type_month[(trans_empty_by_type_month['Тип'] == 'С просрочкой') & (trans_empty_by_type_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1)]["Месяц"].apply(lambda x: x.replace(x.year+1)).tolist(),
                                     y=trans_empty_by_type_month[(trans_empty_by_type_month['Тип'] == 'С просрочкой') & (trans_empty_by_type_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1)]["Кол-во вагонорейсов"].tolist(),
@@ -300,7 +280,7 @@ def render_content(tab, start_date, end_date, railway):
                         figure={
                             "data": [go.Pie(labels=internal_penalty['Дорога назначения'], 
                                 values=internal_delay['Вагонорейсы с просрочкой, %'],
-                                marker=dict(colors=px.colors.sequential.amp + px.colors.sequential.Burg),
+                                marker=dict(colors=(px.colors.sequential.Burg + px.colors.sequential.amp )[::-1]),
                                 hoverinfo='skip',
                                 hovertemplate = '%{label} - %{value}',
                             )],
@@ -319,7 +299,7 @@ def render_content(tab, start_date, end_date, railway):
                         id="dashboard8-pie2",
                         figure={
                             "data": [go.Pie(labels=internal_penalty['Дорога назначения'], values=internal_penalty['Оценка пени, %'],
-                                marker=dict(colors=px.colors.sequential.amp + px.colors.sequential.Burg),
+                                marker=dict(colors=(px.colors.sequential.Burg + px.colors.sequential.amp )[::-1]),
                                 hoverinfo='skip',
                                 hovertemplate = '%{label} - %{value}',
                             )],
@@ -363,6 +343,7 @@ def render_content(tab, start_date, end_date, railway):
                                 ),
                             ],
                             "layout": go.Layout(
+                                yaxis={"autorange":"reversed"},
                                 autosize=True,
                                 title_text='Кол-во вагонорейсов с просрочкой, шт.',
                                 margin={"r": 0, "t": 50, "b": 20, "l": 70, },
@@ -399,6 +380,7 @@ def render_content(tab, start_date, end_date, railway):
                             ],
                             "layout": go.Layout(
                                 autosize=True,
+                                yaxis={"autorange":"reversed"},
                                 title_text='Оценка пени, руб.',
                                 margin={"r": 0, "t": 50, "b": 20, "l": 70, },
                             ),

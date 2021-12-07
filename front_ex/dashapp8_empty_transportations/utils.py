@@ -45,7 +45,7 @@ def get_trans_empty_by_railway_delay(railway='', start_date=None, end_date=None)
         str = sql + 'and "Дорога назначения" = {railway}'.format(railway = railway)
     sql = sql + '''
         group by t."Дорога назначения"
-            order by sum(case when t."Превышение даты истечение срока д" = 'Не удовлетворяет' then "Кол-во вагонорейсов" else 0 end) 
+            order by sum(case when t."Превышение даты истечение срока д" = 'Не удовлетворяет' then "Кол-во вагонорейсов" else 0 end) desc
         ) t
     ''' 
     # print(sql)
@@ -64,7 +64,7 @@ def get_trans_empty_by_railway_penalty():
 						        or lower("Грузоотправитель") like '%пгк' 
 						        or lower("Получатель") like '%пгк')
                             group by t."Дорога назначения"	
-                                order by sum("Оценка пени")				
+                                order by sum("Оценка пени")	desc			
     '''
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     df = pd.read_sql(sql, con)

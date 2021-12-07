@@ -9,6 +9,7 @@ import pandas as pd
 import dash_table
 import dash
 import plotly.express as px
+from dateutil import relativedelta
 
 from ..pages import dash_app
 # Первая закладка
@@ -22,9 +23,6 @@ from ..utils import external_railway
     Output(component_id='dashboard8-dropdown1-in-railway', component_property='options'),
     [Input('dashboard5-date-picker-range', 'start_date'),
      Input('dashboard5-date-picker-range', 'end_date'),
-    #  Input('dashboard5-dropdown1', 'value'),
-    # Input('dashboard5-dropdown2', 'value'),
-    #  Input('dashboard5-dropdown3', 'value'),
      Input('dashboard5-tabs', 'value')]
 )
 def update_dropdown1(start_date, end_date, tab):
@@ -100,42 +98,65 @@ def render_content(tab, start_date, end_date, railway):
                         id="dash8-tab-1-graph1",
                         figure={
                             "data": [
+                                # go.Bar(
+                                #     x=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'Без просрочки']["Месяц"].tolist(),
+                                #     y=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'Без просрочки']["Кол-во вагонорейсов"].tolist(),
+                                #     text=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'Без просрочки']["Кол-во вагонорейсов"]\
+                                #         .map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
+                                #     hoverinfo='skip',
+                                #     hovertemplate=
+                                #     """Кол-во вагонорейсов без просрочки: %{text}""",
+                                #     name = 'Без просрочки',
+                                #     # trans_empty_by_type_month['Тип'],
+                                #     orientation='v',
+                                #     textposition='auto',
+                                #     marker={
+                                #         "color": "#D3D3D3",
+                                #         "line": {
+                                #             "color": "rgb(255, 255, 255)",
+                                #             "width": 2,
+                                #         },
+                                #     },
+                                # ),
                                 go.Bar(
-                                    x=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'Без просрочки']["Месяц"].tolist(),
-                                    y=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'Без просрочки']["Кол-во вагонорейсов"].tolist(),
-                                    text=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'Без просрочки']["Кол-во вагонорейсов"]\
+                                    x=trans_empty_by_type_month[(trans_empty_by_type_month['Тип'] == 'С просрочкой') & (trans_empty_by_type_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1)]["Месяц"].apply(lambda x: x.replace(x.year+1)).tolist(),
+                                    y=trans_empty_by_type_month[(trans_empty_by_type_month['Тип'] == 'С просрочкой') & (trans_empty_by_type_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1)]["Кол-во вагонорейсов"].tolist(),
+                                    text=trans_empty_by_type_month[(trans_empty_by_type_month['Тип'] == 'С просрочкой') & (trans_empty_by_type_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1)]["Кол-во вагонорейсов"]\
                                         .map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """Кол-во вагонорейсов с просрочкой: %{text}""",
-                                    name = 'Без просрочки',
-                                    # trans_empty_by_type_month['Тип'],
+                                        """Кол-во вагонорейсов с просрочкой в прошлом году: %{text}""",
+                                    name = dt.date.today().year - 1 ,
+
                                     orientation='v',
                                     textposition='auto',
+                                    constraintext='outside',
                                     marker={
-                                        "color": "#D3D3D3",
-                                        "line": {
-                                            "color": "rgb(255, 255, 255)",
-                                            "width": 2,
-                                        },
+                                        "color": "#808080",
+                                        # "line": {
+                                        #     "color": "#97151c",
+                                        #     "width": 2,
+                                        # },
                                     },
                                 ),
                                 go.Bar(
-                                    x=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'С просрочкой']["Месяц"].tolist(),
-                                    y=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'С просрочкой']["Кол-во вагонорейсов"].tolist(),
-                                    text=trans_empty_by_type_month[trans_empty_by_type_month['Тип'] == 'С просрочкой']["Кол-во вагонорейсов"]\
+                                    x=trans_empty_by_type_month[(trans_empty_by_type_month['Тип'] == 'С просрочкой') & (trans_empty_by_type_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year)]["Месяц"].tolist(),
+                                    y=trans_empty_by_type_month[(trans_empty_by_type_month['Тип'] == 'С просрочкой') & (trans_empty_by_type_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year)]["Кол-во вагонорейсов"].tolist(),
+                                    text=trans_empty_by_type_month[(trans_empty_by_type_month['Тип'] == 'С просрочкой') & (trans_empty_by_type_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year)]["Кол-во вагонорейсов"]\
                                         .map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """Кол-во вагонорейсов без просрочки: %{text}""",
-                                    name = 'С просрочкой',
-                                    # trans_empty_by_type_month['Тип'],
+                                        """Кол-во вагонорейсов с просрочкой: %{text}""",
+                                    name = dt.date.today().year,
+
                                     orientation='v',
                                     textposition='auto',
+                                    constraintext='outside',
+
                                     marker={
-                                        "color" : "#97151c",
+                                        "color": "#97151c",
                                         "line": {
-                                            "color": "rgb(255, 255, 255)",
+                                            "color": "#97151c",
                                             "width": 2,
                                         },
                                     },
@@ -143,8 +164,9 @@ def render_content(tab, start_date, end_date, railway):
                             ],
                             "layout": go.Layout(
                                 autosize=True,
-                                barmode = 'stack', 
-                                title_text='Кол-во порожних вагонорейсов помесячно, ваг.',
+                                # barmode = 'stack', 
+                                barmode = 'group',
+                                title_text='Кол-во порожних вагонорейсов с просрочкой помесячно, ваг.',
                                 margin={"r": 0, "t": 50, "b": 20, "l": 70, },
                             ),
                         },
@@ -160,7 +182,7 @@ def render_content(tab, start_date, end_date, railway):
                         id="dash8-tab1-pie2",
                         figure={
                             "data": [go.Pie(labels=trans_empty_by_money['Тип'], values=trans_empty_by_money['Рассчитанная сумма'], 
-                             marker={"colors": ["#97151c", "#808080", "#D3D3D3", ]},
+                             marker={"colors": ["#808080","#97151c", "#D3D3D3",]},
                             #  темно-синий "#191970",
                              hoverinfo='skip',
                              hovertemplate = '%{label} - %{text}',
@@ -184,14 +206,34 @@ def render_content(tab, start_date, end_date, railway):
                         figure={
                             "data": [
                                 go.Scatter(
-                                    x=trans_empty_by_money_month["Месяц"].tolist(),
-                                    y=trans_empty_by_money_month["Оценка пени"].tolist(),
-                                    text=trans_empty_by_money_month["Оценка пени"]\
+                                    x=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year]["Месяц"].tolist(),
+                                    y=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year]["Оценка пени"].tolist(),
+                                    text=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year]["Оценка пени"]\
                                         .map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
                                     hoverinfo='skip',
                                     hovertemplate=
                                     """Оценка пени: %{text}""",
-                                    name='Без просрочки',
+                                    name=dt.date.today().year,
+            
+                                    # orientation='v',
+                                    # textposition='auto',
+                                    marker={
+                                        "color": "#97151c",
+                                        "line": {
+                                            "color": "#97151c",
+                                            "width": 2,
+                                        },
+                                    },
+                                ),
+                                go.Scatter(
+                                    x=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1]["Месяц"].apply(lambda x: x.replace(x.year+1)).tolist(),
+                                    y=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1]["Оценка пени"].tolist(),
+                                    text=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1]["Оценка пени"]\
+                                        .map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
+                                    hoverinfo='skip',
+                                    hovertemplate=
+                                    """Оценка пени: %{text}""",
+                                    name=dt.date.today().year - 1,
             
                                     # orientation='v',
                                     # textposition='auto',
@@ -218,7 +260,19 @@ def render_content(tab, start_date, end_date, railway):
                     ),
                 ], className="six columns",
                 ),
-             ], className="row"),
+            ], className="row"),
+            html.Div([
+                html.Div([
+                    html.P("За несоблюдение сроков доставки грузов перевозчик уплачивает пени в соответствии со ст. 97 Устава ЖТД РФ. Размер пени за каждые сутки просрочки составит 6% платы за перевозку, а максимальный размер ответственности – 50%, если перевозчик не докажет, что груз пришёл с опозданием не по его вине.",
+                            # style={"color": "#ffffff"},
+                            style={"fontSize": "12px"},
+                            className="row",
+                    ),
+                ], className='six columns'),
+                html.Div([
+                    html.P('')
+                ], className='six columns'),
+            ], className="row")
         ])
         return content
     elif tab == 'tab-2':
@@ -247,6 +301,8 @@ def render_content(tab, start_date, end_date, railway):
                             "data": [go.Pie(labels=internal_penalty['Дорога назначения'], 
                                 values=internal_delay['Вагонорейсы с просрочкой, %'],
                                 marker=dict(colors=px.colors.sequential.amp + px.colors.sequential.Burg),
+                                hoverinfo='skip',
+                                hovertemplate = '%{label} - %{value}',
                             )],
                             "layout": go.Layout(
                                 autosize=True,
@@ -264,6 +320,8 @@ def render_content(tab, start_date, end_date, railway):
                         figure={
                             "data": [go.Pie(labels=internal_penalty['Дорога назначения'], values=internal_penalty['Оценка пени, %'],
                                 marker=dict(colors=px.colors.sequential.amp + px.colors.sequential.Burg),
+                                hoverinfo='skip',
+                                hovertemplate = '%{label} - %{value}',
                             )],
                             "layout": go.Layout(
                                 autosize=True,
@@ -388,4 +446,19 @@ def render_content(tab, start_date, end_date, railway):
                 ),
              ], className="row"),
         ])
+        return content
+    elif tab == 'tab-3':
+        content = html.Div([
+            html.Div([html.P('')], className = 'row'),
+            html.Div([
+                html.P("Оборот вагонов зависит от скорости продвижения вагонов, выгрузки и погрузки."),
+                html.P("Перевозчики обязаны доставлять грузы по назначению и в установленные сроки согласно ст. 33 Устав ЖДТ РФ. Вагон считается доставленным в срок, если до истечения указанного в транспортной железнодорожной накладной срока доставки (с учетом корректировки в соответствии с правилами исчисления сроков доставки грузов, порожних грузовых вагонов железнодорожным транспортом) перевозчик обеспечил подачу на пути под ГО."), 
+                html.Br(),
+                html.P("Данные из выгрузки вагонорейсов и дашборда могут использоваться:"),
+                # html.Br(),
+                html.P("    - в качестве понимания количества порожних вагонов с нарушением срока доставки и контроля за объемом пени, подлежащих выставлению."),
+                # html.Br(),
+                html.P("    - как рычаг воздействия на перевозчика, т.е. в целях получения преференций от перевозчика (РЖД) для повышения эффективности вагонного парка, при условии не выставление ему пени."),
+            ], className="row")
+        ],)
         return content

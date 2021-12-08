@@ -85,7 +85,7 @@ def render_content(tab, start_date, end_date, railway):
                             "layout": go.Layout(
                                 autosize=True,
                                 font = dict(size=12),
-                                title_text='Кол-во порожних вагонорейсов, шт. <br> (плательщик, грузоотправитель, грузополучатель ПАО "ПКГ")',
+                                title_text='Общее кол-во порожних вагонорейсов, шт. <br> (плательщик, грузоотправитель, грузополучатель ПАО "ПКГ")',
                                 margin={"r": 0, "t": 100, "b": 20, "l": 70, },
                             ),
                         },
@@ -257,9 +257,9 @@ def render_content(tab, start_date, end_date, railway):
         return content
     elif tab == 'tab-2':
         """По дорогам"""
-        trans_empty_by_railway_delay = get_trans_empty_by_railway_delay()
-        trans_empty_by_railway_penalty = get_trans_empty_by_railway_penalty()
-        trans_empty_by_railway_mean_delay = get_trans_empty_by_railway_mean_delay()
+        trans_empty_by_railway_delay = get_trans_empty_by_railway_delay(start_date=start_date, end_date=end_date)
+        trans_empty_by_railway_penalty = get_trans_empty_by_railway_penalty(start_date=start_date, end_date=end_date)
+        trans_empty_by_railway_mean_delay = get_trans_empty_by_railway_mean_delay(start_date=start_date, end_date=end_date)
         
         # Tab-2 pie content вагонорейсы
         internal_delay = trans_empty_by_railway_delay

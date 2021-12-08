@@ -100,7 +100,7 @@ def get_trans_empty_by_railway_mean_delay(railway='', start_date=None, end_date=
             and "Месяц" >= '{start_date}'
             and "Месяц" <= '{end_date}'
         '''.format(start_date = start_date, end_date = end_date)
-    sql = '''    
+    sql = sql + '''    
                             group by t."Дорога назначения"
                                 order by avg("Дней просрочки, суток")
     '''

@@ -62,7 +62,7 @@ def get_tors_by_rps(start_date, end_date):
         a.ILATX AS "Вид ремонта",
         count(a.AUFNR) AS "Количество ремонтов"
         FROM dashboard.tor_ik a
-        WHERE a.DATNRP BETWEEN '%s' AND '%s'
+        WHERE a."DATNRP" BETWEEN '%s' AND '%s'
         GROUP BY a.ROD_ID_TEXT, a.ILATX
     ''' % (start_date, end_date)
 

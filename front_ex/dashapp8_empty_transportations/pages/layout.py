@@ -90,7 +90,7 @@ def create_layout():
             html.Div([
                 dcc.Tabs(id='dashboard8-tabs', value='tab-1', children=[
                     dcc.Tab(label='Общие', value='tab-1', className="tab",),
-                    dcc.Tab(label='По дорогам', value='tab-2', className="tab",),
+                    dcc.Tab(label='По дорогам назначения', value='tab-2', className="tab",),
                     dcc.Tab(label='Описание', value='tab-3', className="tab",),
                 ], className="row all-tabs"),
                 #html.Div(id='tabs-example-content')

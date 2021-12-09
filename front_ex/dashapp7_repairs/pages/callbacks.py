@@ -11,15 +11,132 @@ import dash
 # from .layout import layout
 #import string
 from ..pages import dash_app
-from ..utils import get_rps
+# from ..utils import get_branch_names, get_cargo_names, get_rps
+# from ..utils import get_resellers_by_branches, get_resellers_by_rps
+# from ..utils import get_resellers_count, get_resellers_table
+# from ..utils import get_top_resellers, get_resellers_share, get_resellers_cargo
+# from ..utils import get_all_branch_names, get_all_cargo_names, get_all_rps
+# from ..utils import get_resellers_dynamics
 from ..utils import get_tors_by_rps
-from ..utils import get_tors_by_type
-from ..utils import get_top_tors_by_rps
-from ..utils import get_top_tors_by_type
-from ..utils import get_avg_tors
-from ..utils import get_tors_count
-from ..utils import get_all_rps
 
+
+# Первый график по ремонтам
+@dash_app.callback(
+    Output(component_id='graphs', component_property='children'),
+    [Input('dashboard7-date-picker-range', 'start_date'),
+     Input('dashboard7-date-picker-range', 'end_date')]
+)
+def update_graphs(start_date, end_date):
+    """Первый график по ремонтам - по РПС"""
+
+    print('Запустился callback с графиками')
+    df1 = get_tors_by_rps(start_date, end_date)
+    df1['Total', 'Прочие', 'ДР']= 15
+    df1['Total', 'Прочие', 'КР']= 25
+    df1['Total', 'Прочие', 'ТР-1']= 35
+    df1['Total', 'Прочие', 'ТР-2']= 45
+    print('df1 =', df1)
+
+    x1_data = df1['Количество ремонтов'][df1['Вид ремонта'] == 'ДР']
+    x1_text = df1['Количество ремонтов'][df1['Вид ремонта'] == 'ДР']
+    y1_data = df1['РПС'][df1['Вид ремонта'] == 'ДР']
+
+    x2_data = df1['Количество ремонтов'][df1['Вид ремонта'] == 'КР']
+    x2_text = df1['Количество ремонтов'][df1['Вид ремонта'] == 'КР']
+    y2_data = df1['РПС'][df1['Вид ремонта'] == 'КР']
+
+    x3_data = df1['Количество ремонтов'][df1['Вид ремонта'] == 'ТР-1']
+    x3_text = df1['Количество ремонтов'][df1['Вид ремонта'] == 'ТР-1']
+    y3_data = df1['РПС'][df1['Вид ремонта'] == 'ТР-1']
+
+    x4_data = df1['Количество ремонтов'][df1['Вид ремонта'] == 'ТР-2']
+    x4_text = df1['Количество ремонтов'][df1['Вид ремонта'] == 'ТР-2']
+    y4_data = df1['РПС'][df1['Вид ремонта'] == 'ТР-2']
+
+    content = html.Div([
+        dcc.Graph(
+            id="dashboard7-graph1",
+            figure={
+                "data": [
+                    go.Bar(
+                        x=x1_data,
+                        y=y1_data,
+                        text=x1_text,
+                        hoverinfo='skip',
+                        hovertemplate=
+                            """Кол-во ремонтов ДР: %{y}""",
+                        name = 'ДР',
+                        orientation='h',
+                        textposition='auto',
+                        constraintext='outside',
+                        marker={
+                            "color": "#808080",
+                        },
+                    ),
+                    go.Bar(
+                        x=x2_data,
+                        y=y2_data,
+                        text=x2_text,
+                        hoverinfo='skip',
+                        hovertemplate=
+                            """Кол-во ремонтов КР: %{y}""",
+                        name = 'КР',
+                        orientation='h',
+                        textposition='auto',
+                        constraintext='outside',
+                        marker={
+                            "color": "#7bee00",
+                        },
+                    ),
+                    go.Bar(
+                        x=x3_data,
+                        y=y3_data,
+                        text=x3_text,
+                        hoverinfo='skip',
+                        hovertemplate=
+                            """Кол-во ремонтов ТР-1: %{y}""",
+                        name = 'ТР-1',
+                        orientation='h',
+                        textposition='auto',
+                        constraintext='outside',
+                        marker={
+                            "color": "#feee05",
+                        },
+                    ),
+                    go.Bar(
+                        x=x4_data,
+                        y=y4_data,
+                        text=x4_text,
+                        hoverinfo='skip',
+                        hovertemplate=
+                            """Кол-во ремонтов ТР-2: %{y}""",
+                        name = 'ТР-2',
+                        orientation='h',
+                        textposition='auto',
+                        constraintext='outside',
+                        marker={
+                            "color": "#fe410c",
+                        },
+                    ),
+                ],
+                "layout": go.Layout(
+                    autosize=True,
+                    title_text='Количество ремонтов по родам подвижного состава',
+                    margin={
+                                        "r": 0,
+                                        "t": 50,
+                                        "b": 20,
+                                        "l": 70,
+                    },
+
+                ),
+
+            },
+        ),
+    ], className='six columns')
+
+
+    return content
 
 
 # Количество посреднических рейсов за выбранный период

@@ -4,4 +4,4 @@
 from .. import dash_app
 # , engine_cons
 # import ics.dashapp1.pages.callbacks
-import front_ex.dashapp5.pages.callbacks
+import front_ex.dashapp7_repairs.pages.callbacks

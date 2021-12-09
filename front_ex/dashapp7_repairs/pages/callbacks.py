@@ -31,6 +31,10 @@ def update_graphs(start_date, end_date):
 
     print('Запустился callback с графиками')
     df1 = get_tors_by_rps(start_date, end_date)
+    df1['Total', 'Прочие', 'ДР']= 15
+    df1['Total', 'Прочие', 'КР']= 25
+    df1['Total', 'Прочие', 'ТР-1']= 35
+    df1['Total', 'Прочие', 'ТР-2']= 45
     print('df1 =', df1)
 
     x1_data = df1['Количество ремонтов'][df1['Вид ремонта'] == 'ДР']

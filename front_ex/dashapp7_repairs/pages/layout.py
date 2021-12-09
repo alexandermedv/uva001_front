@@ -5,7 +5,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 # from . import engine_cons
-from ..utils import get_max_date, get_resellers_count
+from ..utils import get_max_date
 from sqlalchemy import create_engine
 import front_ex.config as config
 
@@ -48,7 +48,7 @@ def create_layout():
                             }
                             ),
                     dcc.DatePickerRange(
-                        id='dashboard5-date-picker-range',
+                        id='dashboard7-date-picker-range',
                         min_date_allowed=date(2000, 1, 1),
                         max_date_allowed=date(2050, 1, 1),
                         initial_visible_month=date(2021, 4, 1),
@@ -233,60 +233,8 @@ def create_layout():
                 ], className="row",
                 ),
 
-
-            # html.Div([
-            #     html.Div([
-            #         dcc.RadioItems(
-            #             options=[
-            #                 {'label': i, 'value': i}
-            #                 for i in ['Месяц', 'Неделя', 'День']
-            #             ],
-            #             value="Месяц",
-            #             id = 'ri-level',
-            #             labelStyle={'display': 'inline-block',
-            #                         "height": "20px"},
-            #             # style={"display": "flex",
-            #             #    "align-items": "center",
-            #             #    "height": "20px"}
-            #         ),
-            #     ],
-            #     className = 'three columns'
-            #     ),
-            #     html.Div([
-            #         dcc.RadioItems(
-            #             options=[
-            #                 {'label': i, 'value': i}
-            #                 for i in ['10', '20', '30']
-            #             ],
-            #             value="10",
-            #             id = 'warehouse_quantity',
-            #             labelStyle={'display': 'inline-block',
-            #                         "height": "20px"},
-            #             # style={"display": "flex",
-            #             #    "align-items": "center",
-            #             #    "height": "20px"}
-            #         ),
-            #     ],
-            #     className = 'three columns'
-            #     ),
-            # ], className="row",
-            # ),
-
-            # Row 4 - Закладки
-
-            html.Div([
-                dcc.Tabs(id='dashboard5-tabs', value='tab-1', children=[
-                    dcc.Tab(label='ТОП посредников', value='tab-1', className="tab",),
-                    dcc.Tab(label='По филиалам', value='tab-2', className="tab",),
-                    dcc.Tab(label='По РПС', value='tab-3', className="tab",),
-                    dcc.Tab(label='По типам грузов', value='tab-4', className="tab",),
-                    dcc.Tab(label='Динамика', value='tab-5', className="tab",),
-                ], className="row all-tabs"),
-                #html.Div(id='tabs-example-content')
-            ]),
-
-            # Row 5 - Содержимое закладки
-            html.Div(id='tab-content'),
+            # Row 5 - Графики
+            html.Div(id='graphs'),
         ], className="sub_page",
         ),
     ], className="page_landscape_a3",

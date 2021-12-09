@@ -82,61 +82,60 @@ def get_tors_by_type(start_date, end_date):
 
     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
-"""Выгрузка топ кодов неисправности в разрезе РПС"""
+def get_top_tors_by_rps(start_date, end_date):
+    """Выгрузка топ3 кодов неисправности в разрезе РПС"""
+    sql = '''
+      SELECT
+      a.ROD_ID_TEXT, a.NEIS1_KOD, a.KURZTEXT1, a.KOLVO
+      FROM (
+          SELECT t.ROD_ID_TEXT,t.NEIS1_KOD, t.KURZTEXT1, count(AUFNR) as KOLVO,
+          ROW_NUMBER() OVER (PARTITION BY ROD_ID_TEXT ORDER BY count(AUFNR) DESC) AS r
+          FROM dashboard.tor_ik t 
+          WHERE t."DATNRP" BETWEEN '%s' AND '%s' GROUP BY t.ROD_ID_TEXT, t.NEIS1_KOD,t.KURZTEXT1) a
+          WHERE a.r <= 3;
+    ''' % (start_date, end_date)
 
-"""Выгрузка топ кодов неисправности в разрезе видов ТОР"""
-
-"""Выгрузка средняя длительность ремонтов"""
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
 
-def get_top_tors(start_date, end_date, branches, gruz, rod, sorting):
-    """Топ посредников по количеству рейсов"""
-    sql = """
-        SELECT a."Заказчик",
-            a."Название заказчика",
-            sum(a."Количество рейсов")::bigint AS "Количество рейсов",
-            c."Количество"::int AS "Количество посреднических рейсов",
-            round(c."Количество"::numeric/sum(a."Количество рейсов")::numeric*100, 2) AS "Доля посреднических рейсов",
-            sum(a."Стоимость")::bigint AS "Стоимость рейсов",
-            c."Стоимость"::bigint AS "Стоимость посреднических рейсов",
-            round(c."Стоимость"::numeric/sum(a."Стоимость")::numeric*100, 2) AS "Доля ст посреднических рейсов"
-        FROM dashboard.tors_cube a
 
-            LEFT JOIN (
-                SELECT f."Заказчик",
-                    f."Результат анализа",
-                    sum("Количество рейсов") AS "Количество",
-                    sum("Стоимость") AS "Стоимость"
-                FROM dashboard.tors_cube f
-                WHERE "Результат анализа" = 'Посредник'
-                    AND TO_DATE(f."Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
-                    AND "Наименование филиала" IN %s
-                    AND "Название груза ЕТСНГ" IN %s
-                    AND "Род подвижного состава" IN %s
-                GROUP BY f."Заказчик",
-                    f."Результат анализа") c
-            ON a."Заказчик" = c."Заказчик"
-        WHERE a."Заказчик" IS NOT NULL
-            AND c."Результат анализа" = 'Посредник'
-            AND c."Количество" > 30
-            AND c."Стоимость" IS NOT NULL
-            AND TO_DATE(a."Дата раскредитования", 'YYYYMMDD') BETWEEN '%s' AND '%s'
-            AND a."Наименование филиала" IN %s
-            AND a."Название груза ЕТСНГ" IN %s
-            AND a."Род подвижного состава" IN %s
-        GROUP BY a."Заказчик",
-            a."Название заказчика",
-            c."Количество",
-            c."Стоимость"
-        ORDER BY (CASE '%s' WHEN 'Количество посреднических рейсов' THEN c."Количество"::int
-                    WHEN 'Доля по количеству' THEN round(c."Количество"::numeric/sum(a."Количество рейсов")::numeric*100, 2)
-                    WHEN 'Количество рейсов' THEN sum(a."Количество рейсов")
-                    WHEN 'Сумма посреднических рейсов, руб.' THEN sum(a."Стоимость")::bigint
-                    WHEN 'Доля по сумме' THEN round(c."Стоимость"::numeric/sum(a."Стоимость")::numeric*100, 2)
-                    WHEN 'Сумма, руб.' THEN sum(a."Стоимость")::bigint
-                END) DESC
-        LIMIT 10
-    """ % (start_date, end_date, branches, gruz, rod, start_date, end_date, branches, gruz, rod, sorting)
+
+def get_top_tors_by_type(start_date, end_date):
+    """Выгрузка топ кодов неисправности в разрезе видов ТОР"""
+    sql = '''
+      SELECT
+      a.ILATX, a.NEIS1_KOD, a.KURZTEXT1, a.KOLVO
+      FROM (
+          SELECT t.ILATX,t.NEIS1_KOD, t.KURZTEXT1, count(AUFNR) as KOLVO,
+          ROW_NUMBER() OVER (PARTITION BY ILATX ORDER BY count(AUFNR) DESC) AS r
+          FROM dashboard.tor_ik t 
+          WHERE t."DATNRP" BETWEEN '%s' AND '%s' GROUP BY t.ILATX, t.NEIS1_KOD,t.KURZTEXT1) a
+          WHERE a.r <= 3;
+    ''' % (start_date, end_date)
+
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+
+
+def get_avg_tors(start_date, end_date):
+    """Выгрузка средняя длительность ремонтов"""
+    sql = '''
+      SELECT
+      a.*, t.AVGTIME
+      from (			   
+          select
+          a.ILATX
+          ,avg(a.DIFF)
+          from (
+              select
+              t.ILATX
+              ,t.AUFNR
+              ,t."DATNRP"
+              ,t."DATRP"
+              ,t."DATRP"-t."DATNRP" as DIFF
+              from dashboard.tor_ik t
+              where t.TSTAT is null and t."DATNRP" BETWEEN '%s' AND '%s') a
+              GROUP BY a.ILATX) a left join dashboard.avgttor t on t.ILATX = a.ILATX
+    ''' % (start_date, end_date)
 
     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 

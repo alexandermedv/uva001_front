@@ -263,7 +263,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     text=x1_text,
                                     hoverinfo='skip',
                                     hovertemplate=
-                                        """Контрагент: %{y} <br>Количество посреднических рейсов: %{text}""",
+                                        """Контрагент: %{y} <br>Количество посреднических рейсов: %{y}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',

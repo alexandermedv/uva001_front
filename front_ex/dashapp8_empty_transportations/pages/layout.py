@@ -57,7 +57,7 @@ def create_layout():
                         min_date_allowed=date(2000, 1, 1),
                         max_date_allowed=date(2050, 1, 1),
                         initial_visible_month=date(2021, 4, 1),
-                        start_date=date(2020, 1, 1),
+                        start_date=date(2021, 1, 1),
                         end_date=dt.date.today() - dt.timedelta(days=1),
                         # end_date=get_max_date().strftime("%m.%d.%Y"),
                         # end_date=datetime.datetime.now().strftime("%m.%d.%Y"),
@@ -70,10 +70,9 @@ def create_layout():
                     ),
                     html.Div(
                         html.Output('Дорога:'),
-                        id = 'name1',
                         className='one column',
-                        style={"display": "flex", "align-items": "center", "height": "38px", "justify-content": "center", 
-                            'font-size' : '100%'},
+                        style={"display": "flex", "align-items": "button", "height": "38px"},
+                        id = 'name1'
                     ),
                     dcc.Dropdown(
                         id="dashboard8-dropdown1-in-railway",
@@ -90,6 +89,7 @@ def create_layout():
             html.Div([
                 dcc.Tabs(id='dashboard8-tabs', value='tab-1', children=[
                     dcc.Tab(label='Общие', value='tab-1', className="tab",),
+                    dcc.Tab(label='По РПС', value='tab-4', className="tab",),
                     dcc.Tab(label='По дорогам назначения', value='tab-2', className="tab",),
                     dcc.Tab(label='Описание', value='tab-3', className="tab",),
                 ], className="row all-tabs"),

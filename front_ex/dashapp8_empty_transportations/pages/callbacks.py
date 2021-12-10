@@ -16,25 +16,48 @@ from ..pages import dash_app
 from ..utils import get_trans_empty_by_type, get_trans_empty_by_money, get_trans_empty_by_type_month, get_trans_empty_by_money_month
 # Вторая закладка
 from ..utils import get_raiways, get_trans_empty_all, get_trans_empty_by_railway_delay, get_trans_empty_by_railway_mean_delay, get_trans_empty_by_railway_penalty
-from ..utils import external_railway
+from ..utils import get_tab4_trans_empty_delay_by_rps, get_tab4_trans_empty_penalty_by_rps, get_tab4_trans_empty_mean_delay_by_rps
+from ..utils import external_railway, get_tab1_trans_empty_by_delay_stat
+
+# pie_colors = (px.colors.sequential.Burg + px.colors.sequential.amp )[::-1]
+pie_colors = [ 
+    # 'rgb(60, 9, 17)',
+    #  'rgb(89, 13, 31)',
+    'rgb(120, 14, 40)',
+    'rgb(149, 19, 39)',
+    'rgb(172, 44, 36)',
+    'rgb(186, 74, 47)',
+    'rgb(196, 102, 73)',
+    'rgb(205, 129, 103)',
+    'rgb(213, 156, 137)',
+    'rgb(221, 182, 170)',
+    'rgb(230, 209, 203)',
+    #  'rgb(103, 32, 68)',
+    #  'rgb(139, 48, 88)',
+    #  'rgb(173, 70, 108)',
+    'rgb(204, 96, 125)',
+    'rgb(227, 129, 145)',
+    'rgb(244, 163, 168)',
+    'rgb(255, 198, 196)',
+    'rgb(230, 209, 203)',
+    'rgb(241, 236, 236)',]
 
 # Вычисление списка дорог
 @dash_app.callback(
     Output(component_id='dashboard8-dropdown1-in-railway', component_property='options'),
-    [Input('dashboard5-date-picker-range', 'start_date'),
-     Input('dashboard5-date-picker-range', 'end_date'),
-     Input('dashboard5-tabs', 'value')]
+    [Input('dashboard8-date-picker-range', 'start_date'),
+     Input('dashboard8-date-picker-range', 'end_date'),
+     Input('dashboard8-tabs', 'value')]
 )
 def update_dropdown1(start_date, end_date, tab):
     """Список значений по дорогам"""
     trans_empty_by_railway_penalty = get_trans_empty_by_railway_penalty()
-    # print({'label': i, 'value': i} for i in [''] + trans_empty_by_railway_penalty['Дорога назначения'].unique().tolist())
     return [{'label': i, 'value': i} for i in [''] + trans_empty_by_railway_penalty['Дорога назначения'].unique().tolist()]
 
 # Скрытие фильтра по дорогам по выбору закладки 
 @dash_app.callback(Output('dashboard8-dropdown1-in-railway', 'style'), [Input('dashboard8-tabs', 'value'),])
 def hide_graph(input):
-    if input != 'tab-2':
+    if (input !='tab-2') & (input != 'tab-3'):
         return {'display':'block'}
     else:
         return {'display':'none'}
@@ -42,7 +65,7 @@ def hide_graph(input):
 # Скрытие фильтра по дорогам по выбору закладки 
 @dash_app.callback(Output('name1', 'style'), [Input('dashboard8-tabs', 'value'),])
 def hide_graph(input):
-    if input != 'tab-2':
+    if (input !='tab-2') & (input != 'tab-3'):
         return {'display':'block'}
     else:
         return {'display':'none'}
@@ -67,6 +90,7 @@ def render_content(tab, start_date, end_date, railway):
         trans_empty_by_money = get_trans_empty_by_money(railway=railway, start_date=start_date, end_date=end_date)
         trans_empty_by_type_month = get_trans_empty_by_type_month(railway=railway, start_date=start_date, end_date=end_date)
         trans_empty_by_money_month = get_trans_empty_by_money_month(railway=railway, start_date=start_date, end_date=end_date)
+        tab1_trans_empty_by_delay_stat = get_tab1_trans_empty_by_delay_stat(railway=railway, start_date=start_date, end_date=end_date)
         
         content = html.Div([
             # Первая линия
@@ -80,7 +104,9 @@ def render_content(tab, start_date, end_date, railway):
                                 # hovertext=trans_empty_by_type["Кол-во вагонорейсов"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
                                 hoverinfo='skip',
                                 hovertemplate = '%{label} - %{text}',
-                                text = trans_empty_by_type["Кол-во вагонорейсов"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True)
+                                text = trans_empty_by_type["Кол-во вагонорейсов"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
+                                rotation = -5,
+                                # textfont = dict(color = '#ffffff')
                             ),],
                             "layout": go.Layout(
                                 autosize=True,
@@ -103,6 +129,7 @@ def render_content(tab, start_date, end_date, railway):
                                     y=trans_empty_by_type_month[(trans_empty_by_type_month['Тип'] == 'С просрочкой') & (trans_empty_by_type_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1)]["Кол-во вагонорейсов"].tolist(),
                                     text=trans_empty_by_type_month[(trans_empty_by_type_month['Тип'] == 'С просрочкой') & (trans_empty_by_type_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1)]["Кол-во вагонорейсов"]\
                                         .map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
+                                    textfont = dict(color = '#ffffff'),
                                     hoverinfo='skip',
                                     hovertemplate=
                                         """Кол-во вагонорейсов с просрочкой в прошлом году: %{text}""",
@@ -166,7 +193,8 @@ def render_content(tab, start_date, end_date, railway):
                             #  темно-синий "#191970",
                              hoverinfo='skip',
                              hovertemplate = '%{label} - %{text}',
-                             text = trans_empty_by_money['Рассчитанная сумма'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True)
+                             text = trans_empty_by_money['Рассчитанная сумма'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
+                             textfont = dict(color = '#ffffff'),
                              )],
                             "layout": go.Layout(
                                 autosize=True,
@@ -252,7 +280,35 @@ def render_content(tab, start_date, end_date, railway):
                 html.Div([
                     html.P('')
                 ], className='six columns'),
-            ], className="row")
+            ], className="row"),
+
+            # Статистика по просрочке
+            # html.Div([
+            #     html.Div([
+            #         dcc.Graph(
+            #             id="dash8-tab-1-pie3",
+            #             figure={
+            #                 "data": [go.Pie(labels=tab1_trans_empty_by_delay_stat['Дней просрочки, суток'], 
+            #                     values=tab1_trans_empty_by_delay_stat["Кол-во вагонорейсов"],
+            #                     marker={"colors": px.colors.qualitative.Set3}, 
+            #                     # hovertext=trans_empty_by_type["Кол-во вагонорейсов"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
+            #                     hoverinfo='skip',
+            #                     hovertemplate = '%{label} - %{text}',
+            #                     text = tab1_trans_empty_by_delay_stat["Кол-во вагонорейсов"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
+            #                     # textfont = dict(color = '#ffffff')
+            #                 ),],
+            #                 "layout": go.Layout(
+            #                     autosize=True,
+            #                     font = dict(size=12),
+            #                     title_text='Статистика по дням просрочки, суток',
+            #                     margin={"r": 0, "t": 100, "b": 20, "l": 70, },
+            #                 ),
+            #             },
+            #             # config={"displayModeBar": False},
+            #         ),
+            #     ], className="six columns",
+            #     ),           
+            # ], className="row")
         ])
         return content
     elif tab == 'tab-2':
@@ -279,8 +335,12 @@ def render_content(tab, start_date, end_date, railway):
                         id="dashboard8-pie1",
                         figure={
                             "data": [go.Pie(labels=internal_penalty['Дорога назначения'], 
-                                values=internal_delay['Вагонорейсы с просрочкой, %'],
-                                marker=dict(colors=(px.colors.sequential.Burg + px.colors.sequential.amp )[::-1]),
+                                # values=internal_delay['Вагонорейсы с просрочкой, %'],
+                                values=internal_delay['Кол-во вагонорейсов с просрочкой'],
+                                # marker=dict(colors=pie_colors),
+                                marker=dict(colors=px.colors.qualitative.Antique),                                
+                                text = internal_delay['Кол-во вагонорейсов с просрочкой'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
+                                rotation = 90,
                                 hoverinfo='skip',
                                 hovertemplate = '%{label} - %{value}',
                             )],
@@ -298,10 +358,14 @@ def render_content(tab, start_date, end_date, railway):
                     dcc.Graph(
                         id="dashboard8-pie2",
                         figure={
-                            "data": [go.Pie(labels=internal_penalty['Дорога назначения'], values=internal_penalty['Оценка пени, %'],
-                                marker=dict(colors=(px.colors.sequential.Burg + px.colors.sequential.amp )[::-1]),
+                            "data": [go.Pie(labels=internal_penalty['Дорога назначения'], 
+                                values=internal_penalty['Оценка пени'],
+                                text = internal_penalty['Оценка пени'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
+                                # marker=dict(colors=pie_colors),
+                                marker=dict(colors=px.colors.qualitative.Antique), 
                                 hoverinfo='skip',
                                 hovertemplate = '%{label} - %{value}',
+                                rotation = 90,
                             )],
                             "layout": go.Layout(
                                 autosize=True,
@@ -332,8 +396,9 @@ def render_content(tab, start_date, end_date, railway):
                                     name='',
                                     orientation='h',
                                     textposition='auto',
+                                    constraintext='outside',
                                     marker={
-                                        "color": "#97151c",
+                                        "color": "rgb(175, 100, 88)",
                                         # "color": "#B4B4B4",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
@@ -370,7 +435,7 @@ def render_content(tab, start_date, end_date, railway):
                                     orientation='h',
                                     textposition='auto',
                                     marker={
-                                        "color": "#97151c",
+                                        "color": "rgb(175, 100, 88)",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -405,8 +470,9 @@ def render_content(tab, start_date, end_date, railway):
                                     name='',
                                     orientation='h',
                                     textposition='auto',
+                                    constraintext='outside',
                                     marker={
-                                        "color": "#97151c",
+                                        "color": "rgb(175, 100, 88)",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -443,4 +509,182 @@ def render_content(tab, start_date, end_date, railway):
                 html.P("    - как рычаг воздействия на перевозчика, т.е. в целях получения преференций от перевозчика (РЖД) для повышения эффективности вагонного парка, при условии не выставление ему пени."),
             ], className="row")
         ],)
+        return content
+    elif tab == 'tab-4':
+        """По РПС"""
+        trans_empty_by_railway_delay = get_tab4_trans_empty_delay_by_rps(railway=railway, start_date=start_date, end_date=end_date)
+        trans_empty_by_railway_penalty = get_tab4_trans_empty_penalty_by_rps(railway=railway, start_date=start_date, end_date=end_date)
+        trans_empty_by_railway_mean_delay = get_tab4_trans_empty_mean_delay_by_rps(railway=railway, start_date=start_date, end_date=end_date)
+        
+        # Tab-2 pie content вагонорейсы
+        internal_delay = trans_empty_by_railway_delay
+        # internal_delay['Вагонорейсы с просрочкой, %'] = internal_delay['Кол-во вагонорейсов с просрочкой']/internal_delay['Кол-во вагонорейсов с просрочкой'].sum()
+        
+        # Убрать экспорт-импортные дороги
+        #[~trans_empty_by_railway_delay['Дорога назначения'].isin(external_railway)].copy()
+
+        # Tab-2 pie content рубли
+        internal_penalty = trans_empty_by_railway_penalty[~trans_empty_by_railway_penalty['РПС'].isin(external_railway)].copy()
+        # internal_penalty['Оценка пени, %'] = internal_penalty['Оценка пени']/internal_penalty['Оценка пени'].sum()
+
+        content = html.Div([
+            html.Div([ 
+                html.Div([
+                    dcc.Graph(
+                        id="dashboard8-pie1",
+                        figure={
+                            "data": [go.Pie(labels=internal_penalty['РПС'], 
+                                values=internal_delay['Кол-во вагонорейсов с просрочкой'],
+                                # marker=dict(colors=pie_colors),
+                                text = internal_delay['Кол-во вагонорейсов с просрочкой'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
+                                marker=dict(colors=px.colors.qualitative.Antique), 
+                                hoverinfo='skip',
+                                hovertemplate = '%{label} - %{value}',
+                            )],
+                            "layout": go.Layout(
+                                autosize=True,
+                                title_text='Структура по вагонорейсам с просрочкой, шт.',
+                                margin={"r": 0, "t": 50, "b": 20, "l": 70, },
+                            ),
+                        },
+                        # config={"displayModeBar": False},
+                    ),
+                ], className="six columns",
+                ),
+                html.Div([
+                    dcc.Graph(
+                        id="dashboard8-pie2",
+                        figure={
+                            "data": [go.Pie(labels=internal_penalty['РПС'], values=internal_penalty['Оценка пени'],
+                                # marker=dict(colors=pie_colors),
+                                marker=dict(colors=px.colors.qualitative.Antique), 
+                                text = internal_penalty['Оценка пени'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
+                                hoverinfo='skip',
+                                hovertemplate = '%{label} - %{value}',
+                            )],
+                            "layout": go.Layout(
+                                autosize=True,
+                                title_text='Структура по оценке пени, руб.',
+                                margin={"r": 0, "t": 50, "b": 20, "l": 70, },
+                            ),
+                        },
+                        # config={"displayModeBar": False},
+                    ),
+                ], className="six columns",
+                ),
+            
+            ], className="row"),
+            
+            html.Div([
+                html.Div([
+                    dcc.Graph(
+                        id="dash8-2-graph1",
+                        figure={
+                            "data": [
+                                go.Bar(
+                                    x=internal_delay["Кол-во вагонорейсов с просрочкой"].tolist(),
+                                    y=internal_delay["РПС"].tolist(),
+                                    text=internal_delay["Кол-во вагонорейсов с просрочкой"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
+                                    hoverinfo='skip',
+                                    hovertemplate=
+                                    """Кол-во вагонорейсов с просрочкой: %{text}""",
+                                    name='',
+                                    orientation='h',
+                                    textposition='auto',
+                                    marker={
+                                        "color": "rgb(175, 100, 88)",
+                                        # "color": "#B4B4B4",
+                                        "line": {
+                                            "color": "rgb(255, 255, 255)",
+                                            "width": 2,
+                                        },
+                                    },
+                                ),
+                            ],
+                            "layout": go.Layout(
+                                yaxis={"autorange":"reversed"},
+                                autosize=True,
+                                title_text='Кол-во вагонорейсов с просрочкой, шт.',
+                                margin={"r": 0, "t": 50, "b": 20, "l": 70, },
+                            ),
+                        },
+                        config={"displayModeBar": False},
+                    ),
+                ], className="four columns",
+                ),
+            
+                html.Div([
+                    dcc.Graph(
+                        id="dash8-2-graph2",
+                        figure={
+                            "data": [
+                                go.Bar(
+                                    x=internal_penalty["Оценка пени"].tolist(),
+                                    y=internal_penalty["РПС"].tolist(),
+                                    text=internal_penalty["Оценка пени"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
+                                    hoverinfo='skip',
+                                    hovertemplate=
+                                    """Оценка пени: %{text} руб.""",
+                                    name='',
+                                    orientation='h',
+                                    textposition='auto',
+                                    marker={
+                                        "color": "rgb(175, 100, 88)",
+                                        "line": {
+                                            "color": "rgb(255, 255, 255)",
+                                            "width": 2,
+                                        },
+                                    },
+                                ),
+                            ],
+                            "layout": go.Layout(
+                                autosize=True,
+                                yaxis={"autorange":"reversed"},
+                                title_text='Оценка пени, руб.',
+                                margin={"r": 0, "t": 50, "b": 20, "l": 70, },
+                            ),
+                        },
+                        config={"displayModeBar": False},
+                    ),
+                ], className="four columns",
+                ),
+            
+                html.Div([
+                    dcc.Graph(
+                        id="dashboard5-graph3",
+                        figure={
+                            "data": [
+                                go.Bar(
+                                    x=trans_empty_by_railway_mean_delay["Средняя просрочка, сут"],
+                                    y=trans_empty_by_railway_mean_delay["РПС"],
+                                    text=trans_empty_by_railway_mean_delay["Средняя просрочка, сут"].map('{:,.1f}'.format).astype(str).replace(',', ' ', regex=True).astype(str),
+                                    hoverinfo='skip',
+                                    hovertemplate=
+                                    """Средняя просрочка: %{text} суток""",
+                                    name='',
+                                    orientation='h',
+                                    textposition='auto',
+                                    marker={
+                                        "color": "rgb(175, 100, 88)",
+                                        "line": {
+                                            "color": "rgb(255, 255, 255)",
+                                            "width": 2,
+                                        },
+                                    },
+                                ),
+                            ],
+                            "layout": go.Layout(
+                                autosize=True,
+                                title_text='Средняя просрочка, сут.',
+                                margin={
+                                    "r": 0, "t": 50, "b": 20, "l": 70,
+                                },
+                            ),
+                        },
+                        config={"displayModeBar": False},
+                    ),
+                ], className="four columns",
+                ),
+             ], className="row"),
+        ])
         return content

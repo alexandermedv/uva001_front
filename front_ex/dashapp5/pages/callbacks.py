@@ -29,7 +29,7 @@ from ..utils import get_resellers_dynamics
                    Input('dashboard5-tabs', 'value')])
 def resellers_amount(start_date, end_date, filial, cargo, rps, tab):
     """Вычисление количества посреднических рейсов"""
-
+ 
     if filial == 'Все филиалы':
         branches = tuple(get_all_branch_names(start_date, end_date)['Наименование филиала'].dropna())
     else:

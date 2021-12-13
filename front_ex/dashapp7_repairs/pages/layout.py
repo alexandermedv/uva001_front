@@ -86,37 +86,8 @@ def create_layout():
                 ],)
             ], className="row",
             ),
-
-            # Row 3 - 2-й ряд фильтров
-            html.Div(
-                html.Br(),
-                style={"height":"5px"}),
-            html.Div([
-                dbc.Navbar([
-                    html.Div(
-                        html.Output('РПС:'),
-                        id = 'name3',
-                        className='two columns',
-                        style={"display": "flex",
-                        "align-items": "center",
-                        "justify-content": "center",
-                        "height": "38px"
-                            }
-                            ),
-                    dcc.Dropdown(
-                        id="dashboard7-dropdown3",
-                        value='Все РПС',
-                        clearable=False,
-                        className='two columns',
-                        style={"display": "block",
-                            "justify-content": "center"}),
-
-                    ],),
-
-                ], className="row",
-                ),
-
-
+                # Row 5 - Графики
+                html.Div(id='graphs'),
         ], className="sub_page",
         ),
     ], className="page_landscape_a3",

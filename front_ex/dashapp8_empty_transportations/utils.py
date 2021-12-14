@@ -325,7 +325,9 @@ def get_tab4_trans_empty_delay_by_rps(railway='', start_date=None, end_date=None
             and "Месяц" <= '{end_date}'
         '''.format(start_date = start_date, end_date = end_date)
     if railway:
-        str = sql + 'and "Дорога назначения" = {railway}'.format(railway = railway)
+        sql = sql + '''
+                and "Дорога назначения" = '{railway}'
+            '''.format(railway = railway)
     sql = sql + '''
             group by t."РПС"
                 order by sum(case when t."Превышение даты истечение срока д" = 'Не удовлетворяет' then "Кол-во вагонорейсов" else 0 end) desc

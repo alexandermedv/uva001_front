@@ -529,16 +529,10 @@ def render_content(tab, start_date, end_date, railway):
         return content
     elif tab == 'tab-4':
         """По РПС"""
-        trans_empty_by_railway_delay = get_tab4_trans_empty_delay_by_rps(railway=railway, start_date=start_date, end_date=end_date)
-        trans_empty_by_railway_penalty = get_tab4_trans_empty_penalty_by_rps(railway=railway, start_date=start_date, end_date=end_date)
+        internal_delay = get_tab4_trans_empty_delay_by_rps(railway=railway, start_date=start_date, end_date=end_date)
+        internal_penalty = get_tab4_trans_empty_penalty_by_rps(railway=railway, start_date=start_date, end_date=end_date)
         trans_empty_by_railway_mean_delay = get_tab4_trans_empty_mean_delay_by_rps(railway=railway, start_date=start_date, end_date=end_date)
         
-        # Tab-2 pie content вагонорейсы
-        internal_delay = trans_empty_by_railway_delay
-
-        # Tab-2 pie content рубли
-        internal_penalty = trans_empty_by_railway_penalty
-
         content = html.Div([
             html.Div([ 
                 html.Div([

@@ -77,7 +77,7 @@ def get_tors_by_rps_pr(start_date, end_date):
         a.ILATX AS "Вид ремонта",
         count(a.AUFNR) AS "Количество ремонтов"
         FROM dashboard.tor_ik a
-        WHERE a.ROD_ID_GROUP = 'Прочее' and a.DATNRP BETWEEN '%s' AND '%s'
+        WHERE a.ROD_ID_GROUP = 'Прочие' and a.DATNRP BETWEEN '%s' AND '%s'
         GROUP BY a.ROD_ID_TEXT, a.ILATX
     ''' % (start_date, end_date)
 
@@ -132,7 +132,7 @@ def get_top_tors_by_rps_pr(start_date, end_date):
           SELECT t.ROD_ID_TEXT,t.ROD_ID_GROUP, t.NEIS1_KOD, t.KURZTEXT1, count(AUFNR) as KOLVO,
           ROW_NUMBER() OVER (PARTITION BY ROD_ID_TEXT ORDER BY count(AUFNR) DESC) AS r
           FROM dashboard.tor_ik t 
-          WHERE t.DATNRP BETWEEN '%s' AND '%s' AND t.ROD_ID_GROUP = 'Прочее' GROUP BY t.ROD_ID_TEXT,t.ROD_ID_GROUP, t.NEIS1_KOD,t.KURZTEXT1) a
+          WHERE t.DATNRP BETWEEN '%s' AND '%s' AND t.ROD_ID_GROUP = 'Прочие' GROUP BY t.ROD_ID_TEXT,t.ROD_ID_GROUP, t.NEIS1_KOD,t.KURZTEXT1) a
           WHERE a.r <= 3;
     ''' % (start_date, end_date)
 
@@ -143,6 +143,10 @@ def get_top_tors_by_type(start_date, end_date):
     sql = '''
       SELECT
       a.ILATX AS "Вид ремонта"
+      ,case when a.ILATX = 'ТР-1' then 1
+	  when a.ILATX = 'ТР-2' then 2
+	  when a.ILATX = 'ДР' then 3
+	  else 4 end as "Сортировка"
 	  ,concat_ws(' - ', a.ILATX, a.NEIS1_KOD, a.KURZTEXT1) AS "Код неисправности"
       ,concat_ws(' - ', a.NEIS1_KOD, a.KURZTEXT1) AS "Код неисправности2"
       ,concat_ws(' - ', a.ILATX, a.NEIS1_KOD) AS "Код неисправности3"
@@ -152,7 +156,8 @@ def get_top_tors_by_type(start_date, end_date):
           ROW_NUMBER() OVER (PARTITION BY ILATX ORDER BY count(AUFNR) DESC) AS r
           FROM dashboard.tor_ik t 
           WHERE t.DATNRP BETWEEN '%s' AND '%s' GROUP BY t.ILATX, t.NEIS1_KOD,t.KURZTEXT1) a
-          WHERE a.r <= 3;
+          WHERE a.r <= 3 
+          ORDER BY "Сортировка" desc;
     ''' % (start_date, end_date)
 
     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
@@ -165,6 +170,10 @@ def get_avg_tors(start_date, end_date):
       a.ILATX "Вид ремонта"
       ,ROUND(a.DIFF) "Средняя длительность"
       ,t.AVGTIME "Плановая длительность"
+      ,case when a.ILATX = 'ТР-1' then 1
+	  when a.ILATX = 'ТР-2' then 2
+	  when a.ILATX = 'ДР' then 3
+	  else 4 end as "Сортировка"
       from (			   
           select
           a.ILATX
@@ -178,7 +187,7 @@ def get_avg_tors(start_date, end_date):
               ,t.DATRP-t.DATNRP as DIFF
               from dashboard.tor_ik t
               where t.TSTAT is null and t.DATNRP BETWEEN '%s' AND '%s') a
-              GROUP BY a.ILATX) a left join dashboard.avgttor t on t.ILATX = a.ILATX
+              GROUP BY a.ILATX) a left join dashboard.avgttor t on t.ILATX = a.ILATX order by "Сортировка" desc
     ''' % (start_date, end_date)
 
     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))

@@ -29,7 +29,7 @@ def tors_amount(start_date, end_date):
     """Вычисление количества ремонтов"""
     df0 = get_tors_count(start_date, end_date)
     print('df0 =', df0)
-    return df0['Количество ремонтов']
+    return df0['Количество ремонтов'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True)
 
 
 # Первая линия
@@ -98,8 +98,6 @@ def update_graphs(start_date, end_date):
 
     print('Запустился callback с графиками')
     df3 = get_avg_tors(start_date, end_date)
-    #df3['Total', 'Прочие', 'Плановая длительность']= 15
-    #df3['Total', 'Прочие', 'Средняя длительность']= 25
     print('df3 =', df3)
 
     x9_data = df3['Средняя длительность'].astype(str).tolist()
@@ -112,9 +110,7 @@ def update_graphs(start_date, end_date):
 
 
     print('Запустился callback с графиками')
-    df4 = get_top_tors_by_type(start_date, end_date).sort_values(by='Вид ремонта', ascending=True)
-    #df4['Total', 'Прочие', 'Плановая длительность']= 15
-    #df4['Total', 'Прочие', 'Средняя длительность']= 25
+    df4 = get_top_tors_by_type(start_date, end_date)
     print('df4 =', df4)
 
     x11_data = df4['Количество'].astype(str).tolist()
@@ -216,7 +212,7 @@ def update_graphs(start_date, end_date):
                     ],
                     "layout": go.Layout(
                         autosize=True,
-                        title_text='Ремонты по РПС, шт',
+                        title_text='Ремонты по РПС, шт.',
                         margin={
                                             "r": 0,
                                             "t": 50,
@@ -401,7 +397,7 @@ def update_graphs(start_date, end_date):
                             orientation='h',
                             textposition='outside',
                             marker={
-                                "color": ["#C17A75","#C39491","#D9C4C2","#8A2432","#9F5C66","#C9AAAE","#D9D9D9","#D2D2D2","#E1E1E1","#7E7E7E","#979797","#C5C5C5"],
+                                "color": ["#7E7E7E","#979797","#C5C5C5","#D9D9D9","#D2D2D2","#E1E1E1","#C17A75","#C39491","#D9C4C2","#8A2432","#9F5C66","#C9AAAE"],
                                 "line": {
                                     "color": "rgb(255, 255, 255)",
                                     "width": 2,
@@ -441,7 +437,7 @@ def update_graphs(start_date, end_date):
                             orientation='h',
                             textposition='outside',
                             marker={
-                                "color": ["#083B40","#5E7F83","#B4C4C5","#730031","#A45979","#D5B2C1","#656669","#9B9B9D","#9B9B9D"],
+                                "color": ["#656669","#9B9B9D","#9B9B9D","#730031","#A45979","#D5B2C1","#083B40","#5E7F83","#B4C4C5"],
                                 "line": {
                                     "color": "rgb(255, 255, 255)",
                                     "width": 2,
@@ -520,8 +516,8 @@ def update_graphs(start_date, end_date):
                     "layout": go.Layout(
                         autosize=True,
                         font = dict(size=12),
-                        title_text=f'''Количество некачественных ремонтов_912 - {sum3} шт.''',
-                        margin={"r": 0, "t": 100, "b": 40, "l": 70, },
+                        title_text=f'''Количество некачественных ремонтов 912 - {sum3} шт.''',
+                        margin={"r": 0, "t": 120, "b": 80, "l": 70, },
                     ),
                 },
                 # config={"displayModeBar": False},
@@ -532,6 +528,15 @@ def update_graphs(start_date, end_date):
                 id="dash7-pie3",
                 figure={
                     "data": [go.Pie(labels=df9['РПС'], values=df9["Количество"], sort=False,
+                        #color_discrete_map={'КР':'#083B40',
+                        #         'ПВ':'#730031',
+                        #         'ЗРВ':'#470023',
+                        #         'МВЗ':'#8A2432',
+                        #         'ОКТ':'#AC3B46',
+                        #         'ПЛ':'#C17A75',
+                        #         'ФИТ':'#D97A6B',
+                        #         'ЦМВ':'#F27C8D',
+                        #         'ЦС':'#F4ACBA'},
                         marker={"colors": ["#083B40","#730031","#470023", "#8A2432","#AC3B46","#C17A75","#D97A6B","#F27C8D","#F4ACBA"]}, 
                         hoverinfo='skip',
                         hovertemplate = '%{label} - %{text}',
@@ -540,8 +545,8 @@ def update_graphs(start_date, end_date):
                     "layout": go.Layout(
                         autosize=True,
                         font = dict(size=12),
-                        title_text=f'''Количество некачественных ремонтов_913 - {sum4} шт.''',
-                        margin={"r": 0, "t": 100, "b": 40, "l": 70, },
+                        title_text=f'''Количество некачественных ремонтов 913 - {sum4} шт.''',
+                        margin={"r": 0, "t": 120, "b": 80, "l": 70, },
                     ),
                 },
                 # config={"displayModeBar": False},

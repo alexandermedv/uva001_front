@@ -300,3 +300,13 @@ def get_bad_tors_913(start_date, end_date):
 
     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
+
+def get_kodneis_info():
+    """Выгрузка ремонтов в разрезе РПС"""
+    sql = '''
+			  select
+			  a."Код неисправности", a."Полное наименование", a."Наименование", a."Код причины", a."Расшифровка причины"
+			  from dashboard.kn_info_ik a
+    ''' 
+
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))

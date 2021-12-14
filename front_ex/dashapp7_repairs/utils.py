@@ -103,8 +103,10 @@ def get_top_tors_by_rps(start_date, end_date):
     """Выгрузка топ3 кодов неисправности в разрезе РПС"""
     sql = '''
       SELECT
-      a.ROD_ID_GROUP "РПС", 
-      concat_ws(' - ',a.ROD_ID_GROUP, a.NEIS1_KOD, a.KURZTEXT1) AS "Код неисправности"
+      a.ROD_ID_GROUP "РПС"
+      ,a.NEIS1_KOD as "Код неисправности_id"
+	  ,k."Полное наименование"
+      ,concat_ws(' - ',a.ROD_ID_GROUP, a.NEIS1_KOD, a.KURZTEXT1) AS "Код неисправности"
       ,concat_ws(' - ', a.NEIS1_KOD, a.KURZTEXT1) AS "Код неисправности2"
       ,concat_ws(' - ', a.ROD_ID_GROUP, a.NEIS1_KOD) AS "Код неисправности3"
       ,a.KOLVO "Количество"
@@ -113,6 +115,7 @@ def get_top_tors_by_rps(start_date, end_date):
           ROW_NUMBER() OVER (PARTITION BY ROD_ID_GROUP ORDER BY count(AUFNR) DESC) AS r
           FROM dashboard.tor_ik t 
           WHERE t.DATNRP BETWEEN '%s' AND '%s' GROUP BY t.ROD_ID_GROUP, t.NEIS1_KOD,t.KURZTEXT1) a
+          LEFT JOIN dashboard.kn_info_ik k on k."Код неисправности"::text = a.NEIS1_KOD
           WHERE a.r <= 3;
     ''' % (start_date, end_date)
 
@@ -123,8 +126,10 @@ def get_top_tors_by_rps_pr(start_date, end_date):
     """Выгрузка топ3 кодов неисправности в разрезе РПС"""
     sql = '''
       SELECT
-      a.ROD_ID_TEXT "РПС", 
-      concat_ws(' - ', a.ROD_ID_TEXT, a.NEIS1_KOD, a.KURZTEXT1) AS "Код неисправности"
+      a.ROD_ID_TEXT "РПС" 
+      ,a.NEIS1_KOD as "Код неисправности_id"
+	  ,k."Полное наименование"
+      ,concat_ws(' - ', a.ROD_ID_TEXT, a.NEIS1_KOD, a.KURZTEXT1) AS "Код неисправности"
       ,concat_ws(' - ', a.NEIS1_KOD, a.KURZTEXT1) AS "Код неисправности2"
       ,concat_ws(' - ', a.ROD_ID_TEXT, a.NEIS1_KOD) AS "Код неисправности3"
       ,a.KOLVO "Количество"
@@ -133,6 +138,7 @@ def get_top_tors_by_rps_pr(start_date, end_date):
           ROW_NUMBER() OVER (PARTITION BY ROD_ID_TEXT ORDER BY count(AUFNR) DESC) AS r
           FROM dashboard.tor_ik t 
           WHERE t.DATNRP BETWEEN '%s' AND '%s' AND t.ROD_ID_GROUP = 'Прочие' GROUP BY t.ROD_ID_TEXT,t.ROD_ID_GROUP, t.NEIS1_KOD,t.KURZTEXT1) a
+          LEFT JOIN dashboard.kn_info_ik k on k."Код неисправности"::text = a.NEIS1_KOD
           WHERE a.r <= 3;
     ''' % (start_date, end_date)
 
@@ -147,6 +153,8 @@ def get_top_tors_by_type(start_date, end_date):
 	  when a.ILATX = 'ТР-2' then 2
 	  when a.ILATX = 'ДР' then 3
 	  else 4 end as "Сортировка"
+      ,a.NEIS1_KOD as "Код неисправности_id"
+	  ,k."Полное наименование"
 	  ,concat_ws(' - ', a.ILATX, a.NEIS1_KOD, a.KURZTEXT1) AS "Код неисправности"
       ,concat_ws(' - ', a.NEIS1_KOD, a.KURZTEXT1) AS "Код неисправности2"
       ,concat_ws(' - ', a.ILATX, a.NEIS1_KOD) AS "Код неисправности3"
@@ -156,6 +164,7 @@ def get_top_tors_by_type(start_date, end_date):
           ROW_NUMBER() OVER (PARTITION BY ILATX ORDER BY count(AUFNR) DESC) AS r
           FROM dashboard.tor_ik t 
           WHERE t.DATNRP BETWEEN '%s' AND '%s' GROUP BY t.ILATX, t.NEIS1_KOD,t.KURZTEXT1) a
+          LEFT JOIN dashboard.kn_info_ik k on k."Код неисправности"::text = a.NEIS1_KOD
           WHERE a.r <= 3 
           ORDER BY "Сортировка" desc;
     ''' % (start_date, end_date)

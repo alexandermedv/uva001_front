@@ -29,7 +29,7 @@ from ..utils import get_resellers_dynamics
                    Input('dashboard5-tabs', 'value')])
 def resellers_amount(start_date, end_date, filial, cargo, rps, tab):
     """Вычисление количества посреднических рейсов"""
-
+ 
     if filial == 'Все филиалы':
         branches = tuple(get_all_branch_names(start_date, end_date)['Наименование филиала'].dropna())
     else:
@@ -47,7 +47,9 @@ def resellers_amount(start_date, end_date, filial, cargo, rps, tab):
 
     df0 = get_resellers_count(start_date, end_date, branches, gruz, rod)
 
-    return df0['Количество'][0]
+    result = '{:,.0f}'.format(df0['Количество'][0]).replace(',', ' ')
+
+    return result
 
 
 # Доля посреднических рейсов за выбранный период
@@ -221,7 +223,8 @@ def render_content(tab, start_date, end_date, filial, cargo,
         df1 = get_top_resellers(start_date, end_date, branches, gruz, rod, sorting).sort_values(by=s, ascending=True)
 
         x1_data = df1['Количество посреднических рейсов'].astype(str).tolist()
-        x1_text = df1['Количество посреднических рейсов'].astype(str)
+        x1_text = df1['Количество посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y1_data = df1['Название заказчика'].tolist()
 
         x2_data = df1['Доля посреднических рейсов'].astype(str).tolist()
@@ -229,11 +232,13 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y2_data = df1['Название заказчика'].tolist()
 
         x3_data = df1['Количество рейсов'].astype(str).tolist()
-        x3_text = df1['Количество рейсов'].astype(str)
+        x3_text = df1['Количество рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y3_data = df1['Название заказчика'].tolist()
 
         x4_data = df1['Стоимость посреднических рейсов'].astype(str).tolist()
-        x4_text = df1['Стоимость посреднических рейсов'].astype(str)
+        x4_text = df1['Стоимость посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y4_data = df1['Название заказчика'].tolist()
 
         x5_data = df1['Доля ст посреднических рейсов'].astype(str).tolist()
@@ -241,7 +246,8 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y5_data = df1['Название заказчика'].tolist()
 
         x6_data = df1['Стоимость рейсов'].astype(str).tolist()
-        x6_text = df1['Стоимость рейсов'].astype(str)
+        x6_text = df1['Стоимость рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y6_data = df1['Название заказчика'].tolist()
 
         content = html.Div([
@@ -545,7 +551,8 @@ def render_content(tab, start_date, end_date, filial, cargo,
             'ПГК - Центральный Аппарат', 'ЦА')
 
         x1_data = df1['Количество посреднических рейсов'].astype(str).tolist()
-        x1_text = df1['Количество посреднических рейсов'].astype(str)
+        x1_text = df1['Количество посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y1_data = df1['Аббревиатура филиала'].tolist()
 
         x2_data = df1['Доля посреднических рейсов'].astype(str).tolist()
@@ -553,11 +560,13 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y2_data = df1['Аббревиатура филиала'].tolist()
 
         x3_data = df1['Количество рейсов'].astype(str).tolist()
-        x3_text = df1['Количество рейсов'].astype(str)
+        x3_text = df1['Количество рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y3_data = df1['Аббревиатура филиала'].tolist()
 
         x4_data = df1['Стоимость посреднических рейсов'].astype(str).tolist()
-        x4_text = df1['Стоимость посреднических рейсов'].astype(str)
+        x4_text = df1['Стоимость посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y4_data = df1['Аббревиатура филиала'].tolist()
 
         x5_data = df1['Доля ст посреднических рейсов'].astype(str).tolist()
@@ -565,7 +574,8 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y5_data = df1['Аббревиатура филиала'].tolist()
 
         x6_data = df1['Стоимость рейсов'].astype(str).tolist()
-        x6_text = df1['Стоимость рейсов'].astype(str)
+        x6_text = df1['Стоимость рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y6_data = df1['Аббревиатура филиала'].tolist()
 
         content = html.Div([
@@ -838,7 +848,8 @@ def render_content(tab, start_date, end_date, filial, cargo,
         df1 = get_resellers_by_rps(start_date, end_date, branches, gruz, rod, sorting)
 
         x1_data = df1['Количество посреднических рейсов'].astype(str).tolist()
-        x1_text = df1['Количество посреднических рейсов'].astype(str)
+        x1_text = df1['Количество посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y1_data = df1['Род подвижного состава'].tolist()
 
         x2_data = df1['Доля посреднических рейсов'].astype(str).tolist()
@@ -846,11 +857,13 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y2_data = df1['Род подвижного состава'].tolist()
 
         x3_data = df1['Количество рейсов'].astype(str).tolist()
-        x3_text = df1['Количество рейсов'].astype(str)
+        x3_text = df1['Количество рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y3_data = df1['Род подвижного состава'].tolist()
 
         x4_data = df1['Стоимость посреднических рейсов'].astype(str).tolist()
-        x4_text = df1['Стоимость посреднических рейсов'].astype(str)
+        x4_text = df1['Стоимость посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y4_data = df1['Род подвижного состава'].tolist()
 
         x5_data = df1['Доля ст посреднических рейсов'].astype(str).tolist()
@@ -858,7 +871,8 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y5_data = df1['Род подвижного состава'].tolist()
 
         x6_data = df1['Стоимость рейсов'].astype(str).tolist()
-        x6_text = df1['Стоимость рейсов'].astype(str)
+        x6_text = df1['Стоимость рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y6_data = df1['Род подвижного состава'].tolist()
 
         content = html.Div([
@@ -1140,7 +1154,8 @@ def render_content(tab, start_date, end_date, filial, cargo,
         df1 = get_resellers_cargo(start_date, end_date, branches, gruz, rod, sorting).sort_values(by=s, ascending=True)
 
         x1_data = df1['Количество посреднических рейсов'].astype(str).tolist()
-        x1_text = df1['Количество посреднических рейсов'].astype(str)
+        x1_text = df1['Количество посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y1_data = df1['Название груза ЕТСНГ'].tolist()
 
         x2_data = df1['Доля посреднических рейсов'].astype(str).tolist()
@@ -1148,11 +1163,13 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y2_data = df1['Название груза ЕТСНГ'].tolist()
 
         x3_data = df1['Количество рейсов'].astype(str).tolist()
-        x3_text = df1['Количество рейсов'].astype(str)
+        x3_text = df1['Количество рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y3_data = df1['Название груза ЕТСНГ'].tolist()
 
         x4_data = df1['Стоимость посреднических рейсов'].astype(str).tolist()
-        x4_text = df1['Стоимость посреднических рейсов'].astype(str)
+        x4_text = df1['Стоимость посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y4_data = df1['Название груза ЕТСНГ'].tolist()
 
         x5_data = df1['Доля ст посреднических рейсов'].astype(str).tolist()
@@ -1160,7 +1177,8 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y5_data = df1['Название груза ЕТСНГ'].tolist()
 
         x6_data = df1['Стоимость рейсов'].astype(str).tolist()
-        x6_text = df1['Стоимость рейсов'].astype(str)
+        x6_text = df1['Стоимость рейсов'].map('{:,.0f}'.format).astype(str).replace(
+            ',',' ', regex=True)
         y6_data = df1['Название груза ЕТСНГ'].tolist()
 
         content = html.Div([

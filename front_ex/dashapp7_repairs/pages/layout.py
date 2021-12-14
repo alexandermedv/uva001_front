@@ -26,7 +26,7 @@ def create_layout():
                         html.H5("Аналитика по ремонтам вагонов"),
                         html.Br([]),
                         html.P("\
-                            Данный отчет содержит информацию о статистике выполненных плановых и внеплановых ремонтов ПС.\
+                            Данный отчет содержит информацию о статистике выполненных плановых и отцепочных ремонтов ПС.\
                             Отчет построен на основе данных о ремонтах в SAP S4.",
                             style={"color": "#ffffff"},
                             className="row",
@@ -86,37 +86,17 @@ def create_layout():
                 ],)
             ], className="row",
             ),
+ 
+           html.Div([
+                dcc.Tabs(id='dashboard7-tabs', value='tab-1', children=[
+                    dcc.Tab(label='Графики', value='tab-1', className="tab",),
+                    dcc.Tab(label='Справочник', value='tab-2', className="tab",),
+                ], className="row all-tabs"),
+                #html.Div(id='tabs-example-content')
+            ]),
 
-            # Row 3 - 2-й ряд фильтров
-            html.Div(
-                html.Br(),
-                style={"height":"5px"}),
-            html.Div([
-                dbc.Navbar([
-                    html.Div(
-                        html.Output('РПС:'),
-                        id = 'name3',
-                        className='two columns',
-                        style={"display": "flex",
-                        "align-items": "center",
-                        "justify-content": "center",
-                        "height": "38px"
-                            }
-                            ),
-                    dcc.Dropdown(
-                        id="dashboard7-dropdown3",
-                        value='Все РПС',
-                        clearable=False,
-                        className='two columns',
-                        style={"display": "block",
-                            "justify-content": "center"}),
-
-                    ],),
-
-                ], className="row",
-                ),
-
-
+                # Row 5 - Графики
+            html.Div(id='tab-content'),
         ], className="sub_page",
         ),
     ], className="page_landscape_a3",

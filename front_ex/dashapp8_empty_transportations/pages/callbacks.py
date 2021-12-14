@@ -42,6 +42,20 @@ pie_colors = [
     'rgb(230, 209, 203)',
     'rgb(241, 236, 236)',]
 
+def get_rps_name(rps):
+    dict = {'ПВ':'Полувагоны', 
+        'КР':'Крытые', 
+        'ЦМВ':'Цементовозы', 
+        'ПЛ':'Платформы', 
+        'ЦС':'Цистерны', 
+        'ФИТ':'Фитинговые пл.', 
+        'ОКТ':'Окатышевозы', 
+        'МВЗ':'Минераловозы', 
+        'ПР':'Прочие'
+    }
+    rps_name = dict.get(rps)
+    return rps_name
+
 # Вычисление списка дорог
 @dash_app.callback(
     Output(component_id='dashboard8-dropdown1-in-railway', component_property='options'),
@@ -99,7 +113,8 @@ def render_content(tab, start_date, end_date, railway):
                     dcc.Graph(
                         id="dash8-tab-1-pie1",
                         figure={
-                            "data": [go.Pie(labels=trans_empty_by_type['Тип'], values=trans_empty_by_type["Кол-во вагонорейсов"],
+                            "data": [go.Pie(labels=trans_empty_by_type['Тип'],
+                                values=trans_empty_by_type["Кол-во вагонорейсов"],
                                 marker={"colors": ["#D3D3D3",  "#97151c", "#191970",]}, 
                                 # hovertext=trans_empty_by_type["Кол-во вагонорейсов"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
                                 hoverinfo='skip',
@@ -188,17 +203,18 @@ def render_content(tab, start_date, end_date, railway):
                     dcc.Graph(
                         id="dash8-tab1-pie2",
                         figure={
-                            "data": [go.Pie(labels=trans_empty_by_money['Тип'], values=trans_empty_by_money['Рассчитанная сумма'], 
+                            "data": [go.Pie(labels=trans_empty_by_money['Тип'], 
+                            values=trans_empty_by_money['Рассчитанная сумма'].apply(lambda x: int(x/1000)), 
                              marker={"colors": ["#808080","#97151c", "#D3D3D3",]},
                             #  темно-синий "#191970",
                              hoverinfo='skip',
                              hovertemplate = '%{label} - %{text}',
-                             text = trans_empty_by_money['Рассчитанная сумма'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
+                             text = trans_empty_by_money['Рассчитанная сумма'].apply(lambda x: int(x/1000)).map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
                              textfont = dict(color = '#ffffff'),
                              )],
                             "layout": go.Layout(
                                 autosize=True,
-                                title_text='Сумма пени, исходя из рассчитанной суммы тарифа в SAP, руб.',
+                                title_text='Сумма пени, исходя <br> из рассчитанной суммы тарифа в SAP, тыс. руб.',
                                 margin={
                                     "r": 0, "t": 100, "b": 20, "l": 70,
                                 },
@@ -215,12 +231,12 @@ def render_content(tab, start_date, end_date, railway):
                             "data": [
                                 go.Scatter(
                                     x=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year]["Месяц"].tolist(),
-                                    y=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year]["Оценка пени"].tolist(),
-                                    text=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year]["Оценка пени"]\
+                                    y=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year]["Оценка пени"].apply(lambda x: int(x/1000)).tolist(),
+                                    text=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year]["Оценка пени"].apply(lambda x: int(x/1000))\
                                         .map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """Оценка пени: %{text}""",
+                                    """Оценка пени: %{text} тыс. руб.""",
                                     name=dt.date.today().year,
             
                                     # orientation='v',
@@ -235,12 +251,12 @@ def render_content(tab, start_date, end_date, railway):
                                 ),
                                 go.Scatter(
                                     x=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1]["Месяц"].apply(lambda x: x.replace(x.year+1)).tolist(),
-                                    y=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1]["Оценка пени"].tolist(),
-                                    text=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1]["Оценка пени"]\
+                                    y=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1]["Оценка пени"].apply(lambda x: int(x/1000)).tolist(),
+                                    text=trans_empty_by_money_month[trans_empty_by_money_month['Месяц'].apply(lambda x: x.year) == dt.date.today().year - 1]["Оценка пени"].apply(lambda x: int(x/1000))\
                                         .map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """Оценка пени: %{text}""",
+                                    """Оценка пени: %{text} тыс. руб.""",
                                     name=dt.date.today().year - 1,
             
                                     # orientation='v',
@@ -257,7 +273,7 @@ def render_content(tab, start_date, end_date, railway):
                             "layout": go.Layout(
                                 autosize=True,
                                 barmode = 'stack', 
-                                title_text='Динамика пени за просрочку <br> (оценкa без учета времени простоя в ТОР), руб.',
+                                title_text='Динамика пени за просрочку <br> (оценкa без учета времени простоя в ТОР), тыс. руб.',
                                 # Рассчет при условии 6% от рассчитанной суммы тарифа, но не более 50%
                                 # margin={"r": 0, "t": 50, "b": 20, "l": 70, },
                                 annotations = [dict(showarrow=False, text='test', font=dict(size=10),  x=0.5,  y=-0.5, xref='paper', yref='paper', xshift=-1
@@ -321,12 +337,9 @@ def render_content(tab, start_date, end_date, railway):
         internal_delay = trans_empty_by_railway_delay
         internal_delay['Вагонорейсы с просрочкой, %'] = internal_delay['Кол-во вагонорейсов с просрочкой']/internal_delay['Кол-во вагонорейсов с просрочкой'].sum()
         
-        # Убрать экспорт-импортные дороги
-        #[~trans_empty_by_railway_delay['Дорога назначения'].isin(external_railway)].copy()
-
         # Tab-2 pie content рубли
-        internal_penalty = trans_empty_by_railway_penalty[~trans_empty_by_railway_penalty['Дорога назначения'].isin(external_railway)].copy()
-        internal_penalty['Оценка пени, %'] = internal_penalty['Оценка пени']/internal_penalty['Оценка пени'].sum()
+        internal_penalty = trans_empty_by_railway_penalty
+        # internal_penalty['Оценка пени, %'] = internal_penalty['Оценка пени']/internal_penalty['Оценка пени'].sum()
 
         content = html.Div([
             html.Div([ 
@@ -342,7 +355,8 @@ def render_content(tab, start_date, end_date, railway):
                                 text = internal_delay['Кол-во вагонорейсов с просрочкой'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
                                 rotation = 90,
                                 hoverinfo='skip',
-                                hovertemplate = '%{label} - %{value}',
+                                hovertemplate = '%{label} - %{text}',
+                                name='',
                             )],
                             "layout": go.Layout(
                                 autosize=True,
@@ -359,17 +373,17 @@ def render_content(tab, start_date, end_date, railway):
                         id="dashboard8-pie2",
                         figure={
                             "data": [go.Pie(labels=internal_penalty['Дорога назначения'], 
-                                values=internal_penalty['Оценка пени'],
-                                text = internal_penalty['Оценка пени'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
+                                values=internal_penalty['Оценка пени'].apply(lambda x: int(x/1000)),
+                                text = internal_penalty['Оценка пени'].apply(lambda x: int(x/1000)).map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
                                 # marker=dict(colors=pie_colors),
                                 marker=dict(colors=px.colors.qualitative.Antique), 
                                 hoverinfo='skip',
-                                hovertemplate = '%{label} - %{value}',
+                                hovertemplate = '%{label} - %{text}',
                                 rotation = 90,
                             )],
                             "layout": go.Layout(
                                 autosize=True,
-                                title_text='Структура по оценке пени, руб.',
+                                title_text='Структура по оценке пени, тыс. руб.',
                                 margin={"r": 0, "t": 50, "b": 20, "l": 70, },
                             ),
                         },
@@ -391,8 +405,8 @@ def render_content(tab, start_date, end_date, railway):
                                     y=internal_delay["Дор. назн."].tolist(),
                                     text=internal_delay["Кол-во вагонорейсов с просрочкой"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
                                     hoverinfo='skip',
-                                    hovertemplate=
-                                    """Кол-во вагонорейсов с просрочкой: %{text}""",
+                                    customdata = internal_delay['Дорога назначения'].tolist(),
+                                    hovertemplate= """Дорога: %{customdata} <br> Кол-во вагонорейсов с просрочкой: %{text}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
@@ -425,15 +439,17 @@ def render_content(tab, start_date, end_date, railway):
                         figure={
                             "data": [
                                 go.Bar(
-                                    x=internal_penalty["Оценка пени"].tolist(),
+                                    x=internal_penalty["Оценка пени"].apply(lambda x: int(x/1000)).tolist(),
                                     y=internal_penalty["Дор. назн."].tolist(),
-                                    text=internal_penalty["Оценка пени"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
+                                    text=internal_penalty["Оценка пени"].apply(lambda x: int(x/1000)).map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
+                                    customdata=internal_penalty["Дорога назначения"].tolist(),
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """Оценка пени: %{text} руб.""",
+                                    """Дорога: %{customdata} <br> Оценка пени: %{text} тыс. руб.""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
+                                    constraintext='outside',
                                     marker={
                                         "color": "rgb(175, 100, 88)",
                                         "line": {
@@ -446,7 +462,7 @@ def render_content(tab, start_date, end_date, railway):
                             "layout": go.Layout(
                                 autosize=True,
                                 yaxis={"autorange":"reversed"},
-                                title_text='Оценка пени, руб.',
+                                title_text='Оценка пени, тыс. руб.',
                                 margin={"r": 0, "t": 50, "b": 20, "l": 70, },
                             ),
                         },
@@ -465,8 +481,9 @@ def render_content(tab, start_date, end_date, railway):
                                     y=trans_empty_by_railway_mean_delay["Дор. назн."],
                                     text=trans_empty_by_railway_mean_delay["Средняя просрочка, сут"].map('{:,.1f}'.format).astype(str).replace(',', ' ', regex=True).astype(str),
                                     hoverinfo='skip',
+                                    customdata=trans_empty_by_railway_mean_delay["Дорога назначения"],
                                     hovertemplate=
-                                    """Средняя просрочка: %{text} суток""",
+                                    """Дорога: %{customdata} <br> Средняя просрочка: %{text} суток""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
@@ -518,14 +535,9 @@ def render_content(tab, start_date, end_date, railway):
         
         # Tab-2 pie content вагонорейсы
         internal_delay = trans_empty_by_railway_delay
-        # internal_delay['Вагонорейсы с просрочкой, %'] = internal_delay['Кол-во вагонорейсов с просрочкой']/internal_delay['Кол-во вагонорейсов с просрочкой'].sum()
-        
-        # Убрать экспорт-импортные дороги
-        #[~trans_empty_by_railway_delay['Дорога назначения'].isin(external_railway)].copy()
 
         # Tab-2 pie content рубли
-        internal_penalty = trans_empty_by_railway_penalty[~trans_empty_by_railway_penalty['РПС'].isin(external_railway)].copy()
-        # internal_penalty['Оценка пени, %'] = internal_penalty['Оценка пени']/internal_penalty['Оценка пени'].sum()
+        internal_penalty = trans_empty_by_railway_penalty
 
         content = html.Div([
             html.Div([ 
@@ -533,13 +545,16 @@ def render_content(tab, start_date, end_date, railway):
                     dcc.Graph(
                         id="dashboard8-pie1",
                         figure={
-                            "data": [go.Pie(labels=internal_penalty['РПС'], 
+                            "data": [go.Pie(labels=internal_delay['РПС'], 
                                 values=internal_delay['Кол-во вагонорейсов с просрочкой'],
                                 # marker=dict(colors=pie_colors),
                                 text = internal_delay['Кол-во вагонорейсов с просрочкой'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
                                 marker=dict(colors=px.colors.qualitative.Antique), 
                                 hoverinfo='skip',
-                                hovertemplate = '%{label} - %{value}',
+                                customdata=internal_penalty['РПС'].apply(lambda x: get_rps_name(x)),
+                                hovertemplate = 'РПС: %{customdata} <br> %{label} - %{text}',
+                                name='',
+                                rotation=90,
                             )],
                             "layout": go.Layout(
                                 autosize=True,
@@ -555,16 +570,20 @@ def render_content(tab, start_date, end_date, railway):
                     dcc.Graph(
                         id="dashboard8-pie2",
                         figure={
-                            "data": [go.Pie(labels=internal_penalty['РПС'], values=internal_penalty['Оценка пени'],
+                            "data": [go.Pie(labels=internal_penalty['РПС'], 
+                                values=internal_penalty['Оценка пени'].apply(lambda x: int(x/1000)),
                                 # marker=dict(colors=pie_colors),
                                 marker=dict(colors=px.colors.qualitative.Antique), 
-                                text = internal_penalty['Оценка пени'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
+                                text = internal_penalty['Оценка пени'].apply(lambda x: int(x/1000)).map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
                                 hoverinfo='skip',
-                                hovertemplate = '%{label} - %{value}',
+                                customdata=internal_penalty['РПС'].apply(lambda x: get_rps_name(x)),
+                                hovertemplate = 'РПС: %{customdata} <br> %{label} - %{text}',
+                                name='',
+                                rotation=90,
                             )],
                             "layout": go.Layout(
                                 autosize=True,
-                                title_text='Структура по оценке пени, руб.',
+                                title_text='Структура по оценке пени, тыс. руб.',
                                 margin={"r": 0, "t": 50, "b": 20, "l": 70, },
                             ),
                         },
@@ -586,8 +605,9 @@ def render_content(tab, start_date, end_date, railway):
                                     y=internal_delay["РПС"].tolist(),
                                     text=internal_delay["Кол-во вагонорейсов с просрочкой"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
                                     hoverinfo='skip',
+                                    customdata=internal_delay['РПС'].apply(lambda x: get_rps_name(x)),
                                     hovertemplate=
-                                    """Кол-во вагонорейсов с просрочкой: %{text}""",
+                                    """РПС: %{customdata} <br> Кол-во вагонорейсов с просрочкой: %{text}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
@@ -619,12 +639,13 @@ def render_content(tab, start_date, end_date, railway):
                         figure={
                             "data": [
                                 go.Bar(
-                                    x=internal_penalty["Оценка пени"].tolist(),
+                                    x=internal_penalty["Оценка пени"].apply(lambda x: int(x/1000)).tolist(),
                                     y=internal_penalty["РПС"].tolist(),
-                                    text=internal_penalty["Оценка пени"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
+                                    text=internal_penalty["Оценка пени"].apply(lambda x: int(x/1000)).map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True).tolist(),
                                     hoverinfo='skip',
+                                    customdata=internal_penalty['РПС'].apply(lambda x: get_rps_name(x)),
                                     hovertemplate=
-                                    """Оценка пени: %{text} руб.""",
+                                    """РПС: %{customdata} <br> Оценка пени: %{text} тыс. руб.""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
@@ -640,7 +661,7 @@ def render_content(tab, start_date, end_date, railway):
                             "layout": go.Layout(
                                 autosize=True,
                                 yaxis={"autorange":"reversed"},
-                                title_text='Оценка пени, руб.',
+                                title_text='Оценка пени, тыс. руб.',
                                 margin={"r": 0, "t": 50, "b": 20, "l": 70, },
                             ),
                         },
@@ -659,8 +680,9 @@ def render_content(tab, start_date, end_date, railway):
                                     y=trans_empty_by_railway_mean_delay["РПС"],
                                     text=trans_empty_by_railway_mean_delay["Средняя просрочка, сут"].map('{:,.1f}'.format).astype(str).replace(',', ' ', regex=True).astype(str),
                                     hoverinfo='skip',
+                                    customdata=trans_empty_by_railway_mean_delay['РПС'].apply(lambda x: get_rps_name(x)),
                                     hovertemplate=
-                                    """Средняя просрочка: %{text} суток""",
+                                    """РПС: %{customdata} <br> Средняя просрочка: %{text} суток""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',

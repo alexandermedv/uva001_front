@@ -23,3 +23,6 @@ venv.bak/
 # del migrations
 migration
 migrations/
+
+log_test.txt
+log.txt

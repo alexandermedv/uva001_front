@@ -1,3 +1,7 @@
+# log files
+log.txt
+log_test.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -23,6 +27,9 @@ venv.bak/
 # del migrations
 migration
 migrations/
+<<<<<<< HEAD
 
 log_test.txt
 log.txt
+=======
+>>>>>>> 3523ab26a65d1f7e611a79ac90a57c4513a92919

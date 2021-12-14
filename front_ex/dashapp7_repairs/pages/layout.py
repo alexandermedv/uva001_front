@@ -86,8 +86,17 @@ def create_layout():
                 ],)
             ], className="row",
             ),
+ 
+           html.Div([
+                dcc.Tabs(id='dashboard7-tabs', value='tab-1', children=[
+                    dcc.Tab(label='Графики', value='tab-1', className="tab",),
+                    dcc.Tab(label='Справочник', value='tab-2', className="tab",),
+                ], className="row all-tabs"),
+                #html.Div(id='tabs-example-content')
+            ]),
+
                 # Row 5 - Графики
-                html.Div(id='graphs'),
+            html.Div(id='tab-content'),
         ], className="sub_page",
         ),
     ], className="page_landscape_a3",

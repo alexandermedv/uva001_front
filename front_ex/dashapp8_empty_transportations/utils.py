@@ -332,6 +332,7 @@ def get_tab4_trans_empty_delay_by_rps(railway='', start_date=None, end_date=None
             group by t."РПС"
                 order by sum(case when t."Превышение даты истечение срока д" = 'Не удовлетворяет' then "Кол-во вагонорейсов" else 0 end) desc
         ) t where "Кол-во вагонорейсов с просрочкой" > 0
+            and not t."РПС" in ('ТВЗ', 'РЛВ')
     ''' 
     # print(sql)
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
@@ -348,6 +349,7 @@ def get_tab4_trans_empty_penalty_by_rps(railway='', start_date=None, end_date=No
                         and (lower("Плательщик") like '%пгк%' 
 						        or lower("Грузоотправитель") like '%пгк%' 
 						        or lower("Получатель") like '%пгк%')
+                        and not t."РПС" in ('ТВЗ', 'РЛВ')
     '''
     if start_date and end_date:
         sql = sql + '''
@@ -377,6 +379,7 @@ def get_tab4_trans_empty_mean_delay_by_rps(railway='', start_date=None, end_date
                             and (lower("Плательщик") like '%пгк%' 
 						        or lower("Грузоотправитель") like '%пгк%' 
 						        or lower("Получатель") like '%пгк%')
+                            and not t."РПС" in ('ТВЗ', 'РЛВ')
     '''
     if start_date and end_date:
         sql = sql + '''

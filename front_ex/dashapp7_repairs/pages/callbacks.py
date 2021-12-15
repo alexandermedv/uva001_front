@@ -112,7 +112,7 @@ def render_content(tab, start_date, end_date):
 
 
         print('Запустился callback с графиками')
-        df4 = get_top_tors_by_type(start_date, end_date)
+        df4 = get_top_tors_by_type(start_date, end_date).sort_values(by='Сортировка', ascending=False)
         print('df4 =', df4)
 
         x11_data = df4['Количество'].astype(str).tolist()
@@ -145,6 +145,19 @@ def render_content(tab, start_date, end_date):
         s = '{:,.0f}'.format(sum3).replace(',', ' ')
         sum4 = sum(map(int, df9["Количество"]))
         d = '{:,.0f}'.format(sum4).replace(',', ' ')
+
+        drps = {
+            'КР':'#ADC9B1',
+            'ПВ':'#C17A75',
+            'МВЗ':'#94F57D',
+            'ОКТ':'#B78B79',
+            'ПЛ':'#7D625A',
+            'ФИТ':'#F5B693',
+            'ЦМВ':'#906060',
+            'ЦС':'#758376'
+        }
+        colors2 = [drps[k] for k in df8['РПС'].values]
+        colors3 = [drps[k] for k in df9['РПС'].values]
 
         content = html.Div([
             html.Div([
@@ -326,7 +339,7 @@ def render_content(tab, start_date, end_date):
                             autosize=True,
                             font = dict(size=12),
                             title_text='Количество ремонтов по виду, шт.',
-                            margin={"r": 0, "t": 50, "b": 100, "l": 70, },
+                            margin={"r": 0, "t": 50, "b": 60, "l": 70, },
                         ),
                     },
                     # config={"displayModeBar": False},
@@ -402,7 +415,7 @@ def render_content(tab, start_date, end_date):
                                 orientation='h',
                                 textposition='outside',
                                 marker={
-                                    "color": ["#7E7E7E","#979797","#C5C5C5","#D9D9D9","#D2D2D2","#E1E1E1","#C17A75","#C39491","#D9C4C2","#8A2432","#9F5C66","#C9AAAE"],
+                                    "color": ["#C5C5C5","#979797","#7E7E7E","#E1E1E1","#D2D2D2","#D9D9D9","#C9AAAE","#9F5C66","#8A2432","#D9C4C2","#C39491","#C17A75"],
                                     "line": {
                                         "color": "rgb(255, 255, 255)",
                                         "width": 2,
@@ -443,7 +456,7 @@ def render_content(tab, start_date, end_date):
                                 orientation='h',
                                 textposition='outside',
                                 marker={
-                                    "color": ["#7E7E7E","#979797","#C5C5C5","#8A2432","#B3707A","#DCBDC1","#C0392B","#D67E75","#ECC3BF"],  
+                                    "color": ["#C5C5C5","#979797","#7E7E7E","#DCBDC1","#B3707A","#8A2432","#ECC3BF","#D67E75","#C0392B"],  
                                     "line": {
                                         "color": "rgb(255, 255, 255)",
                                         "width": 2,
@@ -515,17 +528,19 @@ def render_content(tab, start_date, end_date):
                     id="dash7-pie2",
                     figure={
                         "data": [go.Pie(labels=df8['РПС'], values=df8["Количество"], sort=False, 
-                            marker={"colors": ["#C0392B","#8A2432","#470023", "#8A2432","#AC3B46","#C17A75","#D97A6B","#F27C8D","#F4ACBA"]}, 
+                            marker={"colors":colors2},
+                            #marker={"colors": ["#C0392B","#8A2432","#470023", "#8A2432","#AC3B46","#C17A75","#D97A6B","#F27C8D","#F4ACBA"]}, 
                             hoverinfo='skip',
                             hovertemplate = '%{label} - %{text}',
                             name='',
+                            rotation = 90,
                             text = df8["Количество"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True)
                         ),],
                         "layout": go.Layout(
                             autosize=True,
                             font = dict(size=12),
-                            title_text=f'''Количество некачественных ремонтов ДР (код 912) - {s} шт.''',
-                            margin={"r": 0, "t": 120, "b": 100, "l": 70, },
+                            title_text=f'''Количество некачественных ремонтов ДР <br> Код повреждения 912 - {s} шт.''',
+                            margin={"r": 0, "t": 60, "b": 60, "l": 70, },
                         ),
                     },
                     # config={"displayModeBar": False},
@@ -536,6 +551,7 @@ def render_content(tab, start_date, end_date):
                     id="dash7-pie3",
                     figure={
                         "data": [go.Pie(labels=df9['РПС'], values=df9["Количество"], sort=False,
+                        marker={"colors":colors3},
                             #color_discrete_map={'КР':'#083B40',
                             #         'ПВ':'#730031',
                             #         'ЗРВ':'#470023',
@@ -545,17 +561,19 @@ def render_content(tab, start_date, end_date):
                             #         'ФИТ':'#D97A6B',
                             #         'ЦМВ':'#F27C8D',
                             #         'ЦС':'#F4ACBA'},
-                            marker={"colors": ["#C0392B","#8A2432","#470023", "#8A2432","#AC3B46","#C17A75","#D97A6B","#F27C8D","#F4ACBA"]}, 
+                            #marker={"colors": ["#C0392B","#8A2432", "#8A2432","#AC3B46","#C17A75","#D97A6B","#F27C8D","#F4ACBA"]}, 
                             hoverinfo='skip',
                             hovertemplate = '%{label} - %{text}',
                             name='',
+                            rotation = 90,
+                            
                             text = df9["Количество"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True)
                         ),],
                         "layout": go.Layout(
                             autosize=True,
                             font = dict(size=12),
-                            title_text=f'''Количество некачественных ремонтов КР (код 913) - {d} шт.''',
-                            margin={"r": 0, "t": 120, "b": 100, "l": 70, },
+                            title_text=f'''Количество некачественных ремонтов КР <br> Код повреждения 913 - {d} шт.''',
+                            margin={"r": 0, "t": 60, "b": 60, "l": 70, },
                         ),
                     },
                     # config={"displayModeBar": False},

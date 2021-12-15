@@ -116,7 +116,8 @@ def get_top_tors_by_rps(start_date, end_date):
           FROM dashboard.tor_ik t 
           WHERE t.DATNRP BETWEEN '%s' AND '%s' GROUP BY t.ROD_ID_GROUP, t.NEIS1_KOD,t.KURZTEXT1) a
           LEFT JOIN dashboard.kn_info_ik k on k."Код неисправности"::text = a.NEIS1_KOD
-          WHERE a.r <= 3;
+          WHERE a.r <= 3
+          ORDER BY a.ROD_ID_GROUP,a.KOLVO asc;
     ''' % (start_date, end_date)
 
     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
@@ -139,7 +140,8 @@ def get_top_tors_by_rps_pr(start_date, end_date):
           FROM dashboard.tor_ik t 
           WHERE t.DATNRP BETWEEN '%s' AND '%s' AND t.ROD_ID_GROUP = 'Прочие' GROUP BY t.ROD_ID_TEXT,t.ROD_ID_GROUP, t.NEIS1_KOD,t.KURZTEXT1) a
           LEFT JOIN dashboard.kn_info_ik k on k."Код неисправности"::text = a.NEIS1_KOD
-          WHERE a.r <= 3;
+          WHERE a.r <= 3
+          ORDER BY a.ROD_ID_TEXT,a.KOLVO desc;
     ''' % (start_date, end_date)
 
     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
@@ -166,7 +168,7 @@ def get_top_tors_by_type(start_date, end_date):
           WHERE t.DATNRP BETWEEN '%s' AND '%s' GROUP BY t.ILATX, t.NEIS1_KOD,t.KURZTEXT1) a
           LEFT JOIN dashboard.kn_info_ik k on k."Код неисправности"::text = a.NEIS1_KOD
           WHERE a.r <= 3 
-          ORDER BY "Сортировка" desc;
+          ORDER BY "Сортировка",a.KOLVO asc;
     ''' % (start_date, end_date)
 
     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))

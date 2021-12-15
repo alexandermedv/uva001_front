@@ -147,14 +147,14 @@ def render_content(tab, start_date, end_date):
         d = '{:,.0f}'.format(sum4).replace(',', ' ')
 
         drps = {
-            'КР':'#ADC9B1',
-            'ПВ':'#C17A75',
-            'МВЗ':'#94F57D',
-            'ОКТ':'#B78B79',
-            'ПЛ':'#7D625A',
-            'ФИТ':'#F5B693',
-            'ЦМВ':'#906060',
-            'ЦС':'#758376'
+            'КР':'#C0392B',
+            'ПВ':'#8A2432',
+            'МВЗ':'#F27C8D',
+            'ОКТ':'#D97A6B',
+            'ПЛ':'#C17A75',
+            'ФИТ':'#AC3B46',
+            'ЦМВ':'#8A2432',
+            'ЦС':'#AF4154'
         }
         colors2 = [drps[k] for k in df8['РПС'].values]
         colors3 = [drps[k] for k in df9['РПС'].values]

@@ -331,7 +331,7 @@ def get_tab4_trans_empty_delay_by_rps(railway='', start_date=None, end_date=None
     sql = sql + '''
             group by t."РПС"
                 order by sum(case when t."Превышение даты истечение срока д" = 'Не удовлетворяет' then "Кол-во вагонорейсов" else 0 end) desc
-        ) t
+        ) t where "Кол-во вагонорейсов с просрочкой" > 0
     ''' 
     # print(sql)
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')

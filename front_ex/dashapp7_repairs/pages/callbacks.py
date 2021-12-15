@@ -142,8 +142,9 @@ def render_content(tab, start_date, end_date):
         print('df9 =', df9)
 
         sum3 = sum(map(int, df8["Количество"]))
-
+        s = '{:,.0f}'.format(sum3).replace(',', ' ')
         sum4 = sum(map(int, df9["Количество"]))
+        d = '{:,.0f}'.format(sum4).replace(',', ' ')
 
         content = html.Div([
             html.Div([
@@ -218,7 +219,7 @@ def render_content(tab, start_date, end_date):
                             margin={
                                                 "r": 0,
                                                 "t": 50,
-                                                "b": 20,
+                                                "b": 100,
                                                 "l": 70,
                             },
 
@@ -300,7 +301,7 @@ def render_content(tab, start_date, end_date):
                             margin={
                                                 "r": 0,
                                                 "t": 50,
-                                                "b": 20,
+                                                "b": 100,
                                                 "l": 70,
                             },
 
@@ -314,17 +315,18 @@ def render_content(tab, start_date, end_date):
                 dcc.Graph(
                     id="dash7-pie1",
                     figure={
-                        "data": [go.Pie(labels=df5['Вид ремонта'], values=df5["Количество ремонтов"],
+                        "data": [go.Pie(labels=df5['Вид ремонта'], values=df5["Количество ремонтов"], 
                             marker={"colors": ["#D9D9D9","#7E7E7E","#C17A75",  "#8A2432"]}, 
                             hoverinfo='skip',
                             hovertemplate = '%{label} - %{text}',
+                            name='',
                             text = df5["Количество ремонтов"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True)
                         ),],
                         "layout": go.Layout(
                             autosize=True,
                             font = dict(size=12),
                             title_text='Количество ремонтов по виду, шт.',
-                            margin={"r": 0, "t": 100, "b": 20, "l": 70, },
+                            margin={"r": 0, "t": 50, "b": 100, "l": 70, },
                         ),
                     },
                     # config={"displayModeBar": False},
@@ -373,7 +375,7 @@ def render_content(tab, start_date, end_date):
                             margin={
                                                 "r": 0,
                                                 "t": 50,
-                                                "b": 20,
+                                                "b": 100,
                                                 "l": 70,
                             },
 
@@ -393,8 +395,9 @@ def render_content(tab, start_date, end_date):
                                 y=y11_data,
                                 text=x11_text,
                                 hoverinfo='skip',
+                                customdata = df4['Полное наименование'].tolist(),
                                 hovertemplate=
-                                    """<br>Количество ремонтов: %{x}""",
+                                    """Код неисправности: %{customdata} <br>Количество ремонтов: %{x}""",
                                 name='',
                                 orientation='h',
                                 textposition='outside',
@@ -413,7 +416,7 @@ def render_content(tab, start_date, end_date):
                             margin={
                                                 "r": 0,
                                                 "t": 50,
-                                                "b": 20,
+                                                "b": 100,
                                                 "l": 150,
                             },
 
@@ -433,13 +436,14 @@ def render_content(tab, start_date, end_date):
                                 y=y12_data,
                                 text=x12_text,
                                 hoverinfo='skip',
+                                customdata = df6['Полное наименование'].tolist(),
                                 hovertemplate=
-                                    """<br>Количество ремонтов: %{x}""",
+                                    """Код неисправности: %{customdata} <br>Количество ремонтов: %{x}""",
                                 name='',
                                 orientation='h',
                                 textposition='outside',
                                 marker={
-                                    "color": ["#656669","#9B9B9D","#9B9B9D","#730031","#A45979","#D5B2C1","#083B40","#5E7F83","#B4C4C5"],
+                                    "color": ["#7E7E7E","#979797","#C5C5C5","#8A2432","#B3707A","#DCBDC1","#C0392B","#D67E75","#ECC3BF"],  
                                     "line": {
                                         "color": "rgb(255, 255, 255)",
                                         "width": 2,
@@ -453,7 +457,7 @@ def render_content(tab, start_date, end_date):
                             margin={
                                                 "r": 0,
                                                 "t": 50,
-                                                "b": 20,
+                                                "b": 100,
                                                 "l": 150,
                             },
 
@@ -474,13 +478,14 @@ def render_content(tab, start_date, end_date):
                                 text=x13_text,
                                 #layout_yaxis_range=[0,2000],
                                 hoverinfo='skip',
+                                customdata = df7['Полное наименование'].tolist(),
                                 hovertemplate=
-                                    """<br>Количество ремонтов: %{x}""",
+                                    """Код неисправности: %{customdata} <br>Количество ремонтов: %{x}""",
                                 name='',
                                 orientation='h',
                                 textposition='outside',
                                 marker={
-                                    "color": ["#470023","#875970","#C7B2BD","#8A2432","#B3707A","#DCBDC1","#AC3B46","#C97F87","#E6C4C7","#C17A75","#D7A8A5","#ECD7D5","#D97A6B","#E6A89F","#F4D7D2","#F27C8D","#F7AAB5","#FBD7DD","#F4ACBA","#F8C9D2","#FCE6EA"],
+                                    "color": ["#E7C6CB","#CB8390","#AF4154","#DCBDC1","#B3707A","#8A2432","#E6C4C7","#C97F87","#AC3B46","#ECD7D5","#D7A8A5","#C17A75","#F4D7D2","#E6A89F","#D97A6B","#FBD7DD","#F7AAB5","#F27C8D","#FCE6EA","#F8C9D2","#F4ACBA"],
                                     "line": {
                                         "color": "rgb(255, 255, 255)",
                                         "width": 2,
@@ -495,7 +500,7 @@ def render_content(tab, start_date, end_date):
                             margin={
                                                 "r": 0,
                                                 "t": 50,
-                                                "b": 20,
+                                                "b": 80,
                                                 "l": 150,
                             },
 
@@ -509,17 +514,18 @@ def render_content(tab, start_date, end_date):
                 dcc.Graph(
                     id="dash7-pie2",
                     figure={
-                        "data": [go.Pie(labels=df8['РПС'], values=df8["Количество"], sort=False,
-                            marker={"colors": ["#083B40","#730031","#470023", "#8A2432","#AC3B46","#C17A75","#D97A6B","#F27C8D","#F4ACBA"]}, 
+                        "data": [go.Pie(labels=df8['РПС'], values=df8["Количество"], sort=False, 
+                            marker={"colors": ["#C0392B","#8A2432","#470023", "#8A2432","#AC3B46","#C17A75","#D97A6B","#F27C8D","#F4ACBA"]}, 
                             hoverinfo='skip',
                             hovertemplate = '%{label} - %{text}',
+                            name='',
                             text = df8["Количество"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True)
                         ),],
                         "layout": go.Layout(
                             autosize=True,
                             font = dict(size=12),
-                            title_text=f'''Количество некачественных ремонтов 912 - {sum3} шт.''',
-                            margin={"r": 0, "t": 120, "b": 80, "l": 70, },
+                            title_text=f'''Количество некачественных ремонтов ДР (код 912) - {s} шт.''',
+                            margin={"r": 0, "t": 120, "b": 100, "l": 70, },
                         ),
                     },
                     # config={"displayModeBar": False},
@@ -539,16 +545,17 @@ def render_content(tab, start_date, end_date):
                             #         'ФИТ':'#D97A6B',
                             #         'ЦМВ':'#F27C8D',
                             #         'ЦС':'#F4ACBA'},
-                            marker={"colors": ["#083B40","#730031","#470023", "#8A2432","#AC3B46","#C17A75","#D97A6B","#F27C8D","#F4ACBA"]}, 
+                            marker={"colors": ["#C0392B","#8A2432","#470023", "#8A2432","#AC3B46","#C17A75","#D97A6B","#F27C8D","#F4ACBA"]}, 
                             hoverinfo='skip',
                             hovertemplate = '%{label} - %{text}',
+                            name='',
                             text = df9["Количество"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True)
                         ),],
                         "layout": go.Layout(
                             autosize=True,
                             font = dict(size=12),
-                            title_text=f'''Количество некачественных ремонтов 913 - {sum4} шт.''',
-                            margin={"r": 0, "t": 120, "b": 80, "l": 70, },
+                            title_text=f'''Количество некачественных ремонтов КР (код 913) - {d} шт.''',
+                            margin={"r": 0, "t": 120, "b": 100, "l": 70, },
                         ),
                     },
                     # config={"displayModeBar": False},
@@ -571,11 +578,11 @@ def render_content(tab, start_date, end_date):
                                 'font-weight': 'bold'}),
                     html.Br([]),
                     dash_table.DataTable(
-                        id='dashboard7-tabs',
+                        id='dashboard7-tables',
                         columns=[{"name": i, "id": i} for i in df10.columns],
                         data=df10.to_dict('records'),
-                        page_size=20,
-                        style_table={'overflowX': 'auto'},
+                        page_size=2000,
+                        style_table={'overflowY': 'scroll'},
                         style_cell={
                             # all three widths are needed
                             'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
@@ -600,6 +607,18 @@ def render_content(tab, start_date, end_date):
                             'whiteSpace': 'normal',
                             'height': 'auto',
                         },
+                        style_cell_conditional =[
+                            {'if':{'column_id': 'Код неисправности'},
+                            'width':'5%'},
+                            {'if':{'column_id': 'Код причины'},
+                            'width':'5%'},
+                            {'if':{'column_id': 'Наименование'},
+                            'width':'10%'},
+                            {'if':{'column_id': 'Полное наименование'},
+                            'width':'50%'},
+                            {'if':{'column_id': 'Расшифровка причины'},
+                            'width':'30%'},
+                        ],
                     ),
                 ], className="row"),
         ],)

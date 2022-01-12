@@ -51,6 +51,14 @@ def render_dashapp5():
     return render_template('/dashapp5/overview.html')
 
 
+@app.route('/resellers_dash_commerce/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp9():
+    """Дашборд по посредникам (вариант2 - вместо проверки холдингов и операторов проверяется список легитимных контрагентов)"""
+    return render_template('/dashapp9_resellers_commerce/overview.html')
+
+
 @app.route('/monitoring_dash/')
 @login_required
 @logger(os.environ['USER_ACTIONS_FILE'])

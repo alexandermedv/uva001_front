@@ -99,7 +99,6 @@ def render_glossary():
 
 
 @app.route('/IssueTrack_instruction/')
-@login_required
 @logger(os.environ['USER_ACTIONS_FILE'])
 def render_IssueTrack_instruction():
 

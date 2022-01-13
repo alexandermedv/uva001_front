@@ -2,7 +2,7 @@ import json
 from pprint import pprint
 import flask
 import psycopg2
-from flask import url_for, redirect, render_template, flash, request, jsonify
+from flask import url_for, redirect, render_template, flash, request, jsonify, send_from_directory
 from flask_security import login_required, current_user, login_user, logout_user
 import pandas as pd
 from sqlalchemy import func
@@ -96,6 +96,16 @@ def render_glossary():
     return jsonify(
                    my_table=json.loads(df1.to_json(orient="split"))["data"],
                    columns=[{"title": str(col)} for col in json.loads(df1.to_json(orient="split"))["columns"]])
+
+
+@app.route('/IssueTrack_instruction/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_IssueTrack_instruction():
+
+    print(os.getcwd())
+
+    return send_from_directory(os.getcwd() + '/front_ex/files/' ,'Инструкция по работе с мероприятиями.docx', as_attachment=True)
 
 
 @app.route('/report1/')

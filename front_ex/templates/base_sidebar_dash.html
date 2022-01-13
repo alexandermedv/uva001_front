@@ -53,6 +53,9 @@
               {% if current_user.check_report_roles('glossary') %}
               <li><a href="/glossary"><i class="fa fa-dashboard"></i>Словарь терминов</a></li>
               {% endif %}
+              
+              <li><a href="/IssueTrack_instruction"><i class="fa fa-dashboard"></i>Инструкция по работе с мероприятиями</a></li>
+              
               {% if current_user.check_report_roles('reports') %}
               <li><a href="/reports/"><i class="fa fa-dashboard"></i>Отчеты</a></li>
               {% endif %}

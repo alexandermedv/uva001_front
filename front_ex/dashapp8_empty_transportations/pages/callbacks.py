@@ -11,6 +11,7 @@ import dash
 import plotly.express as px
 from dateutil import relativedelta
 import time
+from pprint import pprint
 
 import requests
 
@@ -712,35 +713,44 @@ def render_content(tab, start_date, end_date, railway):
 @dash_app.callback(
     Output('link1', component_property='value'),
     Input('download-report-button', 'n_clicks'),
-    State('dashboard8-dropdown1-in-railway', component_property='value'),
+    [State('dashboard8-date-picker-range', 'start_date'),
+    State('dashboard8-date-picker-range', 'end_date'),
+    State('dashboard8-dropdown1-in-railway', component_property='value')]
 )
-def btn_download_report_button(n_clicks, value):
+def btn_download_report_button(n_clicks, start_date, end_date, railway):
+    print('n_clicks, start_date, end_date, railway', n_clicks, start_date, end_date, railway)
     if n_clicks:
-        if n_clicks:
-            res_task = requests.get('http://msc199-sdb04.domain.local:9002/api/reports/report_test')
+        start_date = dt.datetime.strftime(dt.datetime.strptime(start_date, '%Y-%m-%d'), '%d-%m-%Y')
+        end_date = dt.datetime.strftime(dt.datetime.strptime(end_date, '%Y-%m-%d'), '%d-%m-%Y')
 
-            task_id = res_task.json().get('task_id')
-            
-            while True:
-                res = requests.get('http://msc199-sdb04.domain.local:9002/api/reports/report_test?task_id={task_id}'.format(task_id=task_id))
-                time.sleep(1)
-                if res.json().get('state') == 'PENDING':
-                    break
-        return 'http://msc199-sdb04.domain.local:9002/api/uploads/test.xlsx'
+        url = 'http://msc199-sdb04.domain.local:9001/api/reports/transport_empty_delay'
+
+        res_task = requests.get(url, params={'start_date':start_date, 'end_date':end_date, 'railway':railway}) 
+        # 'is_front':True})
+
+        task_id = res_task.json().get('task_id')
+        
+        while True:
+            time.sleep(1)
+            res = requests.get(url, params={'task_id':task_id})
+            if res.json().get('kwargs'):
+                file_name = res.json().get('kwargs').get('file_name')
+          
+            if res.json().get('state') == 'SUCCESS':
+                break
+        url_upload = 'http://msc199-sdb04.domain.local:9001/api/uploads/{file_name}'.format(file_name=file_name)
+        return url_upload
     else:
         return ''
 
-# @dash_app.callback(
 dash_app.clientside_callback(
     '''
         function download_file(value){
-            alert(value);
             if (value > '') {
-                alert('download');
                 const a = document.createElement('a');
                 document.body.appendChild(a);
                 a.style='display: none';
-                a.href = 'http://msc199-sdb04.domain.local:9002/api/uploads/test.xlsx'
+                a.href = value
                 a.click(); 
             }
         }
@@ -748,6 +758,8 @@ dash_app.clientside_callback(
     Output('download_callback', component_property='children'),
     Input('link1', 'value')
 ) 
+
+# Полный вариант на js
 # def link_update(value):
 #     print('value', value)
 

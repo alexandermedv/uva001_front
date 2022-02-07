@@ -11,9 +11,6 @@ from sqlalchemy import create_engine
 import front_ex.config as config
 
 
-#import dash_table
-#import pandas as pd
-
 #from flask_app import engine_analysis, engine_cons
 from ..utils import get_trans_empty_by_railway_penalty
 
@@ -72,8 +69,8 @@ def create_layout():
                     html.Div(
                         html.Output('Дорога:'),
                         className='one column',
-                        style={"display": "flex", "align-items": "button", "height": "38px"},
-                        id = 'name1'
+                        style={"display": "flex",  "align-items": "center", "height": "38px"},
+                        id = 'name1',
                     ),
                     dcc.Dropdown(
                         id="dashboard8-dropdown1-in-railway",
@@ -83,8 +80,11 @@ def create_layout():
                             "justify-content": "center"},
                         options=[{'label': i, 'value': i} for i in [''] + get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
                         #multi=True,
-                        className='four columns'),
-                ],)
+                        className='three columns'),
+                    html.Button('Выгрузить', id='download-report-button', n_clicks=0),
+                    html.Output(id='link1', className='one column', hidden=True),
+                    html.Output(id='download_callback', hidden=True)
+                ])
             ], className="row",
             ),
             html.Div([

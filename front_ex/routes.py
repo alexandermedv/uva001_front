@@ -368,3 +368,8 @@ def render_resellers():
 @logger(os.environ['USER_ACTIONS_FILE'])
 def render_resellers_table():
     return render_template("/resellers/resellers_table.html")
+
+@app.route('/reports/download_test')
+@login_required
+def report_download_test():
+    return render_template('/dashapp8_empty_transportations/download_test.html')

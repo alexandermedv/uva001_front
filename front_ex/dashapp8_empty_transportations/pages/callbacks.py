@@ -1,7 +1,7 @@
 """ Интерактивные элементы для отчетов по запчастям."""
 import datetime as dt
 import numpy as np
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objects as go
@@ -10,6 +10,10 @@ import dash_table
 import dash
 import plotly.express as px
 from dateutil import relativedelta
+import time
+from pprint import pprint
+
+import requests
 
 from ..pages import dash_app
 # Первая закладка
@@ -705,3 +709,93 @@ def render_content(tab, start_date, end_date, railway):
              ], className="row"),
         ])
         return content
+
+@dash_app.callback(
+    Output('link1', component_property='value'),
+    Input('download-report-button', 'n_clicks'),
+    [State('dashboard8-date-picker-range', 'start_date'),
+    State('dashboard8-date-picker-range', 'end_date'),
+    State('dashboard8-dropdown1-in-railway', component_property='value')]
+)
+def btn_download_report_button(n_clicks, start_date, end_date, railway):
+    print('n_clicks, start_date, end_date, railway', n_clicks, start_date, end_date, railway)
+    if n_clicks:
+        start_date = dt.datetime.strftime(dt.datetime.strptime(start_date, '%Y-%m-%d'), '%d-%m-%Y')
+        end_date = dt.datetime.strftime(dt.datetime.strptime(end_date, '%Y-%m-%d'), '%d-%m-%Y')
+
+        url = 'http://msc199-sdb04.domain.local:9001/api/reports/transport_empty_delay'
+
+        res_task = requests.get(url, params={'start_date':start_date, 'end_date':end_date, 'railway':railway}) 
+        # 'is_front':True})
+
+        task_id = res_task.json().get('task_id')
+        
+        while True:
+            time.sleep(1)
+            res = requests.get(url, params={'task_id':task_id})
+            if res.json().get('kwargs'):
+                file_name = res.json().get('kwargs').get('file_name')
+          
+            if res.json().get('state') == 'SUCCESS':
+                break
+        url_upload = 'http://msc199-sdb04.domain.local:9001/api/uploads/{file_name}'.format(file_name=file_name)
+        return url_upload
+    else:
+        return ''
+
+dash_app.clientside_callback(
+    '''
+        function download_file(value){
+            if (value > '') {
+                const a = document.createElement('a');
+                document.body.appendChild(a);
+                a.style='display: none';
+                a.href = value
+                a.click(); 
+            }
+        }
+    ''',
+    Output('download_callback', component_property='children'),
+    Input('link1', 'value')
+) 
+
+# Полный вариант на js
+# def link_update(value):
+#     print('value', value)
+
+# dash_app.clientside_callback(
+#     """
+#     function btn_download_report_button(n_clicks, value) {
+#         if(n_clicks != 0) {
+#             alert('Загрузка');
+#             const url = 'http://msc199-sdb04.domain.local:9002/api/reports/report_test';
+#             $.get(url)
+#             .done(function get_async_status(data){
+#                 const uuid = data.task_id;
+#                 const url_ask = 'http://msc199-sdb04.domain.local:9002/api/reports/report_test?task_id='+uuid;
+#                 $.get(url_ask)
+#                 .done(function(data){
+#                     const state = data.state;
+#                     if (state == 'SUCCESS'){
+#                         clearTimeout(get_async_status);
+#                         const a = document.createElement('a');
+#                         document.body.appendChild(a);
+#                         a.style='display: none';
+#                         a.href = 'http://msc199-sdb04.domain.local:9002/api/uploads/test.xlsx'
+#                         a.click(); 
+#                     }
+#                     else {
+#                         // 0,5 миллисекунд
+#                         setTimeout(function() { get_async_status(data) }, 1000);
+#                     }
+#                 });
+#             }); 
+#         };
+#         return 'link';
+#     }
+#     """,           
+#     [Output('link', 'children')],
+#     [Input('download-report-button', 'n_clicks')],
+#     [State('dashboard8-dropdown1-in-railway', 'value')]
+# )
+           

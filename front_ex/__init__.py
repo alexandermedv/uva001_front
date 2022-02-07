@@ -26,12 +26,14 @@ from flask_restful import Api
 # Добавляем логирование пользователей и роли
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_cors import CORS
 
 app = Flask(__name__)
 # app.config.update(
 #     USE_TZ = os.environ['USE_TZ'],
 #     TIMEZONE = os.environ['TIMEZONE'],   
 # )
+CORS(app)
 
 #### Добавляет шаблон Bootstrap
 Bootstrap(app)

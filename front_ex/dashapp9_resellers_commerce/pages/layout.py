@@ -53,7 +53,7 @@ def create_layout():
                         max_date_allowed=date(2050, 1, 1),
                         initial_visible_month=date(2021, 4, 1),
                         start_date=date(2021, 1, 1),
-                        end_date=date(2021, 9, 30),
+                        end_date=date(2021, 12, 31),
                         # end_date=get_max_date().strftime("%m.%d.%Y"),
                         # end_date=datetime.datetime.now().strftime("%m.%d.%Y"),
                         number_of_months_shown = 3,
@@ -64,7 +64,7 @@ def create_layout():
                     className='four columns'),
 
                     html.Div(
-                        html.Output('Количество посреднических рейсов:'),
+                        html.Output('Кол-во посредн. рейсов:'),
                     className='two columns',
                     style={"display": "flex",
                         "align-items": "center",
@@ -85,7 +85,7 @@ def create_layout():
                     ),
 
                     html.Div(
-                        html.Output('Доля посреднических рейсов:'),
+                        html.Output('Доля посреднических рейсов, % (в шт.):'),
                     className='two columns',
                     style={"display": "flex",
                         "align-items": "center",
@@ -105,31 +105,84 @@ def create_layout():
                                     }
                     ),
                     
-                    # html.Div(
-                    #     html.Output('Всего рейсов за период:'),
-                    # className='five columns',
-                    # style={"display": "flex",
-                    #     "align-items": "center",
-                    #     "height": "38px"
-                    #         }),
-                    # html.Div(
-                    #     html.B(
-                    #         html.Output(id='transportations_count'),
-                    #         ),
-                    # className='two columns',
-                    #             style={"border-style": "groove",
-                    #                 "border-radius": "5px",
-                    #                 "height": "38px",
-                    #                 "display": "flex",
-                    #                 "align-items": "center",
-                    #                 "justify-content": "center"
-                    #                 }
-                    #         ),
                 ],)
             ], className="row",
             ),
 
-            # Row 3 - 2-й ряд фильтров
+            # Row 3 - Второй ряд значений
+            html.Div(
+                html.Br(),
+                style={"height":"5px"}),
+            html.Div([
+                dbc.Navbar([
+                    html.Div(
+                        html.Output('Кол-во клиентов-посредников'),
+                        className='two columns',
+                        style={"display": "flex",
+                        "align-items": "center",
+                        "height": "38px"
+                            }
+                            ),
+                    html.Div(
+                        html.B(
+                            html.Output(id='resellers_count'),
+                            ),
+                    className='three columns',
+                                style={"border-style": "groove",
+                                    "border-radius": "5px",
+                                    "height": "38px",
+                                    "display": "flex",
+                                    "align-items": "center",
+                                    "justify-content": "center"
+                                    }
+                    ),
+
+                    html.Div(
+                        html.Output('Сумма посредн. рейсов, руб.'),
+                    className='two columns',
+                    style={"display": "flex",
+                        "align-items": "center",
+                        "height": "38px"
+                            }),
+                    html.Div(
+                        html.B(
+                            html.Output(id='resellers_amount_money'),
+                            ),
+                    className='two columns',
+                                style={"border-style": "groove",
+                                    "border-radius": "5px",
+                                    "height": "38px",
+                                    "display": "flex",
+                                    "align-items": "center",
+                                    "justify-content": "center"
+                                    }
+                    ),
+
+                    html.Div(
+                        html.Output('Доля посреднических рейсов, % (в руб.)'),
+                    className='two columns',
+                    style={"display": "flex",
+                        "align-items": "center",
+                        "height": "38px"
+                            }),
+                    html.Div(
+                        html.B(
+                            html.Output(id='resellers_share_money'),
+                            ),
+                    className='two columns',
+                                style={"border-style": "groove",
+                                    "border-radius": "5px",
+                                    "height": "38px",
+                                    "display": "flex",
+                                    "align-items": "center",
+                                    "justify-content": "center"
+                                    }
+                    ),
+                ],)
+            ], className="row",
+            ),
+
+            # Row 4 - 2-й ряд фильтров
             html.Div(
                 html.Br(),
                 style={"height":"5px"}),
@@ -152,7 +205,7 @@ def create_layout():
                         style={"display": "block",
                             "justify-content": "center"},
                         #multi=True,
-                        className='four columns'),
+                        className='three columns'),
 
                     html.Div(
                         html.Output('Группа грузов:'),

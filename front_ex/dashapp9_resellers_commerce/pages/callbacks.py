@@ -3,6 +3,7 @@ import datetime as dt
 import numpy as np
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 import plotly.graph_objects as go
 import pandas as pd
@@ -17,6 +18,42 @@ from ..utils import get_resellers_count, get_resellers_table
 from ..utils import get_top_resellers, get_resellers_share, get_resellers_cargo
 from ..utils import get_all_branch_names, get_all_cargo_names, get_all_rps
 from ..utils import get_resellers_dynamics
+from ..utils import get_top_resellers_detailed, get_resellers_by_branches_detailed
+from ..utils import get_resellers_by_rps_detailed, get_resellers_cargo_detailed
+from ..utils import get_resellers_sum, get_resellers_share_money, get_resellers_kol
+
+
+# Количество посредников
+@dash_app.callback(Output(component_id='resellers_count', component_property='children'),
+                   [Input('dashboard5-date-picker-range', 'start_date'),
+                   Input('dashboard5-date-picker-range', 'end_date'),
+                   Input('dashboard5-dropdown1', 'value'),
+                   Input('dashboard5-dropdown2', 'value'),
+                   Input('dashboard5-dropdown3', 'value'),
+                   Input('dashboard5-tabs', 'value')])
+def resellers_amount(start_date, end_date, filial, cargo, rps, tab):
+    """Вычисление количества посредников"""
+ 
+    if filial == 'Все филиалы':
+        branches = tuple(get_all_branch_names(start_date, end_date)['Наименование филиала'].dropna())
+    else:
+        branches = (filial, filial)
+
+    if rps == 'Все РПС':
+        rod = tuple(get_all_rps(start_date, end_date)['Род подвижного состава'].dropna())
+    else:
+        rod = (rps, rps)
+
+    if cargo == 'Все грузы':
+        gruz = tuple(get_all_cargo_names(start_date, end_date)['Название груза ЕТСНГ'].dropna())
+    else:
+        gruz = (cargo, cargo)
+
+    df0 = get_resellers_kol(start_date, end_date, branches, gruz, rod)
+
+    result = '{:,.0f}'.format(df0['Количество'][0]).replace(',', ' ')
+
+    return result
 
 
 # Количество посреднических рейсов за выбранный период
@@ -52,6 +89,39 @@ def resellers_amount(start_date, end_date, filial, cargo, rps, tab):
     return result
 
 
+# Сумма посреднических рейсов за выбранный период
+@dash_app.callback(Output(component_id='resellers_amount_money', component_property='children'),
+                   [Input('dashboard5-date-picker-range', 'start_date'),
+                   Input('dashboard5-date-picker-range', 'end_date'),
+                   Input('dashboard5-dropdown1', 'value'),
+                   Input('dashboard5-dropdown2', 'value'),
+                   Input('dashboard5-dropdown3', 'value'),
+                   Input('dashboard5-tabs', 'value')])
+def resellers_amount_money(start_date, end_date, filial, cargo, rps, tab):
+    """Выгрузка суммы посреднических рейсов в деньгах"""
+ 
+    if filial == 'Все филиалы':
+        branches = tuple(get_all_branch_names(start_date, end_date)['Наименование филиала'].dropna())
+    else:
+        branches = (filial, filial)
+
+    if rps == 'Все РПС':
+        rod = tuple(get_all_rps(start_date, end_date)['Род подвижного состава'].dropna())
+    else:
+        rod = (rps, rps)
+
+    if cargo == 'Все грузы':
+        gruz = tuple(get_all_cargo_names(start_date, end_date)['Название груза ЕТСНГ'].dropna())
+    else:
+        gruz = (cargo, cargo)
+
+    df0 = get_resellers_sum(start_date, end_date, branches, gruz, rod)
+
+    result = '{:,.0f}'.format(df0['Стоимость'][0]).replace(',', ' ')
+
+    return result
+
+
 # Доля посреднических рейсов за выбранный период
 @dash_app.callback(Output(component_id='resellers_share', component_property='children'),
                    [Input('dashboard5-date-picker-range', 'start_date'),
@@ -79,6 +149,35 @@ def resellers_share(start_date, end_date, filial, cargo, rps, tab):
         gruz = (cargo, cargo)
 
     return get_resellers_share(start_date, end_date, branches, gruz, rod)
+
+
+# Доля посреднических рейсов за выбранный период в деньгах
+@dash_app.callback(Output(component_id='resellers_share_money', component_property='children'),
+                   [Input('dashboard5-date-picker-range', 'start_date'),
+                   Input('dashboard5-date-picker-range', 'end_date'),
+                   Input('dashboard5-dropdown1', 'value'),
+                   Input('dashboard5-dropdown2', 'value'),
+                   Input('dashboard5-dropdown3', 'value'),
+                   Input('dashboard5-tabs', 'value')])
+def resellers_share(start_date, end_date, filial, cargo, rps, tab):
+    """Вычисление доли посреднических рейсов в деньгах"""
+
+    if filial == 'Все филиалы':
+        branches = tuple(get_all_branch_names(start_date, end_date)['Наименование филиала'].dropna())
+    else:
+        branches = (filial, filial)
+
+    if rps == 'Все РПС':
+        rod = tuple(get_all_rps(start_date, end_date)['Род подвижного состава'].dropna())
+    else:
+        rod = (rps, rps)
+
+    if cargo == 'Все грузы':
+        gruz = tuple(get_all_cargo_names(start_date, end_date)['Название груза ЕТСНГ'].dropna())
+    else:
+        gruz = (cargo, cargo)
+
+    return get_resellers_share_money(start_date, end_date, branches, gruz, rod)
 
 
 # Значения списка филиалов
@@ -221,6 +320,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
         elif sorting == 'Сумма, руб.':
             s = 'Стоимость рейсов'
         df1 = get_top_resellers(start_date, end_date, branches, gruz, rod, sorting).sort_values(by=s, ascending=True)
+        df2 = get_top_resellers_detailed(start_date, end_date, branches, gruz, rod, sorting)
 
         x1_data = df1['Количество посреднических рейсов'].astype(str).tolist()
         x1_text = df1['Количество посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
@@ -251,6 +351,14 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y6_data = df1['Название заказчика'].tolist()
 
         content = html.Div([
+
+            html.Br(),
+                dbc.Row(),
+                html.H6('''Топ-10 посредников''',
+                    style={'text-align':'center',
+                            'font-size': '16pt',
+                            'font-weight': 'bold'}),
+
             html.Div([
                 html.Div([
                     dcc.Graph(
@@ -268,7 +376,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     orientation='h',
                                     textposition='auto',
                                     marker={
-                                        "color": "#B4B4B4",
+                                        "color": "#97151c",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -343,12 +451,12 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     text=x3_text,
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """Контрагент: %{y} <br>Количество рейсов: %{text}""",
+                                    """Контрагент: %{y} <br>Количество всех рейсов: %{text}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
                                     marker={
-                                        "color": "#97151c",
+                                        "color": "#B4B4B4",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -358,7 +466,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                             ],
                             "layout": go.Layout(
                                 autosize=True,
-                                title_text='Количество рейсов, шт.',
+                                title_text='Количество всех рейсов, шт.',
                                 margin={
                                                     "r": 0,
                                                     "t": 50,
@@ -392,7 +500,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     orientation='h',
                                     textposition='auto',
                                     marker={
-                                        "color": "#B4B4B4",
+                                        "color": "#97151c",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -467,12 +575,12 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     text=x6_text,
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """Контрагент: %{y} <br>Стоимость рейсов: %{text}""",
+                                    """Контрагент: %{y} <br>Стоимость всех рейсов: %{text}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
                                     marker={
-                                        "color": "#97151c",
+                                        "color": "#B4B4B4",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -482,7 +590,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                             ],
                             "layout": go.Layout(
                                 autosize=True,
-                                title_text='Стоимость рейсов, руб.',
+                                title_text='Стоимость всех рейсов, руб.',
                                 margin={
                                                     "r": 0,
                                                     "t": 50,
@@ -498,6 +606,73 @@ def render_content(tab, start_date, end_date, filial, cargo,
                 ], className="four columns"),
 
             ], className="row"),
+
+            html.Br(),
+            dbc.Row(),
+            html.H6('''Подробные данные''',
+                style={'text-align':'center',
+                        'font-size': '16pt',
+                        'font-weight': 'bold'}),
+
+            dash_table.DataTable(
+                # https://dash.plotly.com/datatable/width
+                id='detailed_table1',
+                columns=[{"name": i, "id": i} for i in df2.columns],
+                data=df2.to_dict('records'),
+                filter_action='native',
+                page_size=15,
+                style_table={'overflowX': 'auto'},
+                css=[{
+                    'selector': '.dash-spreadsheet td div',
+                    'rule': '''
+                        line-height: 15px;
+                        max-height: 30px; min-height: 30px; height: 30px;
+                        display: block;
+                        overflow-y: hidden;
+                    '''
+                }],
+                style_cell={
+                    # all three widths are needed
+                    'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+                    'overflow': 'hidden',
+                    'textOverflow': 'ellipsis',
+                    'textAlign': 'left',
+                },
+                # style_cell_conditional=[
+                #     {'if': {'column_id': "Область риска"},
+                #     'width': '5%'},
+                #     {'if': {'column_id': "Описание недостатка"},
+                #     'width': '20%'},
+                #     {'if': {'column_id': "Длительность устранения план/факт, мес."},
+                #     'width': '5%'},
+                #     {'if': {'column_id': "Срок завершения мероприятий"},
+                #     'width': '10%'},
+                #     {'if': {'column_id': "Статус"},
+                #     'width': '40%'},
+                #     {'if': {'column_id': "Причины длительного устранения"},
+                #     'width': '20%'},
+                # ],
+                export_format='xlsx',
+                export_headers='display',
+                merge_duplicate_headers=True,
+                style_header={
+                    'backgroundColor': 'rgb(138,36,50)',
+                    'color': 'white',
+                    'whiteSpace':'normal',
+                    'fontWeight': 'bold'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': 'rgb(230, 230, 230)',
+                    }
+                ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                },
+            ),
+
         ])
         return content
 
@@ -517,6 +692,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
         # elif sorting == 'Сумма, руб.':
         #     s = 'Стоимость рейсов'
         df1 = get_resellers_by_branches(start_date, end_date, branches, gruz, rod, sorting)
+        df2 = get_resellers_by_branches_detailed(start_date, end_date, branches, gruz, rod, sorting)
 
         df1['Аббревиатура филиала'] = df1['Наименование филиала']
         df1['Аббревиатура филиала'] = df1['Аббревиатура филиала'].replace(
@@ -579,10 +755,18 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y6_data = df1['Аббревиатура филиала'].tolist()
 
         content = html.Div([
+
+            html.Br(),
+                dbc.Row(),
+                html.H6('''Количество посреднических рейсов по филиалам''',
+                    style={'text-align':'center',
+                            'font-size': '16pt',
+                            'font-weight': 'bold'}),
+
             html.Div([
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph1",
+                        id="dashboard9-graph7",
                         figure={
                             "data": [
                                 go.Bar(
@@ -596,7 +780,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     orientation='h',
                                     textposition='auto',
                                     marker={
-                                        "color": "#B4B4B4",
+                                        "color": "#97151c",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -624,7 +808,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
             
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph1",
+                        id="dashboard9-graph8",
                         figure={
                             "data": [
                                 go.Bar(
@@ -666,7 +850,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
             
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph3",
+                        id="dashboard9-graph9",
                         figure={
                             "data": [
                                 go.Bar(
@@ -675,7 +859,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     text=x3_text,
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """Филиал: %{y} <br>Количество рейсов: %{text}""",
+                                    """Филиал: %{y} <br>Количество всех рейсов: %{text}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
@@ -690,7 +874,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                             ],
                             "layout": go.Layout(
                                 autosize=True,
-                                title_text='Количество рейсов, шт.',
+                                title_text='Количество всех рейсов, шт.',
                                 margin={
                                                     "r": 0,
                                                     "t": 50,
@@ -710,7 +894,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
             html.Div([
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph4",
+                        id="dashboard9-graph10",
                         figure={
                             "data": [
                                 go.Bar(
@@ -724,7 +908,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     orientation='h',
                                     textposition='auto',
                                     marker={
-                                        "color": "#B4B4B4",
+                                        "color": "#97151c",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -752,7 +936,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
             
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph5",
+                        id="dashboard9-graph11",
                         figure={
                             "data": [
                                 go.Bar(
@@ -794,7 +978,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
             
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph6",
+                        id="dashboard9-graph12",
                         figure={
                             "data": [
                                 go.Bar(
@@ -803,7 +987,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     text=x6_text,
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """Филиал: %{y} <br>Стоимость рейсов: %{text}""",
+                                    """Филиал: %{y} <br>Стоимость всех рейсов: %{text}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
@@ -818,7 +1002,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                             ],
                             "layout": go.Layout(
                                 autosize=True,
-                                title_text='Стоимость рейсов, руб.',
+                                title_text='Стоимость всех рейсов, руб.',
                                 margin={
                                                     "r": 0,
                                                     "t": 50,
@@ -835,6 +1019,87 @@ def render_content(tab, start_date, end_date, filial, cargo,
                 ),
             ], className="row"),
 
+            html.Br(),
+            dbc.Row(),
+            html.H6('''Подробные данные''',
+                style={'text-align':'center',
+                        'font-size': '16pt',
+                        'font-weight': 'bold'}),
+
+            dash_table.DataTable(
+                # https://dash.plotly.com/datatable/width
+                id='detailed_table1',
+                columns=[{"name": i, "id": i} for i in df2.columns],
+                data=df2.to_dict('records'),
+                filter_action='native',
+                page_size=15,
+                style_table={'overflowX': 'auto'},
+                css=[{
+                    'selector': '.dash-spreadsheet td div',
+                    'rule': '''
+                        line-height: 15px;
+                        max-height: 30px; min-height: 30px; height: 30px;
+                        display: block;
+                        overflow-y: hidden;
+                    '''
+                }],
+                style_cell={
+                    # all three widths are needed
+                    'minWidth': '180px', 
+                    'width': '180px', 
+                    # 'whiteSpace': 'nowrap',
+                    'maxWidth': '180px',
+                    # 'overflow': 'hidden',
+                    # 'textOverflow': 'ellipsis',
+                    'textAlign': 'left',
+
+                    # 'overflow': 'hidden',
+                    # 'textOverflow': 'ellipsis',
+                    # 'maxWidth': 0
+                },
+                tooltip_data=[
+                    {
+                        column: {'value': str(value), 'type': 'markdown'}
+                        for column, value in row.items()
+                    } for row in df2.to_dict('records')
+                ],
+                tooltip_duration=None,
+                # style_cell_conditional=[
+                #     {'if': {'column_id': "Область риска"},
+                #     'width': '5%'},
+                #     {'if': {'column_id': "Описание недостатка"},
+                #     'width': '20%'},
+                #     {'if': {'column_id': "Длительность устранения план/факт, мес."},
+                #     'width': '5%'},
+                #     {'if': {'column_id': "Срок завершения мероприятий"},
+                #     'width': '10%'},
+                #     {'if': {'column_id': "Статус"},
+                #     'width': '40%'},
+                #     {'if': {'column_id': "Причины длительного устранения"},
+                #     'width': '20%'},
+                # ],
+                export_format='xlsx',
+                export_headers='display',
+                merge_duplicate_headers=True,
+                style_header={
+                    'backgroundColor': 'rgb(138,36,50)',
+                    'color': 'white',
+                    'whiteSpace':'normal',
+                    'fontWeight': 'bold'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': 'rgb(230, 230, 230)',
+                    }
+                ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                },
+            ),
+
+            
         ])
         return content
 
@@ -846,6 +1111,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
         # elif sorting == 'Доля по количеству':
         #     s = 'Доля посреднических рейсов'
         df1 = get_resellers_by_rps(start_date, end_date, branches, gruz, rod, sorting)
+        df2 = get_resellers_by_rps_detailed(start_date, end_date, branches, gruz, rod, sorting)
 
         x1_data = df1['Количество посреднических рейсов'].astype(str).tolist()
         x1_text = df1['Количество посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
@@ -876,10 +1142,18 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y6_data = df1['Род подвижного состава'].tolist()
 
         content = html.Div([
+
+            html.Br(),
+                dbc.Row(),
+                html.H6('''Количество посреднических рейсов по РПС''',
+                    style={'text-align':'center',
+                            'font-size': '16pt',
+                            'font-weight': 'bold'}),
+
             html.Div([
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph1",
+                        id="dashboard9-graph13",
                         figure={
                             "data": [
                                 go.Bar(
@@ -893,7 +1167,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     orientation='h',
                                     textposition='auto',
                                     marker={
-                                        "color": "#B4B4B4",
+                                        "color": "#97151c",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -921,7 +1195,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
             
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph1",
+                        id="dashboard9-graph14",
                         figure={
                             "data": [
                                 go.Bar(
@@ -963,7 +1237,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
 
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph3",
+                        id="dashboard9-graph15",
                         figure={
                             "data": [
                                 go.Bar(
@@ -972,7 +1246,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     text=x3_text,
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """РПС: %{y} <br>Количество рейсов: %{text}""",
+                                    """РПС: %{y} <br>Количество всех рейсов: %{text}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
@@ -987,7 +1261,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                             ],
                             "layout": go.Layout(
                                 autosize=True,
-                                title_text='Количество рейсов, шт.',
+                                title_text='Количество всех рейсов, шт.',
                                 margin={
                                                     "r": 0,
                                                     "t": 50,
@@ -1008,7 +1282,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
             html.Div([
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph4",
+                        id="dashboard9-graph16",
                         figure={
                             "data": [
                                 go.Bar(
@@ -1022,7 +1296,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     orientation='h',
                                     textposition='auto',
                                     marker={
-                                        "color": "#B4B4B4",
+                                        "color": "#97151c",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -1050,7 +1324,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
             
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph5",
+                        id="dashboard9-graph17",
                         figure={
                             "data": [
                                 go.Bar(
@@ -1092,7 +1366,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
 
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph6",
+                        id="dashboard9-graph18",
                         figure={
                             "data": [
                                 go.Bar(
@@ -1101,7 +1375,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     text=x6_text,
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """РПС: %{y} <br>Стоимость рейсов: %{text}""",
+                                    """РПС: %{y} <br>Стоимость всех рейсов: %{text}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
@@ -1116,7 +1390,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                             ],
                             "layout": go.Layout(
                                 autosize=True,
-                                title_text='Стоимость рейсов, руб.',
+                                title_text='Стоимость всех рейсов, руб.',
                                 margin={
                                                     "r": 0,
                                                     "t": 50,
@@ -1133,6 +1407,64 @@ def render_content(tab, start_date, end_date, filial, cargo,
                 ),
 
             ], className="row"),
+
+            html.Br(),
+            dbc.Row(),
+            html.H6('''Подробные данные''',
+                style={'text-align':'center',
+                        'font-size': '16pt',
+                        'font-weight': 'bold'}),
+
+            dash_table.DataTable(
+                # https://dash.plotly.com/datatable/width
+                id='detailed_table1',
+                columns=[{"name": i, "id": i} for i in df2.columns],
+                data=df2.to_dict('records'),
+                filter_action='native',
+                page_size=15,
+                style_table={'overflowX': 'auto'},
+                style_cell={
+                    # all three widths are needed
+                    'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+                    'overflow': 'hidden',
+                    'textOverflow': 'ellipsis',
+                    'textAlign': 'left',
+                },
+                # style_cell_conditional=[
+                #     {'if': {'column_id': "Область риска"},
+                #     'width': '5%'},
+                #     {'if': {'column_id': "Описание недостатка"},
+                #     'width': '20%'},
+                #     {'if': {'column_id': "Длительность устранения план/факт, мес."},
+                #     'width': '5%'},
+                #     {'if': {'column_id': "Срок завершения мероприятий"},
+                #     'width': '10%'},
+                #     {'if': {'column_id': "Статус"},
+                #     'width': '40%'},
+                #     {'if': {'column_id': "Причины длительного устранения"},
+                #     'width': '20%'},
+                # ],
+                export_format='xlsx',
+                export_headers='display',
+                merge_duplicate_headers=True,
+                style_header={
+                    'backgroundColor': 'rgb(138,36,50)',
+                    'color': 'white',
+                    'whiteSpace':'normal',
+                    'fontWeight': 'bold'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': 'rgb(230, 230, 230)',
+                    }
+                ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                },
+            ),
+
         ])
         return content
 
@@ -1152,6 +1484,9 @@ def render_content(tab, start_date, end_date, filial, cargo,
         elif sorting == 'Сумма, руб.':
             s = 'Стоимость рейсов'
         df1 = get_resellers_cargo(start_date, end_date, branches, gruz, rod, sorting).sort_values(by=s, ascending=True)
+        df2 = get_resellers_cargo_detailed(start_date, end_date, branches, gruz, rod, sorting)
+
+        print('df2 =', df2)
 
         x1_data = df1['Количество посреднических рейсов'].astype(str).tolist()
         x1_text = df1['Количество посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
@@ -1182,10 +1517,18 @@ def render_content(tab, start_date, end_date, filial, cargo,
         y6_data = df1['Название груза ЕТСНГ'].tolist()
 
         content = html.Div([
+
+            html.Br(),
+                dbc.Row(),
+                html.H6('''Количество посреднических рейсов по грузам''',
+                    style={'text-align':'center',
+                            'font-size': '16pt',
+                            'font-weight': 'bold'}),
+
             html.Div([
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph1",
+                        id="dashboard9-graph19",
                         figure={
                             "data": [
                                 go.Bar(
@@ -1199,7 +1542,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     orientation='h',
                                     textposition='auto',
                                     marker={
-                                        "color": "#B4B4B4",
+                                        "color": "#97151c",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -1226,7 +1569,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
 
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph1",
+                        id="dashboard9-graph20",
                         figure={
                             "data": [
                                 go.Bar(
@@ -1267,7 +1610,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
 
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph3",
+                        id="dashboard9-graph21",
                         figure={
                             "data": [
                                 go.Bar(
@@ -1276,7 +1619,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     text=x3_text,
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """Груз: %{y} <br>Количество рейсов: %{text}""",
+                                    """Груз: %{y} <br>Количество всех рейсов: %{text}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
@@ -1291,7 +1634,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                             ],
                             "layout": go.Layout(
                                 autosize=True,
-                                title_text='Количество рейсов, шт.',
+                                title_text='Количество всех рейсов, шт.',
                                 margin={
                                                     "r": 0,
                                                     "t": 50,
@@ -1311,7 +1654,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
             html.Div([
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph4",
+                        id="dashboard9-graph22",
                         figure={
                             "data": [
                                 go.Bar(
@@ -1325,7 +1668,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     orientation='h',
                                     textposition='auto',
                                     marker={
-                                        "color": "#B4B4B4",
+                                        "color": "#97151c",
                                         "line": {
                                             "color": "rgb(255, 255, 255)",
                                             "width": 2,
@@ -1352,7 +1695,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
 
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph5",
+                        id="dashboard9-graph23",
                         figure={
                             "data": [
                                 go.Bar(
@@ -1393,7 +1736,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
 
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph6",
+                        id="dashboard9-graph24",
                         figure={
                             "data": [
                                 go.Bar(
@@ -1402,7 +1745,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     text=x6_text,
                                     hoverinfo='skip',
                                     hovertemplate=
-                                    """Груз: %{y} <br>Стоимость рейсов: %{text}""",
+                                    """Груз: %{y} <br>Стоимость всех рейсов: %{text}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
@@ -1417,7 +1760,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                             ],
                             "layout": go.Layout(
                                 autosize=True,
-                                title_text='Стоимость рейсов, руб.',
+                                title_text='Стоимость всех рейсов, руб.',
                                 margin={
                                                     "r": 0,
                                                     "t": 50,
@@ -1433,6 +1776,73 @@ def render_content(tab, start_date, end_date, filial, cargo,
                 ], className="four columns"),
 
             ], className="row"),
+
+            html.Br(),
+            dbc.Row(),
+            html.H6('''Подробные данные''',
+                style={'text-align':'center',
+                        'font-size': '16pt',
+                        'font-weight': 'bold'}),
+
+            dash_table.DataTable(
+                # https://dash.plotly.com/datatable/width
+                id='detailed_table1',
+                columns=[{"name": i, "id": i} for i in df2.columns],
+                data=df2.to_dict('records'),
+                filter_action='native',
+                page_size=15,
+                style_table={'overflowX': 'auto'},
+                css=[{
+                    'selector': '.dash-spreadsheet td div',
+                    'rule': '''
+                        line-height: 15px;
+                        max-height: 30px; min-height: 30px; height: 30px;
+                        display: block;
+                        overflow-y: hidden;
+                    '''
+                }],
+                style_cell={
+                    # all three widths are needed
+                    'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+                    'overflow': 'hidden',
+                    'textOverflow': 'ellipsis',
+                    'textAlign': 'left',
+                },
+                # style_cell_conditional=[
+                #     {'if': {'column_id': "Область риска"},
+                #     'width': '5%'},
+                #     {'if': {'column_id': "Описание недостатка"},
+                #     'width': '20%'},
+                #     {'if': {'column_id': "Длительность устранения план/факт, мес."},
+                #     'width': '5%'},
+                #     {'if': {'column_id': "Срок завершения мероприятий"},
+                #     'width': '10%'},
+                #     {'if': {'column_id': "Статус"},
+                #     'width': '40%'},
+                #     {'if': {'column_id': "Причины длительного устранения"},
+                #     'width': '20%'},
+                # ],
+                export_format='xlsx',
+                export_headers='display',
+                merge_duplicate_headers=True,
+                style_header={
+                    'backgroundColor': 'rgb(138,36,50)',
+                    'color': 'white',
+                    'whiteSpace':'normal',
+                    'fontWeight': 'bold'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': 'rgb(230, 230, 230)',
+                    }
+                ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                },
+            ),
+
         ])
         return content
 
@@ -1477,7 +1887,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
             html.Div([
                 html.Div([
                     dcc.Graph(
-                        id="dashboard5-graph1",
+                        id="dashboard9-graph1",
                         config={"displayModeBar": True},
                         figure={
                             'data': [
@@ -1609,7 +2019,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                             ],
                             'layout':go.Layout(
                                 title_text='''
-                                    Доля посреднических рейсов в шт.
+                                    Доля посреднических рейсов, % (в шт.)
                                     ''',
                                 font={"family": "Raleway", "size": 12},
                                 hovermode="closest",
@@ -1776,7 +2186,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                             ],
                             'layout':go.Layout(
                                 title_text='''
-                                    Доля посреднических рейсов в руб.
+                                    Доля посреднических рейсов, % (в руб.)
                                     ''',
                                 font={"family": "Raleway", "size": 12},
                                 hovermode="closest",

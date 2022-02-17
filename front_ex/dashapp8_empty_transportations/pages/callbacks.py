@@ -120,7 +120,7 @@ def render_content(tab, start_date, end_date, railway):
                         figure={
                             "data": [go.Pie(labels=trans_empty_by_type['Тип'],
                                 values=trans_empty_by_type["Кол-во вагонорейсов"],
-                                marker={"colors": ["#D3D3D3",  "#97151c", "#191970",]}, 
+                                marker={"colors": ["#97151c", "#191970", "#D3D3D3"]}, 
                                 # hovertext=trans_empty_by_type["Кол-во вагонорейсов"].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
                                 hoverinfo='skip',
                                 hovertemplate = '%{label} - %{text}',

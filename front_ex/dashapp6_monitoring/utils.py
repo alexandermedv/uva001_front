@@ -21,8 +21,8 @@ def get_get_open_ap_by_groups_182():
                         h."IDFld",
                         i.open_actplans,
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2021-11-30') AS "Reporting_date",
-                        DATE('2021-11-30') - DATE(j."AP_date") AS "duration"
+                        DATE('2022-03-01') AS "Reporting_date",
+                        DATE('2022-03-01') - DATE(j."AP_date") AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
                         ON a."FindGroup" = b."UDFValueID"
@@ -68,7 +68,7 @@ def get_get_open_ap_by_groups_182():
                         AND "Subject" IS NOT NULL
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
-                        AND DATE('2021-11-30') - DATE(j."AP_date") BETWEEN 0 AND 182
+                        AND DATE('2022-03-01') - DATE(j."AP_date") BETWEEN 0 AND 182
                 
             ) z
                     GROUP BY z.issue_group,
@@ -97,8 +97,8 @@ def get_get_open_ap_by_groups_365():
                         h."IDFld",
                         i.open_actplans,
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2021-11-30') AS "Reporting_date",
-                        DATE('2021-11-30') - DATE(j."AP_date") AS "duration"
+                        DATE('2022-03-01') AS "Reporting_date",
+                        DATE('2022-03-01') - DATE(j."AP_date") AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
                         ON a."FindGroup" = b."UDFValueID"
@@ -144,7 +144,7 @@ def get_get_open_ap_by_groups_365():
                         AND "Subject" IS NOT NULL
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
-                        AND DATE('2021-11-30') - DATE(j."AP_date") BETWEEN 183 AND 365
+                        AND DATE('2022-03-01') - DATE(j."AP_date") BETWEEN 183 AND 365
                 
             ) z
                     GROUP BY z.issue_group,
@@ -173,8 +173,8 @@ def get_get_open_ap_by_groups_366():
                         h."IDFld",
                         i.open_actplans,
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2021-11-30') AS "Reporting_date",
-                        DATE('2021-11-30') - DATE(j."AP_date") AS "duration"
+                        DATE('2022-03-01') AS "Reporting_date",
+                        DATE('2022-03-01') - DATE(j."AP_date") AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
                         ON a."FindGroup" = b."UDFValueID"
@@ -220,7 +220,7 @@ def get_get_open_ap_by_groups_366():
                         AND "Subject" IS NOT NULL
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
-                        AND DATE('2021-11-30') - DATE(j."AP_date") > 365
+                        AND DATE('2022-03-01') - DATE(j."AP_date") > 365
                 
             ) z
                     GROUP BY z.issue_group,

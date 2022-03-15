@@ -529,6 +529,60 @@ def get_high_ap_issues():
     return df1
 
 
+def get_delayed_actplans():
+    """Отложенные планы мероприятий"""
+
+    sql = '''
+        SELECT a."Finding" AS "Описание недостатка",
+            j."Subject" AS "Мероприятие",
+            j."APEDate" AS "Первоначальная дата окончания",
+            j."APREDate" AS "Пересмотренная дата окончания",
+            j."APCmt" AS "Комментарий"
+            
+        FROM dashboard.issues a
+        LEFT JOIN dashboard.udfvalue b
+            ON a."FindGroup" = b."UDFValueID"
+        LEFT JOIN dashboard.languageaa c
+                                ON b."LanguageID"::text = c."IDFld"::text
+                                    AND c."Description" = 'UDF'
+                                    
+                            LEFT JOIN dashboard.udfvalue d
+                                ON a."FindType" = d."UDFValueID"
+                            LEFT JOIN dashboard.languageaa e
+                                ON d."LanguageID"::text = e."IDFld"::text
+                                    AND e."Description" = 'UDF'
+                                    
+                            LEFT JOIN dashboard.udfvalue f
+                                ON a."FindRisk" = f."UDFValueID"
+                            LEFT JOIN dashboard.languageaa g
+                                ON f."LanguageID"::text = g."IDFld"::text
+                                    AND g."Description" = 'UDF'
+                            LEFT JOIN dashboard.activities h
+                                ON a."AuditID" = h."GuiIDFld"
+
+                            LEFT JOIN (
+                                SELECT "OrigID", count(*) AS open_actplans
+                                FROM dashboard.actplans
+                                WHERE "APADate" IS NULL
+                                    AND "APStatus" <> '61'
+                                    AND "Deleted" = '-1'
+                                GROUP BY "OrigID"
+                                ) i
+                                ON a."IDFld" = i."OrigID"
+                            LEFT JOIN dashboard.actplans j
+                                ON j."OrigID" = a."IDFld"
+        WHERE g."Language3" = 'Высокий'
+            AND i.open_actplans IS NOT NULL
+            AND j."APREDate" IS NOT NULL
+            AND j."APCmt" IS NOT NULL -- Убрать эту строчку
+            '''
+
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    df1 = pd.read_sql(sql, con)
+
+    return df1
+
+
 def get_manual_table1():
     """Ручная таблица 1"""
 

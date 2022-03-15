@@ -12,7 +12,7 @@ import dash
 from ..pages import dash_app
 from ..utils import get_get_open_ap_by_groups_182, get_get_open_ap_by_groups_365, get_get_open_ap_by_groups_366
 from ..utils import get_incoming_ap, get_increase_ap, get_decrease_ap, get_outcoming_ap, get_high_ap_issues
-from ..utils import get_manual_table1, get_manual_table2, get_manual_table3
+from ..utils import get_manual_table1, get_manual_table2, get_manual_table3, get_delayed_actplans
 
 
 # Построение содержимого выбранной закладки
@@ -146,7 +146,7 @@ def render_content():
 
     high_ap = get_high_ap_issues()
 
-    manual_table1 = get_manual_table1()
+    delayed_actplans = get_delayed_actplans()
     manual_table2 = get_manual_table2()
     manual_table3 = get_manual_table3()
 
@@ -637,7 +637,7 @@ def render_content():
                 # Ручные таблицы
                 html.Br(),
                 dbc.Row(),
-                html.H6('''Недостатки высокого уровня значимости''',
+                html.H6('''Недостатки с высоким риском и перенесенным сроком выполнения мероприятий''',
                     style={'text-align':'center',
                             'font-size': '16pt',
                             'font-weight': 'bold'}),
@@ -645,8 +645,8 @@ def render_content():
                 dash_table.DataTable(
                     # https://dash.plotly.com/datatable/width
                     id='manual_table1',
-                    columns=[{"name": i, "id": i} for i in manual_table1.columns],
-                    data=manual_table1.to_dict('records'),
+                    columns=[{"name": i, "id": i} for i in delayed_actplans.columns],
+                    data=delayed_actplans.to_dict('records'),
                     page_size=20,
                     style_table={'overflowX': 'auto'},
                     style_cell={
@@ -657,69 +657,16 @@ def render_content():
                         'textAlign': 'left',
                     },
                     style_cell_conditional=[
-                        {'if': {'column_id': "Область риска"},
-                        'width': '5%'},
                         {'if': {'column_id': "Описание недостатка"},
                         'width': '20%'},
-                        {'if': {'column_id': "Длительность устранения план/факт, мес."},
-                        'width': '5%'},
-                        {'if': {'column_id': "Срок завершения мероприятий"},
-                        'width': '10%'},
-                        {'if': {'column_id': "Статус"},
-                        'width': '40%'},
-                        {'if': {'column_id': "Причины длительного устранения"},
+                        {'if': {'column_id': "Мероприятие"},
                         'width': '20%'},
-                    ],
-                    export_format='xlsx',
-                    export_headers='display',
-                    merge_duplicate_headers=True,
-                    style_header={
-                        'backgroundColor': 'rgb(138,36,50)',
-                        'color': 'white',
-                        'whiteSpace':'normal',
-                        'fontWeight': 'bold'
-                    },
-                    style_data_conditional=[
-                        {
-                            'if': {'row_index': 'odd'},
-                            'backgroundColor': 'rgb(230, 230, 230)',
-                        }
-                    ],
-                    style_data={
-                        'whiteSpace': 'normal',
-                        'height': 'auto',
-                    },
-                ),
-
-                html.Br(),
-                html.H6('''Недостатки со сроками завершения мероприятий, перенесенными на 2021 год''',
-                    style={'text-align':'center',
-                            'font-size': '16pt',
-                            'font-weight': 'bold'}),
-
-                dash_table.DataTable(
-                    # https://dash.plotly.com/datatable/width
-                    id='manual_table2',
-                    columns=[{"name": i, "id": i} for i in manual_table2.columns],
-                    data=manual_table2.to_dict('records'),
-                    page_size=20,
-                    style_table={'overflowX': 'auto'},
-                    style_cell={
-                        # all three widths are needed
-                        'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
-                        'overflow': 'hidden',
-                        'textOverflow': 'ellipsis',
-                        'textAlign': 'left',
-                    },
-                    style_cell_conditional=[
-                        {'if': {'column_id': "Область риска"},
-                        'width': '10%'},
-                        {'if': {'column_id': "Описание недостатка"},
+                        {'if': {'column_id': "Первоначальная дата окончания"},
+                        'width': '5%'},
+                        {'if': {'column_id': "Пересмотренная дата окончания"},
+                        'width': '5%'},
+                        {'if': {'column_id': "Комментарий"},
                         'width': '50%'},
-                        {'if': {'column_id': "Уровень значимости"},
-                        'width': '10%'},
-                        {'if': {'column_id': "Длительность устранения план/факт"},
-                        'width': '20%'},
                     ],
                     export_format='xlsx',
                     export_headers='display',
@@ -742,58 +689,109 @@ def render_content():
                     },
                 ),
 
-                html.Br(),
-                html.H6('''Недостатки с длительным плановым сроком завершения мероприятий''',
-                    style={'text-align':'center',
-                            'font-size': '16pt',
-                            'font-weight': 'bold'}),
+                # html.Br(),
+                # html.H6('''Недостатки со сроками завершения мероприятий, перенесенными на 2021 год''',
+                #     style={'text-align':'center',
+                #             'font-size': '16pt',
+                #             'font-weight': 'bold'}),
 
-                dash_table.DataTable(
-                    # https://dash.plotly.com/datatable/width
-                    id='manual_table3',
-                    columns=[{"name": i, "id": i} for i in manual_table3.columns],
-                    data=manual_table3.to_dict('records'),
-                    page_size=20,
-                    style_table={'overflowX': 'auto'},
-                    style_cell={
-                        # all three widths are needed
-                        'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
-                        'overflow': 'hidden',
-                        'textOverflow': 'ellipsis',
-                        'textAlign': 'left',
-                    },
-                    export_format='xlsx',
-                    export_headers='display',
-                    merge_duplicate_headers=True,
-                    style_header={
-                        'backgroundColor': 'rgb(138,36,50)',
-                        'color': 'white',
-                        'whiteSpace':'normal',
-                        'fontWeight': 'bold'
-                    },
-                    style_data_conditional=[
-                        {
-                            'if': {'row_index': 'odd'},
-                            'backgroundColor': 'rgb(230, 230, 230)',
-                        }
-                    ],
-                    style_cell_conditional=[
-                        {'if': {'column_id': "Область риска"},
-                        'width': '10%'},
-                        {'if': {'column_id': "Описание недостатка"},
-                        'width': '30%'},
-                        {'if': {'column_id': "Уровень значимости"},
-                        'width': '10%'},
-                        {'if': {'column_id': "Длительность устранения план/факт"},
-                        'width': '10%'},
-                        {'if': {'column_id': "Статус"},
-                        'width': '40%'},
-                    ],
-                    style_data={
-                        'whiteSpace': 'normal',
-                        'height': 'auto',
-                    },
-                ),
+                # dash_table.DataTable(
+                #     # https://dash.plotly.com/datatable/width
+                #     id='manual_table2',
+                #     columns=[{"name": i, "id": i} for i in manual_table2.columns],
+                #     data=manual_table2.to_dict('records'),
+                #     page_size=20,
+                #     style_table={'overflowX': 'auto'},
+                #     style_cell={
+                #         # all three widths are needed
+                #         'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+                #         'overflow': 'hidden',
+                #         'textOverflow': 'ellipsis',
+                #         'textAlign': 'left',
+                #     },
+                #     style_cell_conditional=[
+                #         {'if': {'column_id': "Область риска"},
+                #         'width': '10%'},
+                #         {'if': {'column_id': "Описание недостатка"},
+                #         'width': '50%'},
+                #         {'if': {'column_id': "Уровень значимости"},
+                #         'width': '10%'},
+                #         {'if': {'column_id': "Длительность устранения план/факт"},
+                #         'width': '20%'},
+                #     ],
+                #     export_format='xlsx',
+                #     export_headers='display',
+                #     merge_duplicate_headers=True,
+                #     style_header={
+                #         'backgroundColor': 'rgb(138,36,50)',
+                #         'color': 'white',
+                #         'whiteSpace':'normal',
+                #         'fontWeight': 'bold'
+                #     },
+                #     style_data_conditional=[
+                #         {
+                #             'if': {'row_index': 'odd'},
+                #             'backgroundColor': 'rgb(230, 230, 230)',
+                #         }
+                #     ],
+                #     style_data={
+                #         'whiteSpace': 'normal',
+                #         'height': 'auto',
+                #     },
+                # ),
+
+                # html.Br(),
+                # html.H6('''Недостатки с длительным плановым сроком завершения мероприятий''',
+                #     style={'text-align':'center',
+                #             'font-size': '16pt',
+                #             'font-weight': 'bold'}),
+
+                # dash_table.DataTable(
+                #     # https://dash.plotly.com/datatable/width
+                #     id='manual_table3',
+                #     columns=[{"name": i, "id": i} for i in manual_table3.columns],
+                #     data=manual_table3.to_dict('records'),
+                #     page_size=20,
+                #     style_table={'overflowX': 'auto'},
+                #     style_cell={
+                #         # all three widths are needed
+                #         'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+                #         'overflow': 'hidden',
+                #         'textOverflow': 'ellipsis',
+                #         'textAlign': 'left',
+                #     },
+                #     export_format='xlsx',
+                #     export_headers='display',
+                #     merge_duplicate_headers=True,
+                #     style_header={
+                #         'backgroundColor': 'rgb(138,36,50)',
+                #         'color': 'white',
+                #         'whiteSpace':'normal',
+                #         'fontWeight': 'bold'
+                #     },
+                #     style_data_conditional=[
+                #         {
+                #             'if': {'row_index': 'odd'},
+                #             'backgroundColor': 'rgb(230, 230, 230)',
+                #         }
+                #     ],
+                #     style_cell_conditional=[
+                #         {'if': {'column_id': "Область риска"},
+                #         'width': '10%'},
+                #         {'if': {'column_id': "Описание недостатка"},
+                #         'width': '30%'},
+                #         {'if': {'column_id': "Уровень значимости"},
+                #         'width': '10%'},
+                #         {'if': {'column_id': "Длительность устранения план/факт"},
+                #         'width': '10%'},
+                #         {'if': {'column_id': "Статус"},
+                #         'width': '40%'},
+                #     ],
+                #     style_data={
+                #         'whiteSpace': 'normal',
+                #         'height': 'auto',
+                #     },
+                # ),
 
             ], className="row"),
         ], className="row"),

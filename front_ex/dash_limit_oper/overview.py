@@ -92,6 +92,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
     print("5. Старт загрузки layout")
 
     layout = html.Div([
+        html.Div(html.H5("Отчет превышение лимита. Оперирование"), className='row'),
         dbc.Navbar([
             html.Div('Выберите клиента:', style={'width': '15%', 'display': 'inline-block', 'color': 'white'}),
             html.Div(dcc.Dropdown(id='klient', 
@@ -100,7 +101,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
             html.Div('Выберите договор:', style={'width': '15%', 'display': 'inline-block', 'color': 'white'}),
             html.Div(dcc.Dropdown(id='dogovor'), style={'width': '25%', 'display': 'inline-block'})
         # ], dark=True, sticky="top", color='rgb(71, 71, 71)'),
-        ], dark=True, sticky="top", color='rgb(71, 71, 71)'),
+        ], dark=True, color='rgb(71, 71, 71)'),
         html.Div([
             html.H6('Рейтинг клиентов:'),
             dbc.Col(dash_table.DataTable(

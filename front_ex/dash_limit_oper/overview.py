@@ -17,7 +17,7 @@ import numpy as np
 from sqlalchemy import create_engine
 from . import dash_app as app
 from .utils import get_limit_oper_data, get_limit_oper_ttl_data, get_limit_oper_client_data, get_limit_oper_zuonr_data, get_limit_oper_client_zuonr_data
-from .utils import get_limit_oper_client_zuonr_data, get_limit1
+from .utils import get_limit_oper_client_zuonr_data, get_limit1, get_limit
 
 
 def create_layout(app, start_date = None, end_date=None, debug=False):  
@@ -29,6 +29,9 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
     # print(file)
     # xl = pd.ExcelFile(file)
     dflim = get_limit1().rename(columns={'KUNNR':'kunnr', 'ZUONR': 'zuonr', 'GSBER':'gsber', 'LIMIT':'limit', 'SAP':'sap'})
+
+    df_limit = get_limit()
+    print('df_limit =', df_limit)
     # dflim = xl.parse('BSEG').rename(columns={'KUNNR':'kunnr', 'ZUONR': 'zuonr', 'GSBER':'gsber', 'LIMIT':'limit', 'SAP':'sap'})
 
     print('2. Загрузка данных по контрактам')
@@ -48,7 +51,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
     # dfreit_test = dfreit2[['max_dz','limit']][0:10].copy()
 
     def set_prev(x):
-        prev = 0 
+        prev = 0
         # print(x[0],x[1],prev)
         try:
             if x[0] < 0:
@@ -83,6 +86,8 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
     dfreit6.columns=['Договор', 'Клиент', 'Лимит', 'Лимит в SAP (1-да, 0-нет)', 'Макс_превышение', 'Мин_превышение', 'Кол-во превышений', 'Имя клиента']
     dfreit6['Лимит в SAP'] = dfreit6['Лимит в SAP (1-да, 0-нет)'].apply(lambda x: 'Да' if x==1 else 'Нет')
     dfreit6_cols = ['Договор', 'Клиент', 'Лимит', 'Лимит в SAP', 'Макс_превышение', 'Мин_превышение', 'Кол-во превышений', 'Имя клиента']
+    
+    dfreit6 = dfreit6.loc[dfreit6['Имя клиента'] != 'FREIGHT ONE SCANDINAVIA OY']
 
     dfreit8=dfreit7.pivot_table(['kunnr','deltamax', 'deltamin', 'prevsum'], ['gsber', 'sap'], aggfunc={'kunnr': 'count', 'deltamax': 'sum', 'deltamin': 'sum', 'prevsum': 'sum'}).reset_index()
     dfreit8.columns=['Филиал', 'Лимит в SAP (1-да, 0-нет)', 'Сумма Макс_превышение', 'Сумма Мин_превышение', 'Кол-во договоров', 'Сумма превышений']
@@ -203,7 +208,9 @@ def dogovor(klient):
     if df.empty:
         return None
     else:
-        return  [{'label': i, 'value': i} for i in df['zuonr']], df['zuonr'][0]
+        return [{'label': i, 'value': i} for i in df['zuonr']], df['zuonr'][0]
+
+
 @app.callback(
     Output(component_id='graph', component_property='children'),
     [
@@ -212,7 +219,6 @@ def dogovor(klient):
     ]
 )
 def content(klient, dogovor):
-    print('graph')
     # query2="""
     # SELECT CONCAT(SAPABAP1.BSEG.BELNR, SAPABAP1.BSEG.GJAHR) as IND, ZUONR, SHKZG, HKONT, KUNNR, H_BLART, DMBTR, SAPABAP1.BKPF.CPUDT, SAPABAP1.BKPF.CPUTM, 
     #     TO_TIMESTAMP(CONCAT(SAPABAP1.BKPF.CPUDT, SAPABAP1.BKPF.CPUTM), 'YYYYMMDDHHMISS') as timestamp, SAPABAP1.BKPF.STBLG FROM SAPABAP1.BSEG

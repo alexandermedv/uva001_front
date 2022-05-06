@@ -20,7 +20,18 @@ def get_limit1():
         sql = "select * from analytics.limit1"
         con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
         data = pd.read_sql(sql, con=con)
-        return data    
+        return data
+
+def get_limit():
+        sql = """select * 
+            from sap_s4.limit a
+            left join sap_s4.kna1 b
+            on a.lim_partner = b.kunnr
+            """
+        con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+        data = pd.read_sql(sql, con=con)
+        return data
+
 def get_limit_oper_data(debug=False):
         """Получение первичных данных"""
         sql = "select * from sap_s4.limit_oper"

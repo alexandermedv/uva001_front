@@ -37,9 +37,12 @@ def get_trans_empty_by_railway_delay(railway='', start_date=None, end_date=None)
 		            from dashboard.dash_transport_empty t 
 			            left join sap_s4.rails_mapping ra
 				            on t."Дорога назначения" = ra."db"
+                        left join internal.ssp_rw_cn_map s
+                            on s.rw_short_name = ra.file 
                              where (lower("Плательщик") like '%пгк%' 
 						        or lower("Грузоотправитель") like '%пгк%' 
 						        or lower("Получатель") like '%пгк%')
+                                and cn_short_name = 'РОССИЯ'
     ''' 
     if start_date and end_date:
         sql = sql + '''
@@ -53,7 +56,6 @@ def get_trans_empty_by_railway_delay(railway='', start_date=None, end_date=None)
                 order by sum(case when t."Превышение даты истечение срока д" = 'С просрочкой' then "Кол-во вагонорейсов" else 0 end) desc
         ) t
     ''' 
-    # print(sql)
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     df = pd.read_sql(sql, con)
     return df
@@ -64,10 +66,13 @@ def get_trans_empty_by_railway_penalty(railway='', start_date=None, end_date=Non
 	        from dashboard.dash_transport_empty t 
             	left join sap_s4.rails_mapping ra
 				    on t."Дорога назначения" = ra."db"
+                left join internal.ssp_rw_cn_map s
+                    on s.rw_short_name = ra.file 
                     where t."Превышение даты истечение срока д" = 'С просрочкой'
                         and (lower("Плательщик") like '%пгк%' 
 						        or lower("Грузоотправитель") like '%пгк%' 
 						        or lower("Получатель") like '%пгк%')
+                        and cn_short_name = 'РОССИЯ'
     '''
     if start_date and end_date:
         sql = sql + '''
@@ -90,10 +95,13 @@ def get_trans_empty_by_railway_mean_delay(railway='', start_date=None, end_date=
 	        from dashboard.dash_transport_empty t 
                 left join sap_s4.rails_mapping ra
 				    on t."Дорога назначения" = ra."db"
+                left join internal.ssp_rw_cn_map s
+                    on s.rw_short_name = ra.file 
 		            where t."Превышение даты истечение срока д" = 'С просрочкой'
                             and (lower("Плательщик") like '%пгк%' 
 						        or lower("Грузоотправитель") like '%пгк%' 
 						        or lower("Получатель") like '%пгк%')
+                            and cn_short_name = 'РОССИЯ'
     '''
     if start_date and end_date:
         sql = sql + '''
@@ -120,15 +128,19 @@ def get_trans_empty_by_type(railway='', start_date=None, end_date=None):
                 when 'Нет данных для оценки' then 'Нет данных для оценки' 
                 else "Превышение даты истечение срока д" end as "Тип"
                 , sum("Кол-во вагонорейсов") as "Кол-во вагонорейсов" 
-                    from dashboard.dash_transport_empty f 
+                    from dashboard.dash_transport_empty t 
+                        left join sap_s4.rails_mapping ra
+				            on t."Дорога назначения" = ra."db"
+                        left join internal.ssp_rw_cn_map s
+                            on s.rw_short_name = ra.file 
                         where (lower("Плательщик") like '%пгк%' 
                             or lower("Грузоотправитель") like '%пгк%' 
                             or lower("Получатель") like '%пгк%')
+                            and cn_short_name = 'РОССИЯ'
     '''
     if railway:
-        sql = sql + '''
-            and "Дорога назначения" = '{railway}'
-        '''.format(railway = railway)
+        sql = sql + 'and "Дорога назначения" in ' + "('" + "','".join(railway) + "')"
+
     if start_date and end_date:
         sql = sql + '''
             and "Месяц" >= '{start_date}'
@@ -138,7 +150,7 @@ def get_trans_empty_by_type(railway='', start_date=None, end_date=None):
         group by "Превышение даты истечение срока д"
             order by "Превышение даты истечение срока д" desc
     '''
-    # print(sql)
+    print(sql)
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     df = pd.read_sql(sql, con)
     return df
@@ -152,15 +164,19 @@ def get_trans_empty_by_money(railway, start_date=None, end_date=None):
                         when 'С просрочкой' then 'Сумма тарифа для расчёта пени' 
                         else "Превышение даты истечение срока д" end as "Тип"
                     , sum("Рассчитанная сумма") as "Рассчитанная сумма"  
-                    from dashboard.dash_transport_empty f where "Превышение даты истечение срока д" != 'Нет данных для оценки'
+                    from dashboard.dash_transport_empty t 
+                        left join sap_s4.rails_mapping ra
+				            on t."Дорога назначения" = ra."db"
+                        left join internal.ssp_rw_cn_map s
+                            on s.rw_short_name = ra.file 
+                    where "Превышение даты истечение срока д" != 'Нет данных для оценки'
                             and (lower("Плательщик") like '%пгк%' 
                                 or lower("Грузоотправитель") like '%пгк%' 
                                 or lower("Получатель") like '%пгк%')
+                             and cn_short_name = 'РОССИЯ'
     '''
     if railway:
-        sql = sql + '''
-            and "Дорога назначения" = '{railway}'
-        '''.format(railway = railway) 
+        sql = sql + 'and "Дорога назначения" in ' + "('" + "','".join(railway) + "')"
     if start_date and end_date:
         sql = sql + '''
             and "Месяц" >= '{start_date}'
@@ -172,15 +188,19 @@ def get_trans_empty_by_money(railway, start_date=None, end_date=None):
                 select
                 'Оценка пени' as "Тип"
                     , sum("Оценка пени") as "Рассчитанная сумма" 
-                    from dashboard.dash_transport_empty f where "Превышение даты истечение срока д" = 'С просрочкой'
+                    from dashboard.dash_transport_empty t 
+                        left join sap_s4.rails_mapping ra
+				            on t."Дорога назначения" = ra."db"
+                        left join internal.ssp_rw_cn_map s
+                            on s.rw_short_name = ra.file 
+                        where "Превышение даты истечение срока д" = 'С просрочкой'
                             and (lower("Плательщик") like '%пгк%' 
                                 or lower("Грузоотправитель") like '%пгк%' 
                                 or lower("Получатель") like '%пгк%')
+                            and cn_short_name = 'РОССИЯ'
     '''
     if railway:
-        sql = sql + '''
-            and "Дорога назначения" = '{railway}'
-        '''.format(railway = railway) 
+        sql = sql + 'and "Дорога назначения" in ' + "('" + "','".join(railway) + "')"
     if start_date and end_date:
         sql = sql + '''
             and "Месяц" >= '{start_date}'
@@ -204,15 +224,18 @@ def get_trans_empty_by_type_month(railway, start_date=None, end_date=None):
                         when 'С просрочкой' then 'С просрочкой' 
                         else "Превышение даты истечение срока д" end as "Тип"
                 , sum("Кол-во вагонорейсов") as "Кол-во вагонорейсов" 
-	            from dashboard.dash_transport_empty f 
+	            from dashboard.dash_transport_empty t 
+                    left join sap_s4.rails_mapping ra
+				        on t."Дорога назначения" = ra."db"
+                    left join internal.ssp_rw_cn_map s
+                        on s.rw_short_name = ra.file 
                     where (lower("Плательщик") like '%пгк%' 
 						or lower("Грузоотправитель") like '%пгк%' 
 						or lower("Получатель") like '%пгк%')
+                        and cn_short_name = 'РОССИЯ'
     '''
     if railway:
-        sql = sql + '''
-            and "Дорога назначения" = '{railway}'
-        '''.format(railway = railway) 
+        sql = sql + 'and "Дорога назначения" in ' + "('" + "','".join(railway) + "')"
     if start_date and end_date:
         sql = sql + '''
             and "Месяц" >= '{start_date}'
@@ -230,16 +253,19 @@ def get_trans_empty_by_money_month(railway, start_date=None, end_date=None):
     sql = '''
         select "Месяц"
             ,   sum("Оценка пени") as "Оценка пени"
-	        from dashboard.dash_transport_empty f 
+	        from dashboard.dash_transport_empty t 
+                left join sap_s4.rails_mapping ra
+				    on t."Дорога назначения" = ra."db"
+                left join internal.ssp_rw_cn_map s
+                    on s.rw_short_name = ra.file 
                     where (lower("Плательщик") like '%пгк%' 
 						    or lower("Грузоотправитель") like '%пгк%' 
 						    or lower("Получатель") like '%пгк%') 
                         and "Превышение даты истечение срока д" = 'С просрочкой'
+                        and cn_short_name = 'РОССИЯ'
     '''
     if railway:
-        sql = sql + '''
-            and "Дорога назначения" = '{railway}'
-        '''.format(railway = railway) 	
+        sql = sql + 'and "Дорога назначения" in ' + "('" + "','".join(railway) + "')"
     if start_date and end_date:
         sql = sql + '''
             and "Месяц" >= '{start_date}'
@@ -248,7 +274,7 @@ def get_trans_empty_by_money_month(railway, start_date=None, end_date=None):
     sql = sql + '''         
                     group by "Месяц", "Превышение даты истечение срока д"
     '''
-    print(sql)
+    # print(sql)
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     df = pd.read_sql(sql, con)
     return df
@@ -264,16 +290,19 @@ def get_tab1_trans_empty_by_delay_stat(railway, start_date=None, end_date=None):
             t."Кол-во вагонорейсов"
             from (
                 select "Дней просрочки, суток", sum("Кол-во вагонорейсов") as "Кол-во вагонорейсов" 
-                        from dashboard.dash_transport_empty f 
+                        from dashboard.dash_transport_empty t 
+                        	left join sap_s4.rails_mapping ra
+				                on t."Дорога назначения" = ra."db"
+                            left join internal.ssp_rw_cn_map s
+                                on s.rw_short_name = ra.file 
                             where (lower("Плательщик") like '%пгк%' 
                                 or lower("Грузоотправитель") like '%пгк%' 
                                 or lower("Получатель") like '%пгк%') 
                                 and "Превышение даты истечение срока д" = 'С просрочкой'
+                                and cn_short_name = 'РОССИЯ'
     '''
     if railway:
-        sql = sql + '''
-            and "Дорога назначения" = '{railway}'
-        '''.format(railway = railway) 	
+        sql = sql + 'and "Дорога назначения" in ' + "('" + "','".join(railway) + "')"	
     if start_date and end_date:
         sql = sql + '''
             and "Месяц" >= '{start_date}'
@@ -316,9 +345,12 @@ def get_tab4_trans_empty_delay_by_rps(railway='', start_date=None, end_date=None
 		            from dashboard.dash_transport_empty t 
 			            left join sap_s4.rails_mapping ra
 				            on t."Дорога назначения" = ra."db"
+                        left join internal.ssp_rw_cn_map s
+                            on s.rw_short_name = ra.file 
                              where (lower("Плательщик") like '%пгк%' 
 						        or lower("Грузоотправитель") like '%пгк%' 
 						        or lower("Получатель") like '%пгк%')
+                                and cn_short_name = 'РОССИЯ'
     ''' 
     if start_date and end_date:
         sql = sql + '''
@@ -326,9 +358,7 @@ def get_tab4_trans_empty_delay_by_rps(railway='', start_date=None, end_date=None
             and "Месяц" <= '{end_date}'
         '''.format(start_date = start_date, end_date = end_date)
     if railway:
-        sql = sql + '''
-                and "Дорога назначения" = '{railway}'
-            '''.format(railway = railway)
+        sql = sql + 'and "Дорога назначения" in ' + "('" + "','".join(railway) + "')"
     sql = sql + '''
             group by t."РПС"
                 order by sum(case when t."Превышение даты истечение срока д" = 'С просрочкой' then "Кол-во вагонорейсов" else 0 end) desc
@@ -346,10 +376,13 @@ def get_tab4_trans_empty_penalty_by_rps(railway='', start_date=None, end_date=No
 	        from dashboard.dash_transport_empty t 
             	left join sap_s4.rails_mapping ra
 				    on t."Дорога назначения" = ra."db"
+                left join internal.ssp_rw_cn_map s
+                    on s.rw_short_name = ra.file 
                     where t."Превышение даты истечение срока д" = 'С просрочкой'
                         and (lower("Плательщик") like '%пгк%' 
 						        or lower("Грузоотправитель") like '%пгк%' 
 						        or lower("Получатель") like '%пгк%')
+                        and cn_short_name = 'РОССИЯ'
                         and not t."РПС" in ('ТВЗ', 'РЛВ')
     '''
     if start_date and end_date:
@@ -358,9 +391,7 @@ def get_tab4_trans_empty_penalty_by_rps(railway='', start_date=None, end_date=No
             and "Месяц" <= '{end_date}'
         '''.format(start_date = start_date, end_date = end_date)
     if railway:
-        sql = sql + '''
-            and "Дорога назначения" = '{railway}'
-        '''.format(railway = railway) 	
+        sql = sql + 'and "Дорога назначения" in ' + "('" + "','".join(railway) + "')"
     sql = sql + '''                            
                         group by t."РПС"	
                             order by sum("Оценка пени")	desc			
@@ -376,10 +407,13 @@ def get_tab4_trans_empty_mean_delay_by_rps(railway='', start_date=None, end_date
 	        from dashboard.dash_transport_empty t 
                 left join sap_s4.rails_mapping ra
 				    on t."Дорога назначения" = ra."db"
+                left join internal.ssp_rw_cn_map s
+                    on s.rw_short_name = ra.file 
 		            where t."Превышение даты истечение срока д" = 'С просрочкой'
                             and (lower("Плательщик") like '%пгк%' 
 						        or lower("Грузоотправитель") like '%пгк%' 
 						        or lower("Получатель") like '%пгк%')
+                            and cn_short_name = 'РОССИЯ'
                             and not t."РПС" in ('ТВЗ', 'РЛВ')
     '''
     if start_date and end_date:
@@ -388,9 +422,7 @@ def get_tab4_trans_empty_mean_delay_by_rps(railway='', start_date=None, end_date
             and "Месяц" <= '{end_date}'
         '''.format(start_date = start_date, end_date = end_date)
     if railway:
-        sql = sql + '''
-            and "Дорога назначения" = '{railway}'
-        '''.format(railway = railway) 	
+        sql = sql + 'and "Дорога назначения" in ' + "('" + "','".join(railway) + "')"
     sql = sql + '''    
                             group by t."РПС"
                                 order by sum("Дней просрочки, суток")/sum("Кол-во вагонорейсов") 

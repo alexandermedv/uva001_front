@@ -1,5 +1,6 @@
 """ Интерактивные элементы для отчетов по запчастям."""
 import datetime as dt
+import os
 import numpy as np
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -550,7 +551,7 @@ def render_content(tab, start_date, end_date, railway):
                                 text = internal_delay['Кол-во вагонорейсов с просрочкой'].map('{:,.0f}'.format).astype(str).replace(',', ' ', regex=True),
                                 marker=dict(colors=px.colors.qualitative.Antique), 
                                 hoverinfo='skip',
-                                customdata=internal_penalty['РПС'].apply(lambda x: get_rps_name(x)),
+                                customdata=internal_delay['РПС'].apply(lambda x: get_rps_name(x)),
                                 hovertemplate = 'РПС: %{customdata} <br> %{label} - %{text}',
                                 name='',
                                 rotation=90,
@@ -718,15 +719,16 @@ def render_content(tab, start_date, end_date, railway):
     State('dashboard8-dropdown1-in-railway', component_property='value')]
 )
 def btn_download_report_button(n_clicks, start_date, end_date, railway):
-    print('n_clicks, start_date, end_date, railway', n_clicks, start_date, end_date, railway)
+    # print('n_clicks, start_date, end_date, railway', n_clicks, start_date, end_date, railway)
     if n_clicks:
         start_date = dt.datetime.strftime(dt.datetime.strptime(start_date, '%Y-%m-%d'), '%d-%m-%Y')
         end_date = dt.datetime.strftime(dt.datetime.strptime(end_date, '%Y-%m-%d'), '%d-%m-%Y')
 
-        url = 'http://msc199-sdb04.domain.local:9001/api/reports/transport_empty_delay'
+        url = 'http://{api_host}:{api_port}/api/reports/transport_empty_delay'.format(api_host=os.environ['API_HOST'], api_port=os.environ['API_PORT'])
 
-        res_task = requests.get(url, params={'start_date':start_date, 'end_date':end_date, 'railway':railway}) 
+        res_task = requests.get(url, params={'start_date':start_date, 'end_date':end_date, 'railway':railway, 'is_front': os.environ['API_IS_FRONT']}) 
         # 'is_front':True})
+        print(res_task)
 
         task_id = res_task.json().get('task_id')
         
@@ -738,7 +740,7 @@ def btn_download_report_button(n_clicks, start_date, end_date, railway):
           
             if res.json().get('state') == 'SUCCESS':
                 break
-        url_upload = 'http://msc199-sdb04.domain.local:9001/api/uploads/{file_name}'.format(file_name=file_name)
+        url_upload = 'http://{api_host}:{api_port}/api/uploads/{file_name}'.format(file_name=file_name, api_host=os.environ['API_HOST'], api_port=os.environ['API_PORT'])
         return url_upload
     else:
         return ''

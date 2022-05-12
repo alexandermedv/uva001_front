@@ -36,8 +36,6 @@ def create_layout():
                             style={"color": "#ffffff"},
                             className="row",
                         ),
-                        html.Output(id='link1', className='one column', hidden=True),
-                        html.Output(id='download_callback', hidden=True)
                     ], className="product",
                 )
             ], className="row",
@@ -80,9 +78,11 @@ def create_layout():
                 style={'justify-content': 'center', 'font-size': "50%", 'display': 'inline-block'},
                 # options=[{'label': i, 'value': i} for i in [''] + get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
                 options=[{'label': i, 'value': i} for i in get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
-                placeholder = 'Выберете дорогу',
+                placeholder = 'Выберите дорогу',
                 multi=True,className='seven columns'),
                 html.Button('Выгрузить', id='download-report-button', n_clicks=0),
+                html.Output(id='link1', className='one column', hidden=True),
+                html.Output(id='download_callback', hidden=True)
             ], className="row"
             ),
             html.Div([

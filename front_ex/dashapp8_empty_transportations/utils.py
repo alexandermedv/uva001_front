@@ -150,7 +150,7 @@ def get_trans_empty_by_type(railway='', start_date=None, end_date=None):
         group by "Превышение даты истечение срока д"
             order by "Превышение даты истечение срока д" desc
     '''
-    print(sql)
+    # print(sql)
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     df = pd.read_sql(sql, con)
     return df

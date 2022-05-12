@@ -72,7 +72,8 @@ def get_rps_name(rps):
 def update_dropdown1(start_date, end_date, tab):
     """Список значений по дорогам"""
     trans_empty_by_railway_penalty = get_trans_empty_by_railway_penalty()
-    return [{'label': i, 'value': i} for i in [''] + trans_empty_by_railway_penalty['Дорога назначения'].unique().tolist()]
+    # return [{'label': i, 'value': i} for i in [''] + trans_empty_by_railway_penalty['Дорога назначения'].unique().tolist()]
+    return [{'label': i, 'value': i} for i in trans_empty_by_railway_penalty['Дорога назначения'].unique().tolist()]
 
 # Скрытие фильтра по дорогам по выбору закладки 
 @dash_app.callback(Output('dashboard8-dropdown1-in-railway', 'style'), [Input('dashboard8-tabs', 'value'),])

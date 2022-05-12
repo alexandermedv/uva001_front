@@ -31,11 +31,13 @@ def create_layout():
                             style={"color": "#ffffff"},
                             className="row",
                         ),
-                        html.Br(),
+                        # html.Br(),
                         html.P("*Расчёт отклонения срока доставки производился без учета затрат времени на ТОР.",
                             style={"color": "#ffffff"},
                             className="row",
                         ),
+                        html.Output(id='link1', className='one column', hidden=True),
+                        html.Output(id='download_callback', hidden=True)
                     ], className="product",
                 )
             ], className="row",
@@ -43,49 +45,45 @@ def create_layout():
 
             # Row 2 - 1-й ряд фильтров
             html.Div([
-                dbc.Navbar([
-                    html.Div(
-                        html.Output('Дата:'),
-                        className='one column',
-                        style={"display": "flex", "align-items": "center", "height": "38px"}
-                    ),
-                    dcc.DatePickerRange(
-                        id='dashboard8-date-picker-range',
-                        min_date_allowed=date(2000, 1, 1),
-                        max_date_allowed=date(2050, 1, 1),
-                        initial_visible_month=date(2021, 4, 1),
-                        start_date=date(2021, 1, 1),
-                        # Последний день предыдущего месяца
-                        end_date=(dt.date.today() - dt.timedelta(days=1)).replace(day=1) - dt.timedelta(days=1),
-                        # end_date=get_max_date().strftime("%m.%d.%Y"),
-                        # end_date=datetime.datetime.now().strftime("%m.%d.%Y"),
-                        number_of_months_shown = 3,
-                        updatemode = 'singledate',
-                        display_format='DD.MM.YYYY',
-                        start_date_placeholder_text='Начало периода',
-                        end_date_placeholder_text='Конец периода',
-                        className='four columns'
-                    ),
-                    html.Div(
-                        html.Output('Дорога:'),
-                        className='one column',
-                        style={"display": "flex",  "align-items": "center", "height": "38px"},
-                        id = 'name1',
-                    ),
-                    dcc.Dropdown(
-                        id="dashboard8-dropdown1-in-railway",
-                        value='',
-                        clearable=False,
-                        style={"display": "block",
-                            "justify-content": "center"},
-                        options=[{'label': i, 'value': i} for i in [''] + get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
-                        #multi=True,
-                        className='three columns'),
-                    html.Button('Выгрузить', id='download-report-button', n_clicks=0),
-                    html.Output(id='link1', className='one column', hidden=True),
-                    html.Output(id='download_callback', hidden=True)
-                ])
-            ], className="row",
+                # html.Div(
+                #     html.Output('Дата:'),
+                #     className='one column',
+                #     style={"display": "flex", "align-items": "center", "height": "38px"}
+                # ),
+                dcc.DatePickerRange(
+                    id='dashboard8-date-picker-range',
+                    min_date_allowed=date(2000, 1, 1),
+                    max_date_allowed=date(2050, 1, 1),
+                    initial_visible_month=date(2021, 4, 1),
+                    start_date=date(2021, 1, 1),
+                    # Последний день предыдущего месяца
+                    end_date=(dt.date.today() - dt.timedelta(days=1)).replace(day=1) - dt.timedelta(days=1),
+                    # end_date=get_max_date().strftime("%m.%d.%Y"),
+                    # end_date=datetime.datetime.now().strftime("%m.%d.%Y"),
+                    number_of_months_shown = 3,
+                    updatemode = 'singledate',
+                    display_format='DD.MM.YYYY',
+                    start_date_placeholder_text='Начало периода',
+                    end_date_placeholder_text='Конец периода',
+                    className='four columns'
+                ),
+                # html.Div(
+                #     html.Output('Дорога:'),
+                #     className='one column',
+                #     style={"display": "flex",  "align-items": "center", "height": "38px"},
+                #     # id = 'name1',
+                # ),
+                dcc.Dropdown(
+                id="dashboard8-dropdown1-in-railway",
+                # value='',
+                # clearable=False,
+                style={'justify-content': 'center', 'font-size': "50%", 'display': 'inline-block'},
+                # options=[{'label': i, 'value': i} for i in [''] + get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
+                options=[{'label': i, 'value': i} for i in get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
+                placeholder = 'Выберете дорогу',
+                multi=True,className='seven columns'),
+                html.Button('Выгрузить', id='download-report-button', n_clicks=0),
+            ], className="row"
             ),
             html.Div([
                 dcc.Tabs(id='dashboard8-tabs', value='tab-1', children=[

@@ -13,6 +13,7 @@ import plotly.express as px
 from dateutil import relativedelta
 import time
 from pprint import pprint
+import json
 
 import requests
 
@@ -726,8 +727,8 @@ def btn_download_report_button(n_clicks, start_date, end_date, railway):
         end_date = dt.datetime.strftime(dt.datetime.strptime(end_date, '%Y-%m-%d'), '%d-%m-%Y')
 
         url = 'http://{api_host}:{api_port}/api/reports/transport_empty_delay'.format(api_host=os.environ['API_HOST'], api_port=os.environ['API_PORT'])
-
-        res_task = requests.get(url, params={'start_date':start_date, 'end_date':end_date, 'railway':railway, 'is_front': os.environ['API_IS_FRONT']}) 
+        print(json.dumps(railway))
+        res_task = requests.get(url, params={'start_date':start_date, 'end_date':end_date, 'railway': json.dumps(railway), 'is_front': os.environ['API_IS_FRONT']}) 
         # 'is_front':True})
         print(res_task)
 

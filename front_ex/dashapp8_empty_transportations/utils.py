@@ -50,7 +50,7 @@ def get_trans_empty_by_railway_delay(railway='', start_date=None, end_date=None)
             and "Месяц" <= '{end_date}'
         '''.format(start_date = start_date, end_date = end_date)
     if railway:
-        str = sql + 'and "Дорога назначения" = {railway}'.format(railway = railway)
+        sql = sql + 'and "Дорога назначения" in ' + "('" + "','".join(railway) + "')"
     sql = sql + '''
             group by t."Дорога назначения"
                 order by sum(case when t."Превышение даты истечение срока д" = 'С просрочкой' then "Кол-во вагонорейсов" else 0 end) desc

@@ -16,7 +16,7 @@ RUN pip install --upgrade pip
 COPY . /usr/src/app/  
 
 # install necessary python modules
-RUN pip install -r requirements.txt
+RUN pip install --proxy=http://msc01-cfw01.pgk.rzd:9090 -r requirements.txt
 
 # copy entrypoint.sh
 # COPY ./entrypoint.sh /opt/restapi/entrypoint.sh

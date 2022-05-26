@@ -1,7 +1,7 @@
 """Выгрузка данных и вспомогательные функции"""
 import os
 import pandas as pd
-import front_ex.config as config
+# import front_ex.config as config
 from sqlalchemy import create_engine
 
 
@@ -102,7 +102,7 @@ def get_max_date():
     FROM dashboard.resellers_cube
     '''
     # return engine_cons.execute(sql).fetchone()[0]
-    con = create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8')
+    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     return con.execute(sql).fetchone()[0]
 
 

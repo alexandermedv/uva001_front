@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.7'
 services: 
    test_app:
       container_name: test_front
@@ -34,5 +34,5 @@ networks:
       driver: bridge
       ipam:
          config:
-           - subnet: 13.9.1.0/16
+           - subnet: 172.17.8.0/24
             

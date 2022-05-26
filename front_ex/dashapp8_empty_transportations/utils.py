@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 from pandas.io import sql
-import front_ex.config as config
+# import front_ex.config as config
 from sqlalchemy import create_engine
 import datetime as dt
 

@@ -5,7 +5,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from sqlalchemy import create_engine
-import front_ex.config as config
+# s
 from .callbacks import render_content
 
 

@@ -1,7 +1,7 @@
 """Выгрузка данных и вспомогательные функции"""
 import os
 import pandas as pd
-import front_ex.config as config
+# import front_ex.config as config
 from sqlalchemy import create_engine
 
 

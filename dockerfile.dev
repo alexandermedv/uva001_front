@@ -1,5 +1,5 @@
 # Set version python 
-FROM python:3.8
+FROM nexus.dp.pgk.ru/python:3.8
 LABEL maintainer "Турганов Артем TurganovAI@pgkweb.ru"
 
 # set workdir directory

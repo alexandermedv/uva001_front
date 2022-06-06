@@ -1,5 +1,5 @@
 # Set version python 
-FROM python:3.8
+FROM nexus.dp.pgk.ru/python:3.8
 LABEL maintainer "Турганов Артем TurganovAI@pgkweb.ru"
 
 # set workdir directory
@@ -7,16 +7,26 @@ WORKDIR /usr/src/app
 
 # set TZ Moscow time
 ENV TZ Europe/Moscow
-RUN apt-get install tzdata
-RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone 
+
+# ADD /drivers/tzdata_2021a-1+deb11u2_all.deb /opt
+# RUN apt-get install tzdata
+# RUN dpkg -i /opt/tzdata_2021a-1+deb11u2_all.deb
 
 # install system dependencies
 # RUN pip install --upgrade pip
 # copy requirements and projects 
+
+RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone 
+
 COPY . /usr/src/app/  
 
+# AT pip nexus
+COPY pip.conf .
+ENV PIP_CONFIG_FILE pip.conf
+RUN pip install -r requirements.txt
+
 # install necessary python modules
-RUN pip install --proxy=http://msc01-cfw01.pgk.rzd:9090 -r requirements.txt
+# RUN pip install --proxy=http://msc01-cfw01.pgk.rzd:9090 -r requirements.txt
 
 # copy entrypoint.sh
 # COPY ./entrypoint.sh /opt/restapi/entrypoint.sh

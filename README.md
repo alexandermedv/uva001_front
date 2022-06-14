@@ -41,3 +41,7 @@ user='svc_fs-uva', password='Hfesb#th45xao$qhjkc'
 https://cyber01.ru/ustanovka-ssl-sertifikata-na-nginx/
 https://www.leaderssl.ru/articles/224-ssl-nginx-ustanavlivaem-ssl-sertifikat-na-server-nginx
 
+
+Доступ к папкам:
+sudo setfacl -m u:svc_fs-uva:rwx dag_tm_transportaions.py
+

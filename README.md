@@ -1,8 +1,6 @@
 <!-- Релизы -->
 PGK-260 v0.005 Релиз - выход на новое доменное имя msc199-sas40
 
-
-
 <!-- Help -->
 
 Добавлены переменные окружения
@@ -25,3 +23,25 @@ docker-compose -f docker-compose.prod.yml up -d --build
 
 <!-- Internal LDAP USER -->
 user='svc_fs-uva', password='Hfesb#th45xao$qhjkc'
+
+<!-- Сертификация NGINX -->
+Пароль: INC0223850
+
+Перейдем в директорию, где расположен данный файл (например /root/site_certs/)
+
+[root@server ~]# cd /root/site_certs/
+Получим цепочку сертификатов
+
+[root@server certs]# openssl pkcs12 -in cert.pfx -clcerts -nokeys -out public.crt
+Получим приватный ключ
+
+[root@server certs]# openssl pkcs12 -in cert.pfx -nocerts -nodes -out private.key
+
+Установка
+https://cyber01.ru/ustanovka-ssl-sertifikata-na-nginx/
+https://www.leaderssl.ru/articles/224-ssl-nginx-ustanavlivaem-ssl-sertifikat-na-server-nginx
+
+
+Доступ к папкам:
+sudo setfacl -m u:svc_fs-uva:rwx dag_tm_transportaions.py
+

@@ -727,8 +727,20 @@ def btn_download_report_button(n_clicks, start_date, end_date, railway):
         end_date = dt.datetime.strftime(dt.datetime.strptime(end_date, '%Y-%m-%d'), '%d-%m-%Y')
 
         url = 'http://{api_host}:{api_port}/api/reports/transport_empty_delay'.format(api_host=os.environ['API_HOST'], api_port=os.environ['API_PORT'])
-        print(json.dumps(railway))
-        res_task = requests.get(url, params={'start_date':start_date, 'end_date':end_date, 'railway': json.dumps(railway), 'is_front': os.environ['API_IS_FRONT']}) 
+        # print(url)
+        # print(railway)
+        # print(json.dumps(railway).encode('utf8'))
+        print('url', url)
+        url = 'http://172.17.0.135:9002/api/reports/transport_empty_delay' 
+    
+        res_task = requests.get(url, 
+            # params={'start_date':start_date, 'end_date':end_date, 'is_front': os.environ['API_IS_FRONT'], 'railway': json.dumps(railway).encode('utf8')},
+            params={'start_date':start_date, 'end_date':end_date, 'is_front': os.environ['API_IS_FRONT']},
+            json={'railway': railway}
+
+        ) 
+        # res_task = requests.get(url, params={'start_date':start_date, 'end_date':end_date, 'is_front': os.environ['API_IS_FRONT']}) 
+
         # 'is_front':True})
         print(res_task)
 

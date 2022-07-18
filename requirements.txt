@@ -16,6 +16,7 @@ click-didyoumean==0.0.3
 click-plugins==1.1.1
 click-repl==0.1.6
 cryptography==3.4.7
+# cryptography
 dash==1.20.0
 dash-bootstrap-components==0.12.0
 dash-core-components==1.16.0

@@ -714,7 +714,7 @@ def render_content(tab, start_date, end_date, railway):
         return content
 
 @dash_app.callback(
-    Output('link1', component_property='value'),
+    Output('link1', component_property='href'),
     Input('download-report-button', 'n_clicks'),
     [State('dashboard8-date-picker-range', 'start_date'),
     State('dashboard8-date-picker-range', 'end_date'),
@@ -726,35 +726,39 @@ def btn_download_report_button(n_clicks, start_date, end_date, railway):
         start_date = dt.datetime.strftime(dt.datetime.strptime(start_date, '%Y-%m-%d'), '%d-%m-%Y')
         end_date = dt.datetime.strftime(dt.datetime.strptime(end_date, '%Y-%m-%d'), '%d-%m-%Y')
 
-        url = 'http://{api_host}:{api_port}/api/reports/transport_empty_delay'.format(api_host=os.environ['API_HOST'], api_port=os.environ['API_PORT'])
-        # print(url)
-        # print(railway)
-        # print(json.dumps(railway).encode('utf8'))
-        print('url', url)
-        url = 'http://172.17.0.135:9002/api/reports/transport_empty_delay' 
-    
+        url = 'http://{api_host}:{api_port}/api/    reports/transport_empty_delay'.format(api_host=os.environ['API_HOST'], api_port=os.environ['API_PORT'])
+        print(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), ' ', 'АPI request: ', url, flush = True)    
+        
         res_task = requests.get(url, 
-            # params={'start_date':start_date, 'end_date':end_date, 'is_front': os.environ['API_IS_FRONT'], 'railway': json.dumps(railway).encode('utf8')},
-            params={'start_date':start_date, 'end_date':end_date, 'is_front': os.environ['API_IS_FRONT']},
+            params={'start_date':start_date, 'end_date':end_date},
             json={'railway': railway}
 
         ) 
-        # res_task = requests.get(url, params={'start_date':start_date, 'end_date':end_date, 'is_front': os.environ['API_IS_FRONT']}) 
-
-        # 'is_front':True})
-        print(res_task)
 
         task_id = res_task.json().get('task_id')
         
+        i = 0 
         while True:
-            time.sleep(1)
+            time.sleep(10)
             res = requests.get(url, params={'task_id':task_id})
+            print("res.json().get('state')", res.json().get('state'))
             if res.json().get('kwargs'):
                 file_name = res.json().get('kwargs').get('file_name')
+
+            print("res.json()", res.json(), flush = True)
           
             if res.json().get('state') == 'SUCCESS':
                 break
+            
+            i += i
+            # Ожидание 10 мин
+            if i > 60:
+                print('no file', flush=True)
+                return 'no file'
         url_upload = 'http://{api_host}:{api_port}/api/uploads/{file_name}'.format(file_name=file_name, api_host=os.environ['API_HOST'], api_port=os.environ['API_PORT'])
+        print(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), ' ', 'URL_upload: ', url_upload, flush=True)
+
+
         return url_upload
     else:
         return ''
@@ -766,13 +770,14 @@ dash_app.clientside_callback(
                 const a = document.createElement('a');
                 document.body.appendChild(a);
                 a.style='display: none';
-                a.href = value
+                a.href = value;
                 a.click(); 
+                alert('Ссылка на файл для скачивания: ' + value);
             }
         }
     ''',
     Output('download_callback', component_property='children'),
-    Input('link1', 'value')
+    Input('link1', 'href')
 ) 
 
 # Полный вариант на js

@@ -45,3 +45,9 @@ https://www.leaderssl.ru/articles/224-ssl-nginx-ustanavlivaem-ssl-sertifikat-na-
 Доступ к папкам:
 sudo setfacl -m u:svc_fs-uva:rwx dag_tm_transportaions.py
 
+<!-- Internal LDAP USER -->
+<!-- user='svc_fs-uva', password='Hfesb#th45xao$qhjkc' -->
+user='svc_fs-uva', password='Hfesb1th45xao2qhjkc'
+
+https://github.com/microsoft/vscode-python/releases/tag/2021.12.1559732655
+

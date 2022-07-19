@@ -726,7 +726,7 @@ def btn_download_report_button(n_clicks, start_date, end_date, railway):
         start_date = dt.datetime.strftime(dt.datetime.strptime(start_date, '%Y-%m-%d'), '%d-%m-%Y')
         end_date = dt.datetime.strftime(dt.datetime.strptime(end_date, '%Y-%m-%d'), '%d-%m-%Y')
 
-        url = 'http://{api_host}:{api_port}/api/    reports/transport_empty_delay'.format(api_host=os.environ['API_HOST'], api_port=os.environ['API_PORT'])
+        url = 'http://{api_host}:{api_port}/api/reports/transport_empty_delay'.format(api_host=os.environ['API_HOST'], api_port=os.environ['API_PORT'])
         print(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), ' ', 'АPI request: ', url, flush = True)    
         
         res_task = requests.get(url, 

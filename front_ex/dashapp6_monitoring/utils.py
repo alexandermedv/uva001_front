@@ -268,9 +268,9 @@ def get_incoming_ap():
             g."Language3" AS issue_risk_level,
             h."IDFld",
             i.open_actplans,
-            (CASE WHEN i."Sent_to_Itrack" IS NULL
+            (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
-							ELSE TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) AS "Sent_to_Itrack",
             k."Close_date"
         FROM dashboard.issues a
@@ -317,6 +317,7 @@ def get_incoming_ap():
 
         LEFT JOIN (
 			SELECT "OrigID",
+            min("Sent_to_Itrack") AS "Sent_to_Itrack",
 			max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
 			FROM dashboard.actplans
             WHERE "Deleted" = '-1'
@@ -328,13 +329,13 @@ def get_incoming_ap():
 			AND "Subject" IS NOT NULL
             AND a."Deleted" = '-1'
 			AND a."Dispos" = '52'
-            AND (CASE WHEN i."Sent_to_Itrack" IS NULL
+            AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
-							ELSE TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) < TO_DATE('20220401', 'YYYYMMDD')
-            AND (CASE WHEN i."Sent_to_Itrack" IS NULL
+            AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
-							ELSE TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) IS NOT NULL
             AND NOT (k."Close_date" < TO_DATE('20220401', 'YYYYMMDD') AND i.open_actplans IS NULL)
         ) z
@@ -360,9 +361,9 @@ def get_increase_ap():
             g."Language3" AS issue_risk_level,
             h."IDFld",
             i.open_actplans,
-			(CASE WHEN i."Sent_to_Itrack" IS NULL
+			(CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
-							ELSE TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) AS "Sent_to_Itrack",
             k."Close_date"
         FROM dashboard.issues a
@@ -406,6 +407,7 @@ def get_increase_ap():
 							
 		LEFT JOIN (
 			SELECT "OrigID",
+            min("Sent_to_Itrack") AS "Sent_to_Itrack",
 			max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
 			FROM dashboard.actplans
             WHERE "Deleted" = '-1'
@@ -417,13 +419,13 @@ def get_increase_ap():
 			AND "Subject" IS NOT NULL
             AND a."Deleted" = '-1'
 			AND a."Dispos" = '52'
-            AND (CASE WHEN i."Sent_to_Itrack" IS NULL
+            AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
-							ELSE TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) IS NOT NULL
-			AND (CASE WHEN i."Sent_to_Itrack" IS NULL
+			AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
-							ELSE TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) >= TO_DATE('20220401', 'YYYYMMDD')
         ) z
         GROUP BY z.issue_risk_level
@@ -448,9 +450,9 @@ def get_decrease_ap():
             g."Language3" AS issue_risk_level,
             h."IDFld",
             i.open_actplans,
-			(CASE WHEN i."Sent_to_Itrack" IS NULL
+			(CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
-							ELSE TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) AS "Sent_to_Itrack",
             k."Close_date"
         FROM dashboard.issues a
@@ -494,6 +496,7 @@ def get_decrease_ap():
 							
 		LEFT JOIN (
 			SELECT "OrigID",
+            min("Sent_to_Itrack") AS "Sent_to_Itrack",
 			max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
 			FROM dashboard.actplans
             WHERE "Deleted" = '-1'
@@ -506,9 +509,9 @@ def get_decrease_ap():
             AND i.open_actplans IS NULL
             AND a."Deleted" = '-1'
 			AND a."Dispos" = '52'
-            AND (CASE WHEN i."Sent_to_Itrack" IS NULL
+            AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
-							ELSE TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) IS NOT NULL
 			AND k."Close_date" >= TO_DATE('20220401', 'YYYYMMDD')
         ) z
@@ -534,9 +537,9 @@ def get_outcoming_ap():
             g."Language3" AS issue_risk_level,
             h."IDFld",
             i.open_actplans,
-            (CASE WHEN i."Sent_to_Itrack" IS NULL
+            (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
-							ELSE TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) AS "Sent_to_Itrack",
             k."Close_date"
         FROM dashboard.issues a
@@ -583,6 +586,7 @@ def get_outcoming_ap():
 
         LEFT JOIN (
 			SELECT "OrigID",
+            min("Sent_to_Itrack") AS "Sent_to_Itrack",
 			max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
 			FROM dashboard.actplans
             WHERE "Deleted" = '-1'
@@ -595,9 +599,9 @@ def get_outcoming_ap():
             AND a."Deleted" = '-1'
 			AND a."Dispos" = '52'
             AND i.open_actplans IS NOT NULL
-            AND (CASE WHEN i."Sent_to_Itrack" IS NULL
+            AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
-							ELSE TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) IS NOT NULL
         ) z
         GROUP BY z.issue_risk_level

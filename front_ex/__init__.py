@@ -111,6 +111,8 @@ from .dashapp6_monitoring import dash_app as dashapp6_monitoring
 from .dashapp7_repairs import dash_app as dashapp7_repairs
 from .dashapp8_empty_transportations import dash_app as dashapp8_empty_transportations
 from .dashapp9_resellers_commerce import dash_app as dashapp9_resellers_commerce
+from .dashapp10_nagon import dash_app as dashapp10_nagon
+from .dashapp11_risks import dash_app as dashapp11_risks
 
 
 # Добавляем руты и таски
@@ -128,4 +130,6 @@ dispatch_app = DispatcherMiddleware(app.wsgi_app, {
     'dashapp7': dashapp7_repairs.server,
     'dashapp8': dashapp8_empty_transportations.server,
     'dashapp9': dashapp9_resellers_commerce.server,
+    'dashapp10': dashapp10_nagon.server,
+    'dashapp11': dashapp11_risks.server
     })

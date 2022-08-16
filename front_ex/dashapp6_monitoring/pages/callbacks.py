@@ -119,28 +119,53 @@ def render_content():
 
     y11 = incoming_ap[incoming_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]
     y11_bold = '<b>' + str(incoming_ap[incoming_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]) + '</b>'
-    y12 = increase_ap[increase_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]
-    y12_bold = '<b>' + str(increase_ap[increase_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]) + '</b>'
-    y13 = (-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]
-    y13_bold = '<b>' + str((-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]) + '</b>'
+    if not increase_ap[increase_ap['issue_risk_level'] == 'Высокий'].empty:
+        print('increase_ap =', increase_ap)
+        y12 = increase_ap[increase_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]
+        y12_bold = '<b>' + str(increase_ap[increase_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]) + '</b>'
+    else:
+        y12 = 0
+        y12_bold = 0
+    if not decrease_ap.empty:
+        y13 = (-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]
+        y13_bold = '<b>' + str((-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]) + '</b>'
+    else:
+        y13 = 0
+        y13_bold = 0
     y14 = (-1)*outcoming_ap[outcoming_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]
     y14_bold = '<b>' + str(outcoming_ap[outcoming_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]) + '</b>'
 
     y21 = incoming_ap[incoming_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]
     y21_bold = '<b>' + str(incoming_ap[incoming_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]) + '</b>'
-    y22 = increase_ap[increase_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]
-    y22_bold = '<b>' + str(increase_ap[increase_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]) + '</b>'
-    y23 = (-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]
-    y23_bold = '<b>' + str((-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]) + '</b>'
+    if not increase_ap[increase_ap['issue_risk_level'] == 'Средний'].empty:
+        y22 = increase_ap[increase_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]
+        y22_bold = '<b>' + str(increase_ap[increase_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]) + '</b>'
+    else:
+        y22 = 0
+        y22_bold = 0
+    if not decrease_ap.empty:
+        y23 = (-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]
+        y23_bold = '<b>' + str((-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]) + '</b>'
+    else:
+        y23 = 0
+        y23_bold = 0
     y24 = (-1)*outcoming_ap[outcoming_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]
     y24_bold = '<b>' + str(outcoming_ap[outcoming_ap['issue_risk_level'] == 'Средний']['count'].iloc[0]) + '</b>'
 
     y31 = incoming_ap[incoming_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]
     y31_bold = '<b>' + str(incoming_ap[incoming_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]) + '</b>'
-    y32 = increase_ap[increase_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]
-    y32_bold = '<b>' + str(increase_ap[increase_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]) + '</b>'
-    y33 = (-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]
-    y33_bold = '<b>' + str((-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]) + '</b>'
+    if not increase_ap[increase_ap['issue_risk_level'] == 'Низкий'].empty:
+        y32 = increase_ap[increase_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]
+        y32_bold = '<b>' + str(increase_ap[increase_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]) + '</b>'
+    else:
+        y32 = 0
+        y32_bold = 0
+    if not decrease_ap.empty:
+        y33 = (-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]
+        y33_bold = '<b>' + str((-1)*decrease_ap[decrease_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]) + '</b>'
+    else:
+        y33 = 0
+        y33_bold = 0
     y34 = (-1)*outcoming_ap[outcoming_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]
     y34_bold = '<b>' + str(outcoming_ap[outcoming_ap['issue_risk_level'] == 'Низкий']['count'].iloc[0]) + '</b>'
 

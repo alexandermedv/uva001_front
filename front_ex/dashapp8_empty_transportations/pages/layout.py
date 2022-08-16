@@ -2,14 +2,15 @@
 from datetime import date
 import datetime as dt
 import datetime
+from weakref import ref
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+# from dash import dcc
 # from . import engine_cons
 # from ..utils import get_max_date, get_resellers_count
 from sqlalchemy import create_engine
 # import front_ex.config as config
-
 
 #from flask_app import engine_analysis, engine_cons
 from ..utils import get_trans_empty_by_railway_penalty
@@ -20,6 +21,7 @@ def create_layout():
     layout = html.Div([
         html.Div([
             # Row 1 - Описание отчета
+            
             html.Div([
                 html.Div(
                     [
@@ -72,19 +74,32 @@ def create_layout():
                 #     # id = 'name1',
                 # ),
                 dcc.Dropdown(
-                id="dashboard8-dropdown1-in-railway",
-                # value='',
-                # clearable=False,
-                style={'justify-content': 'center', 'font-size': "50%", 'display': 'inline-block'},
-                # options=[{'label': i, 'value': i} for i in [''] + get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
-                options=[{'label': i, 'value': i} for i in get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
-                placeholder = 'Выберите дорогу',
-                multi=True,className='seven columns'),
+                    id="dashboard8-dropdown1-in-railway",
+                    # value='',
+                    # clearable=False,
+                    style={'justify-content': 'center', 'font-size': "50%", 'display': 'inline-block'},
+                    # options=[{'label': i, 'value': i} for i in [''] + get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
+                    options=[{'label': i, 'value': i} for i in get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
+                    placeholder = 'Выберите дорогу',
+                    multi=True,
+                className='seven columns'),
+                
                 html.Button('Выгрузить', id='download-report-button', n_clicks=0),
-                html.Output(id='link1', className='one column', hidden=True),
-                html.Output(id='download_callback', hidden=True)
             ], className="row"
             ),
+                        html.Div([
+                # html.Output(id='link1', className='one column', hidden=True),
+                dcc.Link(
+                    id='link1', 
+                    href = '',  
+                    style={'textAlign': 'center', 'font-size': 'small'}, 
+                    refresh=True
+                ),
+                # html.Output(id='download_callback', hidden=True)
+                html.Output(id='download_callback', className='one column')
+            ], className="row"
+            ), 
+
             html.Div([
                 dcc.Tabs(id='dashboard8-tabs', value='tab-1', children=[
                     dcc.Tab(label='Общие', value='tab-1', className="tab",),

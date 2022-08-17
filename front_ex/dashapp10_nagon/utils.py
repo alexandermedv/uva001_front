@@ -19,7 +19,7 @@ def get_defect(start_date,  end_date):
             AND (accept_date > '%s' OR accept_date is null)
         ''' % (start_date,  end_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
 
 # Количество непроведенных операций выбраковки
@@ -35,7 +35,7 @@ def get_defect_count(start_date,  end_date):
             AND (accept_date > '%s' OR accept_date is null)
         ''' % (start_date,  end_date, end_date)
     print(sql)
-    con = create_engine(os.environ['POSTGRE_DASH'], max_identifier_length=128, encoding='utf-8')
+    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     return con.execute(sql).fetchone()[0]
 
 # Выгрузка непроведенных операций пересылки
@@ -52,7 +52,7 @@ def get_transfer(start_date,  end_date):
             AND (accept_date > '%s' OR accept_date is null)
         ''' % (start_date,  end_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
 
 # Количество непроведенных операций пересылки
@@ -68,7 +68,7 @@ def get_transfer_count(start_date,  end_date):
             AND (accept_date > '%s' OR accept_date is null)
         ''' % (start_date,  end_date, end_date)
     print(sql)
-    con = create_engine(os.environ['POSTGRE_DASH'], max_identifier_length=128, encoding='utf-8')
+    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     return con.execute(sql).fetchone()[0]
 
 # Выгрузка непроведенных операций ремонта
@@ -85,7 +85,7 @@ def get_repair(start_date,  end_date):
             AND (accept_date > '%s' OR accept_date is null)
         ''' % (start_date,  end_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
 
 # Количество непроведенных операций ремонта
@@ -101,7 +101,7 @@ def get_repair_count(start_date,  end_date):
             AND (accept_date > '%s' OR accept_date is null)
         ''' % (start_date,  end_date, end_date)
     print(sql)
-    con = create_engine(os.environ['POSTGRE_DASH'], max_identifier_length=128, encoding='utf-8')
+    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     return con.execute(sql).fetchone()[0]
 
 # Выгрузка непроведенных операций реализации
@@ -118,7 +118,7 @@ def get_sale(start_date,  end_date):
             AND (accept_date > '%s' OR accept_date is null)
         ''' % (start_date,  end_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
 
 # Количество непроведенных операций реализации
@@ -134,7 +134,7 @@ def get_sale_count(start_date,  end_date):
             AND (accept_date > '%s' OR accept_date is null)
         ''' % (start_date,  end_date, end_date)
     print(sql)
-    con = create_engine(os.environ['POSTGRE_DASH'], max_identifier_length=128, encoding='utf-8')
+    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     return con.execute(sql).fetchone()[0]
 
 

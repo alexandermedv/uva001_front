@@ -107,6 +107,12 @@
               {% if current_user.check_dash_roles('empty_transportations') %}  
               <li><a href="/empty_transportations_dash"><i class="fa fa-dashboard"></i>Порожние рейсы (дашборд)</a></li>
               {% endif %}
+              {% if current_user.check_dash_roles('nagon') %}
+              <li><a href="dashboards/nagon_dash"><i class="fa fa-dashboard"></i>Дашборд по нагону</a></li>
+              {% endif %}
+              {% if current_user.check_dash_roles('risks') %}
+              <li><a href="dashboards/risks_dash"><i class="fa fa-dashboard"></i>Дашборд по рискам</a></li>
+              {% endif %}
               {% if current_user.check_report_roles('admin') %}
                 <li><a href="https://uvapgk.atlassian.net/jira/projects"><i class="fa fa-dashboard"></i>Jira</a></li>
               {% endif %}

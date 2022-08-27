@@ -14,6 +14,14 @@ def get_data():
 	return 'x'
 
 # Выгрузка оборота и количества операций по счету 94* за выбранный период
+
+
+print(os.getcwd())
+
+def get_risk_csv():
+	print(os.getcwd())
+
+
 # def get_osv_detail_by_dates(start_date, end_date, debug = False):
 #     """Выгрузка недостач деталей за выбранный период"""
 #     sql = '''

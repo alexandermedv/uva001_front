@@ -33,13 +33,14 @@ def create_layout():
                         ),
                         html.P(
                             dcc.Markdown("\
-                            На **" + get_max_date().strftime("%d.%m.%Y") +
+                            На **" 
+                            # + get_max_date().strftime("%d.%m.%Y") +
                             "** размер недостачи по данным SAP составляет **"
-                             + '{0:,}'.format(round(engine_cons.execute(
-                                 """SELECT round(sum("Сумма во внутренней валюте по дебе" -
-                                 "Сумма во внутренней валюте по кред")) AS "Сальдо"
-                                 FROM dashboard.osv_94""").fetchone()[0]/1000)).replace(',', ' ') +
-                                "** тыс. руб.",
+                            #  + '{0:,}'.format(round(engine_cons.execute(
+                            #      """SELECT round(sum("Сумма во внутренней валюте по дебе" -
+                            #      "Сумма во внутренней валюте по кред")) AS "Сальдо"
+                            #      FROM dashboard.osv_94""").fetchone()[0]/1000)).replace(',', ' ') +
+                            #     "** тыс. руб.",
                                         ),
                             style={"color": "#ffffff"},
                             className="row",
@@ -66,7 +67,7 @@ def create_layout():
                         max_date_allowed=date(2050, 1, 1),
                         initial_visible_month=date(2020, 1, 1),
                         start_date=date(2020, 1, 1),
-                        end_date=get_max_date().strftime("%m.%d.%Y"),
+                        end_date=date(2020, 1, 1), #get_max_date().strftime("%m.%d.%Y"),
                         number_of_months_shown = 3,
                         updatemode = 'singledate',
                         display_format='DD.MM.YYYY',

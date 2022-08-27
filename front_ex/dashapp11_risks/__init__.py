@@ -27,11 +27,10 @@ from .pages import layout
 @dash_app.callback(Output("page-content","children"), [Input("url", "pathname")])
 def display_page(pathname):
     """Выбор шаблона"""
-    print(pathname)
+    print('pathname', pathname, flush=True)
     if pathname == "/dashboards/risks_dash/":
         layout_dash1 = layout.create_layout()
         return layout_dash1
-        #page_4.create_layout(dash_app)
     else:
         #layout = overview.create_layout(dash_app)
         return 'Не тот путь'

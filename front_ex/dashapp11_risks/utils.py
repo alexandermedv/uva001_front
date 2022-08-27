@@ -10,6 +10,9 @@ from sqlalchemy import create_engine
 # engine_cons = create_engine("""postgresql://locadm:Temp001@msc199-
 # sdb04.domain.local:8031/uva_cons""", max_identifier_length=128, encoding='utf-8')
 
+def get_data():
+	return 'x'
+
 # Выгрузка оборота и количества операций по счету 94* за выбранный период
 
 

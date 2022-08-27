@@ -732,7 +732,6 @@ def btn_download_report_button(n_clicks, start_date, end_date, railway):
         res_task = requests.get(url, 
             params={'start_date':start_date, 'end_date':end_date},
             json={'railway': railway}
-
         ) 
 
         task_id = res_task.json().get('task_id')

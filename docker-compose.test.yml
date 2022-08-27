@@ -30,10 +30,10 @@ services:
    #       - test_net_nginx
           
 
-# networks: 
-#    test_net_nginx: 
-#       driver: bridge
-#       ipam:
-#          config:
-#            - subnet: 172.17.8.0/24
+networks: 
+   test_net_nginx: 
+      driver: bridge
+      ipam:
+         config:
+           - subnet: 172.17.43.0/24
             

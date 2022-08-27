@@ -5,7 +5,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 # from . import engine_cons
-from ..utils import get_max_date
+# from ..utils import get_max_date
 from sqlalchemy import create_engine
 
 #import dash_table

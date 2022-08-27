@@ -16,7 +16,7 @@ def get_data():
 # Выгрузка оборота и количества операций по счету 94* за выбранный период
 
 
-print(os.getcwd())
+print(os.getcwd(), flush=True)
 
 def get_risk_csv():
 	print(os.getcwd())

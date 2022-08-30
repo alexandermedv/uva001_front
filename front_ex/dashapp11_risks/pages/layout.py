@@ -8,6 +8,8 @@ import dash_bootstrap_components as dbc
 # from ..utils import get_max_date
 from sqlalchemy import create_engine
 
+import dash_table
+
 #import dash_table
 #import pandas as pd
 
@@ -49,6 +51,54 @@ def create_layout():
                 )
             ], className="row",
                     ),
+            
+            html.Div([
+                dash_table.DataTable(
+                        # https://dash.plotly.com/datatable/width
+                        id='table_defect',
+                        columns=[{"name": i, "id": i} for i in ['1', '2', '3']],
+                        data={'1': '1', '2': '1', '3': '1'},
+                        page_size=20,
+                        style_table={'overflowX': 'auto'},
+                        style_cell={
+                            # all three widths are needed
+                            'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+                            'overflow': 'hidden',
+                            'textOverflow': 'ellipsis',
+                            'textAlign': 'left',
+                        },
+                        # style_cell_conditional=[
+                        #     {'if': {'column_id': "Описание недостатка"},
+                        #     'width': '20%'},
+                        #     {'if': {'column_id': "Мероприятие"},
+                        #     'width': '20%'},
+                        #     {'if': {'column_id': "Первоначальная дата окончания"},
+                        #     'width': '5%'},
+                        #     {'if': {'column_id': "Пересмотренная дата окончания"},
+                        #     'width': '5%'},
+                        #     {'if': {'column_id': "Комментарий"},
+                        #     'width': '50%'},
+                        # ],
+                        export_format='xlsx',
+                        export_headers='display',
+                        merge_duplicate_headers=True,
+                        style_header={
+                            'backgroundColor': 'rgb(138,36,50)',
+                            'color': 'white',
+                            'whiteSpace':'normal',
+                            'fontWeight': 'bold'
+                        },
+                        style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': 'rgb(230, 230, 230)',
+                            }
+                        ],
+                        style_data={
+                            'whiteSpace': 'normal',
+                            'height': 'auto',
+                        },
+                    ),], className="row",),
 
             # Row 2 - 1-й ряд фильтров
             html.Div([

@@ -1,4 +1,4 @@
-# Версия Ярослава Канунникова
+# Версия Ярослава Канунникова 
 import os
 from dotenv import load_dotenv
 

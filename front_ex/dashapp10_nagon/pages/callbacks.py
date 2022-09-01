@@ -286,8 +286,8 @@ def render_content(start_date, end_date, tab, filial, detail_type,
                     
                     dash_table.DataTable(
                         # https://dash.plotly.com/datatable/width
-                        id='table_defect',
-                        columns=[{"name": i, "id": i} for i in df_defect.columns],
+                        id='table_defect',                        columns=[{"name": i, "id": i} for i in df_defect.columns],
+
                         data=df_defect.to_dict('records'),
                         page_size=20,
                         style_table={'overflowX': 'auto'},

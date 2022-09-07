@@ -10,15 +10,31 @@ from sqlalchemy import create_engine
 # engine_cons = create_engine("""postgresql://locadm:Temp001@msc199-
 # sdb04.domain.local:8031/uva_cons""", max_identifier_length=128, encoding='utf-8')
 
-def get_data():
-	return 'x'
+# Выгрузка таблицы по рискам
+def get_risk_table():
+	schema='analysis'
+	Name_table='risk_radar_base'
+	login='svc_fs_uva'
+	passwors='Temp001'
+	ip_server='172.17.0.136:5432'
+	chunksize=100000
+	sql = '''
+		SELECT *
+		FROM '''+schema+'''.'''+Name_table
+	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
+	df2=con.execute(sql).fetchall()
+	df2=pd.DataFrame()
+	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
+		df2=df2.append(chunk)
+	return df2
+
 
 # Выгрузка оборота и количества операций по счету 94* за выбранный период
 
-print(os.getcwd(), flush=True)
+# print(os.getcwd(), flush=True)
 
-def get_risk_csv():
-	print(os.getcwd())
+# def get_risk_csv():
+# 	print(os.getcwd())
 
 
 # def get_osv_detail_by_dates(start_date, end_date, debug = False):

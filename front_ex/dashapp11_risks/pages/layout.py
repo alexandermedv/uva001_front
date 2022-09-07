@@ -14,7 +14,7 @@ import dash_table
 import pandas as pd
 
 from . import radar
-
+from ..utils import  get_risk_table
 #from flask_app import engine_analysis, engine_cons
 
 # Добавление пазов для модуле
@@ -33,9 +33,10 @@ import plotly.graph_objects as go
 # import seaborn as sns
 
 
-path_xlsx = os.getcwd()+'/front_ex/files/reestr_risk.xlsx' 
+# path_xlsx = os.getcwd()+'/front_ex/files/reestr_risk.xlsx' 
+risks=get_risk_table()
 risks_cols = ['Номер', 'Категория', 'Описание', 'Вероятность', 'Ущерб']
-risks = pd.read_excel(path_xlsx, engine='openpyxl', header=1)
+# risks = pd.read_excel(path_xlsx, engine='openpyxl', header=1)
 # print(risks.head(3), flush=True)
 risks.columns = risks_cols
 
@@ -55,20 +56,15 @@ def create_layout():
                         figure={
                             "data": [
                                 go.Scatterpolargl(
-    
-                                    #       r = df.trial_1_r * 8,
-                                    #       theta = df.trial_1_theta,
                                     hovertext=radar.hover_text,
+                                    showlegend=False,
                                     hoverinfo="text",
-  
                                     r = radar.trial_1_r,
                                     theta = radar.trial_1_theta,
                                     name = "Риск",
-                                    #       marker=dict(size=15, color="mediumseagreen", mode='makers'), 
                                     mode="markers+text", 
-                                    #     marker=dict(size=marker_size, color ='rgb(227, 166, 178)', opacity=0.5),
-                                    marker=dict(size=radar.p*0.85*np.array(radar.marker_size), 
-                                        color ='grey', 
+                                    marker=dict(size=radar.p*radar.koef_resize_markers*np.array(radar.marker_size), 
+                                        color ='rgb(217,217,217)', 
                                     #                 Прозрачность
                                         opacity=1,
                                         line=dict(color='grey'),
@@ -83,7 +79,6 @@ def create_layout():
                                 go.Barpolar(
                                     r = radar.bar_r,
                                     theta = radar.bar_theta,
-                                    #     text=bar_text,
                                     name='Группы рисков',
                                     hovertext=radar.hover_sec_text,
                                     hoverinfo="text",
@@ -93,8 +88,6 @@ def create_layout():
                                     showlegend=False
                                     #     marker=dict(color='frequency')
                                 ),
-
-
                             ],
                             "layout": go.Layout(
                                 height=radar.p*100, 
@@ -102,7 +95,7 @@ def create_layout():
                                 # height=fig.layout.height*p, 
                                 # width=(fig.layout.width-100)*p+100  ,#900, 
                                 autosize=True,
-                                margin=dict(l=0, r=100, t=0, b=0),
+                                margin=dict(l=0, r=0, t=0, b=0),
 
                                 polar_bargap=0, 
     
@@ -112,13 +105,14 @@ def create_layout():
                                                         ticks='',# opacity=1,
                                                         showgrid=False,
                                                         showline=False,
-                                                        layer='below traces'
-                                #                          linecolor = 'Black',
+                                                        layer='below traces',
+                                                        linecolor = 'White'
                                 #                                   linewidth = 3,
                                                         ),
                                         angularaxis = dict(showticklabels=False, 
                                                         showgrid=False,
                                                         ticks='',
+                                                        linecolor = 'White',
                                 #                             gridwidth = 3,
                                 #                              linewidth = 3,
                                         ),
@@ -130,16 +124,60 @@ def create_layout():
                                 # margin={"r": 0, "t": 50, "b": 20, "l": 70, },
                             ),
                         },
+                        config = {'displayModeBar': False}
                 ),            
-            ]),
+            ], style={'width': radar.p*100, 'display': 'inline-block'}),
             html.Div([
                 dash_table.DataTable(
                     id='table-risks',
                     columns=(
                         [{"name":i, "id":i} for i in risks_cols]
                     ),
-                    data= risks.to_dict(orient='records'),
-                    page_size=15,
+                     data= risks.to_dict(orient='records'),
+                    # columns=[{'id': c, 'name': c} for c in df.columns],
+                    # page_action='none',
+                    filter_action="native",
+                    # filter_action='custom',
+                    # filter_query='',
+                    sort_action='native',
+                    sort_mode='multi',
+                    row_selectable='multi',
+                    selected_rows=risks.index.tolist(),
+                    page_action='native',
+                    style_table={'height': 530, 
+                            # 'width':800,
+                            'overflowY': 'auto',
+                            'lineHeight': '30px'},
+
+                    editable=True,
+                    merge_duplicate_headers=True,
+                    style_header={
+                                'backgroundColor': 'rgb(138,36,50)',
+                                'color': 'white',
+                                'whiteSpace':'normal',
+                                'fontWeight': 'bold',
+                                'font_size': '16px'
+                    },
+                    style_data_conditional=[
+                                {
+                                    'if': {'row_index': 'odd'},
+                                    'backgroundColor': 'rgb(230, 230, 230)',
+                                }
+                    ],
+                    # fixed_rows={'headers': True},
+                    style_data={
+                            'whiteSpace': 'normal',
+                            'height': 'auto',
+                            'font_size': '12px',
+                            'line-height': 0.9
+                            # 'width': '100px',
+                            # 'maxWidth': '100px',
+                            # 'minWidth': '100px',
+                        },
+                    style_cell={
+                            'minWidth': 10, 'maxWidth': 95, 'width': 10,'textAlign': 'left'
+                        },
+                    page_size=100,
                     export_format='xlsx',
                     # editable=True
                 ),
@@ -190,7 +228,8 @@ def create_layout():
                 #                 'height': 'auto',
                 #             },
                 #     ),]),
-            ], ),
+            ], style={'display': 'inline-block', 'width': '49%',
+             'verticalAlign': 'top','margin-right': '1px','margin-left': '1px',} ),
 
             # # Row 4 - Закладки
             # html.Div([
@@ -205,7 +244,7 @@ def create_layout():
 
             # Row 5 - Содержимое закладки
             # html.Div(id='tab-content'),
-        ], className="sub_page",
+        ], className="sub_page", #style={'flex-basis': '45%', 'vertical-align': 'middle'}#'display': 'inline-block',}
                 ),
     ], className="page_landscape_a3",
     )

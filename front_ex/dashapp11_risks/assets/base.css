@@ -8,6 +8,10 @@ body {
   background-color: #fafafa;
   font-size: 1.1rem;
   line-height: 1.3;
+
+  /* display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly; */
 }
 * {
   box-sizing: border-box;

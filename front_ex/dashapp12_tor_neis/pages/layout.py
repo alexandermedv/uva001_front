@@ -5,7 +5,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 # from . import engine_cons
-from ..utils import get_tors, get_tors_by_contr, get_tors_by_cient, get_tors_count, get_tors_count_nk
+
+from ..utils import get_tors, get_tors_by_contr, get_tors_by_client, get_tors_count, get_tors_count_nk
 from sqlalchemy import create_engine
 # import front_ex.config as config
 

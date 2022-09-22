@@ -8,7 +8,7 @@ from .. import app
 # , db, engine_cons
 
 dash_app = Dash(__name__, server=app,
-                url_base_pathname='/dashboards/repairs_dash/',
+                url_base_pathname='/dashboards/tor_ik_dash/',
                 suppress_callback_exceptions=True)
 dash_app.config.update(app.config)
 dash_app.layout = html.Div()
@@ -24,12 +24,11 @@ dash_app.layout = html.Div(
 # from .pages import callbacks
 from .pages import layout
 
-
 @dash_app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):
     """Выбор шаблона"""
-    print(pathname)
-    if pathname == "/dashboards/repairs_dash/":
+    print('pathname', pathname, flush=True)
+    if pathname == "/dashboards/tor_ik_dash/":
         layout_dash1 = layout.create_layout()
         return layout_dash1
         #page_4.create_layout(dash_app)

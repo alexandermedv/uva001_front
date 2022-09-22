@@ -4,7 +4,6 @@ import pandas as pd
 # import front_ex.config as config
 from sqlalchemy import create_engine
 
-
 #Выгрузка полного списка ремонтов
 def get_tors(start_date, end_date):
     """ Выгрузка списка ремонтов"""
@@ -93,7 +92,7 @@ def get_tors_by_client(start_date, end_date):
     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
 #Выгрузка количество ремонтов
- def get_tors_count(start_date, end_date):
+def get_tors_count(start_date, end_date):
      """Выгрузка количества"""
      sql = '''
          SELECT 
@@ -105,7 +104,7 @@ def get_tors_by_client(start_date, end_date):
      return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
 #Выгрузка количество некачественных ремонтов
- def get_tors_count_nk(start_date, end_date):
+def get_tors_count_nk(start_date, end_date):
      """Выгрузка количества некачественных"""
      sql = '''
          SELECT 

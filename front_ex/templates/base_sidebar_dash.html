@@ -108,6 +108,9 @@
               {% if current_user.check_dash_roles('repairs') %}  
               <li><a href="/repairs_dash"><i class="fa fa-dashboard"></i>Ремонты (дашборд)</a></li>
               {% endif %}
+              {% if current_user.check_dash_roles('repairs') %}  
+              <li><a href="/tor_ik_dash"><i class="fa fa-dashboard"></i>Некачественные ремонты (дашборд)</a></li>
+              {% endif %}
               {% if current_user.check_dash_roles('empty_transportations') %}  
               <li><a href="/empty_transportations_dash"><i class="fa fa-dashboard"></i>Порожние рейсы (дашборд)</a></li>
               {% endif %}

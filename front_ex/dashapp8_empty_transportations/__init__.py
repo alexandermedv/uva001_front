@@ -28,11 +28,10 @@ dash_app.layout = html.Div(
 # from .pages import callbacks
 from .pages import layout
 
-
 @dash_app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):
     """Выбор шаблона"""
-    print(pathname)
+    print('pathname', pathname, flush=True)
     if pathname == "/dashboards/empty_transportations_dash/":
         layout_dash1 = layout.create_layout()
         return layout_dash1

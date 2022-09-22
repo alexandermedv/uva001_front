@@ -9,9 +9,7 @@ from sqlalchemy import create_engine
 def get_defect(start_date,  end_date):
     """Выгрузка непроведенных операций выбраковки"""
     sql = '''
-        SELECT *,
-        date_part('day', TO_DATE('20220802', 'YYYYMMDD') - defect_date),
-        date_part('day', accept_date - TO_DATE('20220815', 'YYYYMMDD'))
+        SELECT *
         FROM udv.details_defect a
         LEFT JOIN udv.view_details_reports_defect_details b
         ON a.details_defect_id = b.details_defect_id
@@ -38,6 +36,13 @@ def get_defect_count(start_date,  end_date):
     con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     return con.execute(sql).fetchone()[0]
 
+def get_defect_dynamics(start_date,  end_date):
+    """Динамика непроведенных операций выбраковки"""
+
+    sql = """
+
+    """ % (start_date,  end_date, end_date)
+
 # Выгрузка непроведенных операций пересылки
 def get_transfer(start_date,  end_date):
     """Выгрузка непроведенных операций выбраковки"""
@@ -57,7 +62,7 @@ def get_transfer(start_date,  end_date):
 
 # Количество непроведенных операций пересылки
 def get_transfer_count(start_date,  end_date):
-    """Количество непроведенных операций выбраковки"""
+    """Количество непроведенных операций пересылки"""
 
     sql = '''
         SELECT count(*)
@@ -73,7 +78,7 @@ def get_transfer_count(start_date,  end_date):
 
 # Выгрузка непроведенных операций ремонта
 def get_repair(start_date,  end_date):
-    """Выгрузка непроведенных операций выбраковки"""
+    """Выгрузка непроведенных операций ремонта"""
     sql = '''
         SELECT *,
         date_part('day', TO_DATE('20220802', 'YYYYMMDD') - rem_act_date),
@@ -90,7 +95,7 @@ def get_repair(start_date,  end_date):
 
 # Количество непроведенных операций ремонта
 def get_repair_count(start_date,  end_date):
-    """Количество непроведенных операций выбраковки"""
+    """Количество непроведенных операций ремонта"""
 
     sql = '''
         SELECT count(*)
@@ -106,7 +111,7 @@ def get_repair_count(start_date,  end_date):
 
 # Выгрузка непроведенных операций реализации
 def get_sale(start_date,  end_date):
-    """Выгрузка непроведенных операций выбраковки"""
+    """Выгрузка непроведенных операций реализации"""
     sql = '''
         SELECT *,
         date_part('day', TO_DATE('20220802', 'YYYYMMDD') - sale_date),
@@ -123,7 +128,7 @@ def get_sale(start_date,  end_date):
 
 # Количество непроведенных операций реализации
 def get_sale_count(start_date,  end_date):
-    """Количество непроведенных операций выбраковки"""
+    """Количество непроведенных операций реализации"""
 
     sql = '''
         SELECT count(*)
@@ -133,12 +138,153 @@ def get_sale_count(start_date,  end_date):
         WHERE sale_date between '%s' and '%s'
             AND (accept_date > '%s' OR accept_date is null)
         ''' % (start_date,  end_date, end_date)
-    print(sql)
+
     con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     return con.execute(sql).fetchone()[0]
 
 
+# Сводные результаты нагона
+def get_nagon_results(start_date, end_date):
+    """Сводные результаты нагона"""
 
+    sql = '''
+        SELECT 'Выбраковка' AS "operation",
+    date_part('year', defect_date)::int AS "year",
+    filial_id AS "filial",
+    c.filial_short_name AS "filial_name",
+    count(*)::bigint AS "oper_accepted_count",
+    avg("oper_count")::bigint AS "oper_count",
+    round(count(*)/avg("oper_count"), 2) AS "percentage"
+FROM udv.details_defect a
+        LEFT JOIN udv.view_details_reports_defect_details b
+        ON a.details_defect_id = b.details_defect_id
+        LEFT JOIN udv.nsi_org_filial c
+        ON a.filial_id = c.nsi_org_filial_id
+        
+        LEFT JOIN (
+            SELECT 'Выбраковка' AS "operation",
+            date_part('year', defect_date) AS "year",
+            filial_id AS "filial",
+            c.filial_short_name AS "filial_name",
+            count(*) AS "oper_count"
+        FROM udv.details_defect a
+                LEFT JOIN udv.view_details_reports_defect_details b
+                ON a.details_defect_id = b.details_defect_id
+                LEFT JOIN udv.nsi_org_filial c
+                ON a.filial_id = c.nsi_org_filial_id
+                WHERE defect_date between '%s' and '%s'
+                    AND filial_id NOT IN ('30', '32', '34')
+        GROUP BY date_part('year', defect_date),
+                filial_id,
+                c.filial_short_name) x
+        ON date_part('year', a.defect_date) = x."year"
+        AND a.filial_id = x."filial"
+        AND c.filial_short_name = x."filial_name" 
+        WHERE defect_date between '%s' and '%s'
+            AND (accept_date > '%s' OR accept_date is null)
+            AND filial_id NOT IN ('30', '32', '34')
+        GROUP BY date_part('year', defect_date),
+                filial_id,
+                c.filial_short_name
+            
+        UNION 
+        SELECT 'Пересылка' AS "operation",
+                date_part('year', transfer_date)::int AS "year",
+                filial_id AS "filial",
+                c.filial_short_name AS "filial_name",
+                count(*)::bigint AS "oper_accepted_count",
+                avg("oper_count")::bigint AS "oper_count",
+                round(count(*)/avg("oper_count"), 2) AS "percentage"
+        FROM udv.details_transfer a
+                left join udv.view_details_reports_transfer_details b
+                ON a.details_transfer_id = b.details_transfer_id
+                LEFT JOIN udv.nsi_org_filial c
+                ON a.filial_id = c.nsi_org_filial_id
+                LEFT JOIN (
+                    SELECT 'Пересылка' AS "operation",
+                    date_part('year', transfer_date) AS "year",
+                    filial_id AS "filial",
+                    c.filial_short_name AS "filial_name",
+                    count(*) AS "oper_count"
+                FROM udv.details_transfer a
+                        LEFT JOIN udv.view_details_reports_transfer_details b
+                        ON a.details_transfer_id = b.details_transfer_id
+                        LEFT JOIN udv.nsi_org_filial c
+                        ON a.filial_id = c.nsi_org_filial_id
+                        WHERE transfer_date between '%s' and '%s'
+                            AND filial_id NOT IN ('30', '32', '34')
+                GROUP BY date_part('year', transfer_date),
+                        filial_id,
+                        c.filial_short_name) x
+                ON date_part('year', a.transfer_date) = x."year"
+                AND a.filial_id = x."filial"
+                AND c.filial_short_name = x."filial_name"
+        WHERE transfer_date between '%s' and '%s'
+            AND (accept_date > '%s' OR accept_date is null)
+            AND filial_id NOT IN ('30', '32', '34')
+        GROUP BY date_part('year', transfer_date),
+                filial_id,
+                c.filial_short_name
+
+        UNION
+        SELECT 'Расход в ремонт вагонов' AS "operation",
+                date_part('year', rem_act_date)::int AS "year",
+                filial_id AS "filial",
+                c.filial_short_name AS "filial_name",
+                count(*)::bigint AS "oper_accepted_count",
+                avg("oper_count")::bigint AS "oper_count",
+                round(count(*)/avg("oper_count"), 2) AS "percentage"
+        FROM udv.details_repair a
+                left join udv.view_details_reports_repair_details b
+                ON a.details_rapair_id = b.details_repair_id
+                LEFT JOIN udv.nsi_org_filial c
+                ON a.filial_id = c.nsi_org_filial_id
+                LEFT JOIN (
+                    SELECT 'Расход в ремонт вагонов' AS "operation",
+                    date_part('year', rem_act_date) AS "year",
+                    filial_id AS "filial",
+                    c.filial_short_name AS "filial_name",
+                    count(*) AS "oper_count"
+                FROM udv.details_repair a
+                        LEFT JOIN udv.view_details_reports_repair_details b
+                        ON a.details_rapair_id = b.details_repair_id
+                        LEFT JOIN udv.nsi_org_filial c
+                        ON a.filial_id = c.nsi_org_filial_id
+                        WHERE rem_act_date between '%s' and '%s'
+                            AND filial_id NOT IN ('30', '32', '34')
+                GROUP BY date_part('year', rem_act_date),
+                        filial_id,
+                        c.filial_short_name) x
+                ON date_part('year', a.rem_act_date) = x."year"
+                AND a.filial_id = x."filial"
+                AND c.filial_short_name = x."filial_name"
+        WHERE rem_act_date between '%s' and '%s'
+            AND (accept_date > '%s' OR accept_date is null)
+            AND filial_id NOT IN ('30', '32', '34')
+        GROUP BY date_part('year', rem_act_date),
+                filial_id,
+                c.filial_short_name
+        ''' % (start_date,  end_date, start_date, end_date, end_date, start_date,  end_date, start_date, end_date, end_date, start_date,  end_date, start_date, end_date, end_date)
+
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+
+
+
+# Выгрузка динамики по нагону
+def get_nagon_dynamics(start_date, end_date):
+    """Выгрузка динамики по нагону"""
+
+    start_date = start_date.replace(day=1)
+    end_date = end_date.replace(day=1)
+
+    sql = '''
+        SELECT *
+        FROM udv.nagon_dynamics_months
+        WHERE start_date = '%s'
+            AND end_date between '%s' AND '%s'
+        ''' % (start_date, start_date,  end_date)
+
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
 
 
 

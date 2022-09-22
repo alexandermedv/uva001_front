@@ -75,7 +75,7 @@ def create_layout():
                     className='four columns'),
 
                     html.Div(
-                        html.Output('Изменение недостачи за период, тыс. руб.:'),
+                        html.Output('Количество неотраженных операций в периоде, шт.:'),
                     className='five columns',
                     style={"display": "flex",
                         "align-items": "center",
@@ -83,7 +83,7 @@ def create_layout():
                             }),
                     html.Div(
                         html.B(
-                            html.Output(id='shortage_amount'),
+                            html.Output(id='nagon_count'),
                             ),
                     className='two columns',
                                 style={"border-style": "groove",
@@ -235,11 +235,12 @@ def create_layout():
 
             html.Div([
                 dcc.Tabs(id='dashboard2-tabs', value='tab-1', children=[
-                    dcc.Tab(label='Динамика недостачи', value='tab-1', className="tab",),
+                    dcc.Tab(label='Динамика нагона по данным УДВ', value='tab-1', className="tab",),
                     dcc.Tab(label='Выбраковка', value='tab-2', className="tab",),
                     dcc.Tab(label='Пересылки', value='tab-3', className="tab",),
                     dcc.Tab(label='Ремонты', value='tab-4', className="tab",),
                     dcc.Tab(label='Реализация', value='tab-5', className="tab",),
+                    dcc.Tab(label='Сводные результаты', value='tab-6', className="tab",),
                 ], className="row all-tabs"),
                 #html.Div(id='tabs-example-content')
             ]),

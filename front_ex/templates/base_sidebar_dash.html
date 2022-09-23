@@ -60,6 +60,10 @@
               <li><a href="/risks_dash"><i class="fa fa-dashboard"></i>Дашборд по рискам</a></li>
               {% endif %}
               
+              {% if current_user.check_dash_roles('dashapp13') %}
+              <li><a href="/credit_risks_dash"><i class="fa fa-dashboard"></i>Кредитные риски</a></li>
+              {% endif %}
+              
               <!-- {% if current_user.check_report_roles('reports') %}
               <li><a href="/reports/"><i class="fa fa-dashboard"></i>Отчеты</a></li>
               {% endif %} -->

@@ -10,6 +10,6 @@ print('База SAP S4', os.environ['SAP_HOST_S4'])
 # Обязательно добавить app иначе flask db его не видит 
 from front_ex import dispatch_app, app
 
-if(__name__ == '__main__'):
+if (__name__ == '__main__'):
     app.wsgi_app = dispatch_app
-    app.run('0.0.0.0', int(os.environ['FLASK_PORT'])+100, debug=os.environ['FLASK_DEBUG'])
+    app.run('172.17.0.133', '7113', debug=True)

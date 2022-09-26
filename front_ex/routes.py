@@ -19,6 +19,14 @@ from .utils import logger
 
 
 # Руты к дэшбордам
+@app.route('/risks_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp11():
+    """Дашборд по размеру и динамике недостачи"""
+    return render_template('/dashapp11_risks/overview.html')
+
+
 @app.route('/limit_oper/')
 @login_required
 @logger(os.environ['USER_ACTIONS_FILE'])
@@ -74,6 +82,12 @@ def render_dashapp7_repairs():
     """Дашборд по ремонтам"""
     return render_template('/dashapp7_repairs/overview.html')
 
+@app.route('/tor_ik_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp12_tor_neis():
+    """Дашборд по ремонтам"""
+    return render_template('/dashapp12_tor_neis/overview.html')
 
 @app.route('/empty_transportations_dash/')
 @login_required

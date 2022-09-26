@@ -36,4 +36,11 @@ services:
 #       ipam:
 #          config:
 #            - subnet: 172.17.8.0/24
+
+networks: 
+    net_nginx_prod: 
+        driver: bridge
+        ipam:
+            config:
+            - subnet: 172.17.48.0/24
             

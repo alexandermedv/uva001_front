@@ -762,60 +762,59 @@ def btn_download_report_button(n_clicks, start_date, end_date, railway):
     else:
         return ''
 
-dash_app.clientside_callback(
-    '''
-        function download_file(value){
-            if (value > '') {
-                const a = document.createElement('a');
-                document.body.appendChild(a);
-                a.style='display: none';
-                a.href = value;
-                a.click(); 
-                alert('Ссылка на файл для скачивания: ' + value);
-            }
-        }
-    ''',
-    Output('download_callback', component_property='children'),
-    Input('link1', 'href')
-) 
+# dash_app.clientside_callback(
+#     '''
+#         function download_file(value){
+#             if (value > '') {
+#                 const a = document.createElement('a');
+#                 document.body.appendChild(a);
+#                 a.style='display: none';
+#                 a.href = value;
+#                 a.click(); 
+#                 alert('Ссылка на файл для скачивания: ' + value);
+#             }
+#         }
+#     ''',
+#     Output('download_callback', component_property='children'),
+#     Input('link1', 'href')
+# ) 
 
 # Полный вариант на js
 # def link_update(value):
 #     print('value', value)
 
-# dash_app.clientside_callback(
-#     """
-#     function btn_download_report_button(n_clicks, value) {
-#         if(n_clicks != 0) {
-#             alert('Загрузка');
-#             const url = 'http://msc199-sdb04.domain.local:9002/api/reports/report_test';
-#             $.get(url)
-#             .done(function get_async_status(data){
-#                 const uuid = data.task_id;
-#                 const url_ask = 'http://msc199-sdb04.domain.local:9002/api/reports/report_test?task_id='+uuid;
-#                 $.get(url_ask)
-#                 .done(function(data){
-#                     const state = data.state;
-#                     if (state == 'SUCCESS'){
-#                         clearTimeout(get_async_status);
-#                         const a = document.createElement('a');
-#                         document.body.appendChild(a);
-#                         a.style='display: none';
-#                         a.href = 'http://msc199-sdb04.domain.local:9002/api/uploads/test.xlsx'
-#                         a.click(); 
-#                     }
-#                     else {
-#                         // 0,5 миллисекунд
-#                         setTimeout(function() { get_async_status(data) }, 1000);
-#                     }
-#                 });
-#             }); 
-#         };
-#         return 'link';
-#     }
-#     """,           
-#     [Output('link', 'children')],
-#     [Input('download-report-button', 'n_clicks')],
-#     [State('dashboard8-dropdown1-in-railway', 'value')]
-# )
-           
+dash_app.clientside_callback(
+    """
+    function btn_download_report_button(n_clicks, value) {
+        if(n_clicks != 0) {
+            alert('Загрузка');
+            const url = 'http://msc199-sdb04.domain.local:9002/api/reports/report_test';
+            $.get(url)
+            .done(function get_async_status(data){
+                const uuid = data.task_id;
+                const url_ask = 'http://msc199-sdb04.domain.local:9002/api/reports/report_test?task_id='+uuid;
+                $.get(url_ask)
+                .done(function(data){
+                    const state = data.state;
+                    if (state == 'SUCCESS'){
+                        clearTimeout(get_async_status);
+                        const a = document.createElement('a');
+                        document.body.appendChild(a);
+                        a.style='display: none';
+                        a.href = 'http://msc199-sdb04.domain.local:9002/api/uploads/test.xlsx'
+                        a.click(); 
+                    }
+                    else {
+                        // 0,5 миллисекунд
+                        setTimeout(function() { get_async_status(data) }, 1000);
+                    }
+                });
+            }); 
+        };
+        return 'link';
+    }
+    """,           
+    [Output('link', 'children')],
+    [Input('download-report-button', 'n_clicks')],
+    [State('dashboard8-dropdown1-in-railway', 'value')]
+)

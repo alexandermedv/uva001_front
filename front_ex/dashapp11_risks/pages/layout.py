@@ -35,15 +35,15 @@ import plotly.graph_objects as go
 
 # path_xlsx = os.getcwd()+'/front_ex/files/reestr_risk.xlsx' 
 risks=get_risk_table()
-risks_cols = ['Номер', 'Категория', 'Описание', 'Вероятность', 'Ущерб']
+risks_cols = ['Номер', 'Категория', 'Описание', 'Вероятность', 'Ущерб                ']
 # risks = pd.read_excel(path_xlsx, engine='openpyxl', header=1)
 # print(risks.head(3), flush=True)
 risks.columns = risks_cols
 
-params = [
-    'Weight', 'Torque', 'Width', 'Height',
-    'Efficiency', 'Power', 'Displacement'
-]
+# params = [
+#     'Weight', 'Torque', 'Width', 'Height',
+#     'Efficiency', 'Power', 'Displacement'
+# ]
 
 def create_layout():
     """Создание шаблона"""
@@ -159,10 +159,21 @@ def create_layout():
                                 'font_size': '16px'
                     },
                     style_data_conditional=[
+                        # {'if': {'column_name':  'Ущерб'},
+                        #             'width': '10'},
+                        #             {'if': {'column_name': 'Вероятность'},
+                        #             'width': '180px'}, 
+                        #             {'if': {'column_name': 'Номер'},
+                        #             'width': '180px'},
+                        #             {'if': {'column_name': 'Категория'},
+                        #             'width': '10'},
+                        #             {'if': {'column_name': 'Описание'},
+                        #             'width': '10'},
                                 {
                                     'if': {'row_index': 'odd'},
                                     'backgroundColor': 'rgb(230, 230, 230)',
-                                }
+                                },
+                                 
                     ],
                     # fixed_rows={'headers': True},
                     style_data={
@@ -175,8 +186,21 @@ def create_layout():
                             # 'minWidth': '100px',
                         },
                     style_cell={
-                            'minWidth': 10, 'maxWidth': 95, 'width': 10,'textAlign': 'left'
+                            'minWidth': 10, 'maxWidth': 95, 'width': 15,
+                            'textAlign': 'left'
                         },
+                    # style_cell_conditional=[
+                    #     {'if': {'column_id':  'Ущерб'},
+                    #     'width': '10'},
+                    #     {'if': {'column_id': 'Вероятность'},
+                    #     'width': '5'}, 
+                    #     {'if': {'column_id': 'Номер'},
+                    #     'width': '5'},
+                    #     {'if': {'column_id': 'Категория'},
+                    #     'width': '10'},
+                    #     {'if': {'column_id': 'Описание'},
+                    #     'width': '10'},
+                    # ],
                     page_size=100,
                     export_format='xlsx',
                     # editable=True

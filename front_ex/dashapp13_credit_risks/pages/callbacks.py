@@ -1,73 +1,130 @@
-""" Интерактивные элементы для отчетов по запчастям."""
-import datetime as dt
-# from sre_parse import State
-import numpy as np
-from dash.dependencies import Input, Output,State
-import dash
 import dash_core_components as dcc
 import dash_html_components as html
-#import dash_table
-#from dash_table.Format import Format, Scheme, Group
-#from app.dashes import dashapp1
-#from app.raw_sql import dashapp1_non_used_details_udv_filial
-import plotly.graph_objects as go
+import plotly.graph_objs as go
+from dash.dependencies import Output, Input, State
+# from dash.dash_table.Format import Format, Group
+import dash_bootstrap_components as dbc
+import dash_table
+from datetime import date
 import pandas as pd
-#from .layout import layout2
-#import string
-# from ..utils import get_osv_detail_by_dates, get_osv_detail_by_dates2, get_osv_data
-# from ..utils import get_branch_names, get_detail_type_names, get_warehouse_names
-from ..pages import dash_app
-from . import radar
-#Показывает шарик на радаре соответствуюший выбраной ячейки в таблице 
-# Перрерисовывать таблицу по выбраным ячейкам
-@dash_app.callback( 
-    [
-        Output('dash8-tab-1-graph1', 'figure')
-    ],
-    [
-        Input('table-risks', 'active_cell'),
-        Input('table-risks', 'selected_rows'),
+import os
+from functools import lru_cache
+import pyhdb
+import datetime as dt
+from datetime import datetime
+import numpy as np
 
-    ],
-    [
-        State('dash8-tab-1-graph1', 'figure'),
-        State('table-risks', 'derived_viewport_data'), 
-        State('table-risks', 'data'),         
-        ],  prevent_initial_call=True, background=True
-)
-def show_marker(a_c,s_r,f,d_w_d,d):
-    ctx=dash.callback_context
-    if ctx.triggered[0]['prop_id']=='table-risks.active_cell':
-        if a_c and (a_c['column'] in [0,2]):
-            i0=f['data'][0]['text'].index(str(d_w_d[a_c['row']]['Номер']))
-            f['data'][0]['marker']['color']=['rgb(217,217,217)' if i!=i0 else 'rgb(255,255,102)'  for i in range(len(f['data'][0]['r']))]
-        else:
-            f['data'][0]['marker']['color']=['rgb(217,217,217)'  for i in range(len(f['data'][0]['r']))]
-    elif ctx.triggered[0]['prop_id']=='table-risks.selected_rows':
-        mask=[1 if i in s_r else 0 for i in range(len(d))]
-        bar_theta,bar_r,bar_bound,hover_sec_text,ball_text,trial_1_r,\
-            trial_1_theta,marker_size,hover_text,bar_color=radar.main0(pd.DataFrame(d),  radar.bigest_size,radar.b,radar.koef,radar.koef_r,radar.try_resize_radius_bounds,radar.resize_balles, mask)
-        if a_c and (a_c['column'] in [0,2]) and (str(d_w_d[a_c['row']]['Номер']) in ball_text):
-            i0=ball_text.index(str(d_w_d[a_c['row']]['Номер']))
-            f['data'][0]['marker']['color']=['rgb(217,217,217)' if i!=i0 else 'rgb(255,255,102)'  for i in range(len(ball_text))]
-        else:
-            f['data'][0]['marker']['color']=['rgb(217,217,217)'  for i in range(len(ball_text))]
-
-        f['data'][0]['marker']['size']=radar.p*radar.koef_resize_markers*np.array(marker_size)
-        f['data'][0]['text']=[ str (i) for i in ball_text]
-        f['data'][0]['theta']=trial_1_theta
-        f['data'][0]['r']=trial_1_r
-        f['data'][0]['hovertext']=hover_text
-        f['data'][1]['hovertext']=hover_sec_text
-        f['data'][1]['theta']=bar_theta
-        f['data'][1]['r']=bar_r
-        f['data'][1]['marker']['color']=bar_color
-                                        
+from sqlalchemy import create_engine
+from . import dash_app as app
+from ..utils import  get_credit_data, get_credit_data_all, get_credit_data_clients#get_credit_data_filials,
+# from .utils import get_limit_oper_client_zuonr_data, get_limit1, get_limit
+def sum_nonlimit(s , n=0.13):
+    if n in s.values:
+        return n
     else:
-        raise dash.exceptions.PreventUpdate
-    return [f]
+        return s.sum()
+def get_matrix_stat_1(df3_1, s_d=None, e_d=None):
+    if s_d is not None:
+        df3_1=df3_1[df3_1['date']>=s_d]
+    if e_d is not None:
+        df3_1=df3_1[df3_1['date']<=e_d]
+    if df3_1.shape[0]==0:
+        return pd.DataFrame()
+    df3_1=df3_1.sort_values([ 'id_rcm', 'client_name','date'])
+    df6=pd.DataFrame()
+    i0=0
+    res=0
+    dg_n=0
+    for dg, dt, dp in df3_1[[ 'id_rcm', 'date','dept_over_lim']].values:
+        if dg_n==0:
+            # set_trace()
+            dg_n=dg
+            m=dp
+        elif  dg_n!=dg:
+            # set_trace()
+            # print(dg)
+            df6_1=pd.DataFrame({'id_rcm': [dg_n],
+            'res': [res],
+            'max': [m]})
+            df6=pd.concat([df6, df6_1], ignore_index=True)
+            if (dp>0):
+                res=1
+                i0=dp
+            else:
+                i0=0
+            m=dp
+            dg_n=dg
+        else:
+            if (i0==0) & (dp>0):
+                res=res+1
+                i0=dp
+            elif (dp==0):
+                i0=0
+            if dp>m:
+                m=dp
+    df6_1=pd.DataFrame({'id_rcm': [dg_n],
+            'res': [res],
+            'max': [m]})
+    df6=pd.concat([df6, df6_1], ignore_index=True)
+    col0=[i  for i in ['client_name', 
+        'dog_number',
+       # 'date',  
+        'dinamic_saldo', 'lim_sum',
+       'dept_over_lim', 'rating', 'garanty','res','max'] if (i in df3_1.columns) | (i in df6.columns )]
+    return df3_1.loc[df3_1['date']==df3_1['date'].max(),].merge(df6, left_on='id_rcm', right_on='id_rcm')[col0].sort_values(['dept_over_lim','dinamic_saldo', ],  ascending=False)
+def get_matrix_stat_2(df3_1,  e_d=None):
+    if (e_d is None) :
+        df3_1=df3_1.loc[df3_1['date']==df3_1['date'].max(),['client_name', 'dog_number', 
+         'dinamic_saldo', 'rating', 'garanty',]]
+    else:
+        df3_1=df3_1.loc[df3_1['date']==e_d,['client_name', 'dog_number', 
+         'dinamic_saldo', 'rating', 'garanty',]]
+    df3_1['postpone_pay']=np.nan
+    df3_1['prosrochka']=np.nan
+    df3_1['percent']=np.nan
+    return df3_1.sort_values(['dinamic_saldo', ],  ascending=False)
 
-#     bar_theta,bar_r,bar_bound,hover_sec_text,ball_text,trial_1_r,
-# trial_1_theta,marker_size,hover_text,bar_color=radar.main0(d,s_r)
+def get_dates_for_table():
+    print('1. Загрузка данных')
+    df = get_credit_data()
     
-#   
+    print('2. Все контракты')
+    df_dog_2=df.loc[(df['3_group']==2) , ['id_rcm','client_name', 'dog_number', 
+       'date',  'dinamic_saldo', 'lim_sum', 'rating', 'garanty',
+       'dept_over_lim']]
+    df_dog_3=df.loc[(df['3_group']==3) , ['id_rcm','client_name', 'dog_number', 
+       'date',  'dinamic_saldo', 'rating', 'garanty',
+       ]]
+    df_dog_1=df.loc[(df['3_group']==1) , ['id_rcm','client_name', 'dog_number', 
+       'date',  'dinamic_saldo', 'rating', 'dept_over_lim'
+       ]]
+    # df_dog_2_1=get_matrix_stat_1(df_dog_2)
+    # df_dog_3_1=get_matrix_stat_2(df_dog_3)
+    # df_dog_1_1=get_matrix_stat_1(df_dog_1)
+    return [df_dog_1,df_dog_2,df_dog_3]
+@app.callback(
+        [
+        Output('datatable_clients_limit', 'data'),
+        Output('datatable_clients_X', 'data'),
+        Output('datatable_clients_prepaid', 'data'),
+        ]
+        ,
+        Input('submit-val', 'n_clicks')
+        ,
+        State('risk_str_date', 'date'),
+        State('risk_end_date', 'date'),
+        background=True,
+        # State('datatable_clients_limit', 'data'),  
+        prevent_initial_call=True,
+        running=[
+        ( Output("submit-val", "disabled"), True, False),
+        ]
+)
+def chose_period(n_c, s_d, e_d):
+    df_dog_1,df_dog_2,df_dog_3=get_dates_for_table()
+    df_dog_2_1=get_matrix_stat_1(df_dog_2, s_d=s_d, e_d= e_d)
+    df_dog_3_1=get_matrix_stat_2(df_dog_3)
+    df_dog_1_1=get_matrix_stat_1(df_dog_1)
+    return [df_dog_2_1.to_dict('records'),df_dog_3_1.to_dict('records'),df_dog_1_1.to_dict('records'),]
+
+    

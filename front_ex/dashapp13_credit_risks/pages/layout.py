@@ -1,170 +1,342 @@
-""" Шаблоны для отчетов по запчастям."""
-import os
-import numpy as np
-from pathlib import Path
-from datetime import date
 import dash_core_components as dcc
 import dash_html_components as html
+import plotly.graph_objs as go
+from dash.dependencies import Output, Input, State
+# from dash.dash_table.Format import Format, Group
 import dash_bootstrap_components as dbc
-# from . import engine_cons
-# from ..utils import get_max_date
-from sqlalchemy import create_engine
-
 import dash_table
+from datetime import date
 import pandas as pd
+import os
+from functools import lru_cache
+import pyhdb
+import datetime as dt
+from datetime import datetime
+import numpy as np
 
-from . import radar
-from ..utils import  get_risk_table
-#from flask_app import engine_analysis, engine_cons
+from sqlalchemy import create_engine
+from . import dash_app as app
+from ..utils import  get_credit_data, get_credit_data_all, get_credit_data_clients#get_credit_data_filials,
+# from .utils import get_limit_oper_client_zuonr_data, get_limit1, get_limit
+def sum_nonlimit(s , n=0.13):
+    if n in s.values:
+        return n
+    else:
+        return s.sum()
+def get_matrix_stat_1(df3_1, s_d=None, e_d=None):
+    if s_d is not None:
+        df3_1=df3_1[df3_1['date']>=s_d]
+    if e_d is not None:
+        df3_1=df3_1[df3_1['date']<=e_d]
+    if df3_1.shape[0]==0:
+        return pd.DataFrame()
+    df3_1=df3_1.sort_values([ 'id_rcm', 'client_name','date'])
+    df6=pd.DataFrame()
+    i0=0
+    res=0
+    dg_n=0
+    for dg, dt, dp in df3_1[[ 'id_rcm', 'date','dept_over_lim']].values:
+        if dg_n==0:
+            # set_trace()
+            dg_n=dg
+            m=dp
+        elif  dg_n!=dg:
+            # set_trace()
+            # print(dg)
+            df6_1=pd.DataFrame({'id_rcm': [dg_n],
+            'res': [res],
+            'max': [m]})
+            df6=pd.concat([df6, df6_1], ignore_index=True)
+            if (dp>0):
+                res=1
+                i0=dp
+            else:
+                i0=0
+            m=dp
+            dg_n=dg
+        else:
+            if (i0==0) & (dp>0):
+                res=res+1
+                i0=dp
+            elif (dp==0):
+                i0=0
+            if dp>m:
+                m=dp
+    df6_1=pd.DataFrame({'id_rcm': [dg_n],
+            'res': [res],
+            'max': [m]})
+    df6=pd.concat([df6, df6_1], ignore_index=True)
+    col0=[i  for i in ['client_name', 
+        'dog_number',
+       # 'date',  
+        'dinamic_saldo', 'lim_sum',
+       'dept_over_lim', 'rating', 'garanty','res','max'] if (i in df3_1.columns) | (i in df6.columns )]
+    return df3_1.loc[df3_1['date']==df3_1['date'].max(),].merge(df6, left_on='id_rcm', right_on='id_rcm')[col0].sort_values(['dept_over_lim','dinamic_saldo', ],  ascending=False)
+def get_matrix_stat_2(df3_1,  e_d=None):
+    if (e_d is None) :
+        df3_1=df3_1.loc[df3_1['date']==df3_1['date'].max(),['client_name', 'dog_number', 
+         'dinamic_saldo', 'rating', 'garanty',]]
+    else:
+        df3_1=df3_1.loc[df3_1['date']==e_d,['client_name', 'dog_number', 
+         'dinamic_saldo', 'rating', 'garanty',]]
+    df3_1['postpone_pay']=np.nan
+    df3_1['prosrochka']=np.nan
+    df3_1['percent']=np.nan
+    return df3_1.sort_values(['dinamic_saldo', ],  ascending=False)
 
-# Добавление пазов для модуле
-# sys.path.append('/opt/airflow')
-# os.path.abspath(Path(__file__).parents[1])
-# Адрес файла
-# print(Path(__file__), flush=True)
-# Адрес проекта
-# print(os.getcwd()+'/front_ex/files', flush=True)
-
-# секция настройки радара
-
-
-import plotly.graph_objects as go
-# from IPython.core.debugger import set_trace
-# import seaborn as sns
-
-
-# path_xlsx = os.getcwd()+'/front_ex/files/reestr_risk.xlsx' 
-risks=get_risk_table()
-risks_cols = ['Номер', 'Категория', 'Описание', 'Вероятность', 'Ущерб']
-# risks = pd.read_excel(path_xlsx, engine='openpyxl', header=1)
-# print(risks.head(3), flush=True)
-risks.columns = risks_cols
-
-params = [
-    'Weight', 'Torque', 'Width', 'Height',
-    'Efficiency', 'Power', 'Displacement'
-]
-
-def create_layout():
-    """Создание шаблона"""
-    # engine_cons = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
-    layout = html.Div([
-        html.Div([
-            html.Div([
-                dcc.Graph(
-                        id="dash8-tab-1-graph1",
-                        figure={
-                            "data": [
-                                go.Scatterpolargl(
-                                    hovertext=radar.hover_text,
-                                    showlegend=False,
-                                    hoverinfo="text",
-                                    r = radar.trial_1_r,
-                                    theta = radar.trial_1_theta,
-                                    name = "Риск",
-                                    mode="markers+text", 
-                                    marker=dict(size=radar.p*radar.koef_resize_markers*np.array(radar.marker_size), 
-                                        color ='rgb(217,217,217)', 
-                                    #                 Прозрачность
-                                        opacity=1,
-                                        line=dict(color='grey'),
-                                    ),
-                                    #     hover_data={'r':False},
-                                    text = radar.ball_text, 
-                                    hoverlabel=dict(
-                                        bgcolor='rgb(0,0,0)'
-                                    )
-                                    #     textfont = dict(color='black', size = 15),
-                                ), 
-                                go.Barpolar(
-                                    r = radar.bar_r,
-                                    theta = radar.bar_theta,
-                                    name='Группы рисков',
-                                    hovertext=radar.hover_sec_text,
-                                    hoverinfo="text",
-                                    marker=dict(color=radar.bar_color, 
-                                                line=dict(width=1)
-                                            ),
-                                    showlegend=False
-                                    #     marker=dict(color='frequency')
-                                ),
-                            ],
-                            "layout": go.Layout(
-                                height=radar.p*100, 
-                                # width=100+100,
-                                # height=fig.layout.height*p, 
-                                # width=(fig.layout.width-100)*p+100  ,#900, 
-                                autosize=True,
-                                margin=dict(l=0, r=0, t=0, b=0),
-
-                                polar_bargap=0, 
+def get_dates_for_table():
+    print('1. Загрузка данных')
+    df = get_credit_data()
     
-                                polar = dict(
-                                    bgcolor ='White',# "rgb(223, 0, 0)",
-                                        radialaxis = dict(showticklabels=False, 
-                                                        ticks='',# opacity=1,
-                                                        showgrid=False,
-                                                        showline=False,
-                                                        layer='below traces',
-                                                        linecolor = 'White'
-                                #                                   linewidth = 3,
-                                                        ),
-                                        angularaxis = dict(showticklabels=False, 
-                                                        showgrid=False,
-                                                        ticks='',
-                                                        linecolor = 'White',
-                                #                             gridwidth = 3,
-                                #                              linewidth = 3,
-                                        ),
-                                    ),
-                                # autosize=True,
-                                # # barmode = 'stack', 
-                                # barmode = 'group',
-                                # title_text='Кол-во порожних вагонорейсов с просрочкой помесячно, ваг.',
-                                # margin={"r": 0, "t": 50, "b": 20, "l": 70, },
-                            ),
-                        },
-                        config = {'displayModeBar': False}
-                ),            
-            ], style={'width': radar.p*100, 'display': 'inline-block'}),
-            html.Div([
-                dash_table.DataTable(
-                    id='table-risks',
-                    columns=(
-                        [{"name":i, "id":i} for i in risks_cols]
+    print('2. Все контракты')
+    df_dog_2=df.loc[(df['3_group']==2) , ['id_rcm','client_name', 'dog_number', 
+       'date',  'dinamic_saldo', 'lim_sum', 'rating', 'garanty',
+       'dept_over_lim']]
+    df_dog_3=df.loc[(df['3_group']==3) , ['id_rcm','client_name', 'dog_number', 
+       'date',  'dinamic_saldo', 'rating', 'garanty',
+       ]]
+    df_dog_1=df.loc[(df['3_group']==1) , ['id_rcm','client_name', 'dog_number', 
+       'date',  'dinamic_saldo', 'rating', 'dept_over_lim'
+       ]]
+    # df_dog_2_1=get_matrix_stat_1(df_dog_2)
+    # df_dog_3_1=get_matrix_stat_2(df_dog_3)
+    # df_dog_1_1=get_matrix_stat_1(df_dog_1)
+    return [df_dog_1,df_dog_2,df_dog_3]
+
+def create_layout(): 
+    df_dog_1,df_dog_2,df_dog_3=get_dates_for_table()
+    df_dog_2_1=get_matrix_stat_1(df_dog_2)
+    df_dog_3_1=get_matrix_stat_2(df_dog_3)
+    df_dog_1_1=get_matrix_stat_1(df_dog_1)
+    # contracts_2 = df_dog_2[['dog_number', 'id_rcm']].drop_duplicates()
+    # clients_2 = df_dog_2[[ 'client_name']].drop_duplicates()
+       
+    
+    # print('3. Все клиенты')
+    # df_clients0=get_credit_data_clients()
+    # df_clients=df_clients0[df_clients0['date']=='2022-08-31'].sort_values(['dept_over_lim','dinamic_saldo', ],  ascending=False)
+    # clients = df_clients0[[ 'client_name']].drop_duplicates()
+    # print('4. Все филиалы')
+    # df_filial0=get_credit_data_filials()
+    # df_filial0.loc[:,['dinamic_saldo', 'dept_over_lim','debitor','dept_over_lim_y', ] ] *=-1
+
+    # df_filial=df_filial0[df_filial0['date']=='2022-08-31']
+    # filials = df_filial['filial'].drop_duplicates()
+    print('5. Все и безлимитные')
+    df_all0=get_credit_data_all()
+    max_date=df_all0['date'].max()
+    min_date=df_all0['date'].min()
+    df_all0=df_all0.set_index('date')
+    col_name_rus={
+        'clients_count':['Кол-во превышений лимита','numeric', 1],
+        'postpone_pay':['Кол-во дней отсрочки платежа','numeric', 1],
+        'prosrochka':['Просроченная задолжность','numeric', 1],
+        'percent':['Доля долга','percent', 1],
+        'res':['Кол-во превышений лимита','numeric', 1], 
+        'max':['Максимальное превышение лимита','numeric', 1],
+        'rating':['Рейтинг','numeric', 1],
+        'garanty':['Гарантии','numeric', 1],
+        'date':['Дата','str', 0],
+        'client':['id клиента','numeric', 0], 
+        'client_name':['Клиента','str', 0],
+        'id_rcm':['id договора','numeric', 0], 
+        'filial':['Филиал','str', 0],
+        'dog_number':['Договор','str', 0],
+        'dinamic_saldo':['Сальдо','numeric', 1],
+        'lim_sum':['Лимит','numeric', 1], 
+        'dept_over_lim':['Превышение лимита','numeric', 1], 
+        'dinamic_saldo_X':['Сальдо безлимитных','numeric', 1],
+        'debitor':['debitor','numeric', 1],   
+        'debitor_X':['debitor_X','numeric', 1], 
+
+        'dinamic_saldo_min':['Минимальное сальдо','numeric', 1], 
+        'dinamic_saldo_mean_below_zero':['Средняя задолженность','numeric', 1], 
+        'dept_over_lim_min':['Максимальное превышение лимита','numeric', 1], 
+        'dept_over_lim_mean':['Среднее превышение лимита','numeric', 1],
+        'days_over_limit_max':['Максимум дней выше лимита','numeric', 1], 
+        'days_over_limit_mean':['Среднее число дней выше лимита','numeric', 1], 
+        'days_over_limit_count_days_over':['Число превышений лимита','numeric', 1], 
+        'days_over_limit':['Текущее число дней выше лимита','numeric', 1], 
+        'debitor_min':['debitor_min','numeric', 1], 
+        'debitor_mean_below_zero':['debitor_mean_below_zero','numeric', 1], 
+        'dept_over_lim_min_y':['dept_over_lim_min_y','numeric', 1],
+        'dept_over_lim_mean_y':['dept_over_lim_mean_y','numeric', 1], 
+        'days_over_limit_max_y':['days_over_limit_max_y','numeric', 1], 
+        'days_over_limit_mean_y':['days_over_limit_mean_y','numeric', 1], 
+        'days_over_limit_count_days_over_y':['days_over_limit_count_days_over_y','numeric', 1],
+        'dept_over_lim_y':['dept_over_lim_y','numeric', 1], 
+        'days_over_limit_y':['days_over_limit_y','numeric', 1]
+	
+    }
+    
+    
+    dates=df_all0.index.date
+
+    df_all0_M=df_all0.groupby([pd.Grouper( freq="1M"),'3_group']).mean().reset_index(1)
+    df_all0_M_1=df_all0_M[df_all0_M['3_group']==1]
+    df_all0_M_2=df_all0_M[df_all0_M['3_group']==2]
+    df_all0_M_3=df_all0_M[df_all0_M['3_group']==3]
+    dates1_1=df_all0_M_1.index.date
+    dates1_2=df_all0_M_2.index.date
+    dates1_3=df_all0_M_3.index.date
+    df_all0_M_1=df_all0_M_1.reset_index()
+    df_all0_M_2=df_all0_M_2.reset_index()
+    df_all0_M_3=df_all0_M_3.reset_index()
+    # df_all0_M['date'] = df_all0_M['date'].dt.strftime('%m-%Y')
+    
+    # df_filial['date'] = df_filial['date'].dt.strftime('%d/%m/%Y')
+    # df_clients['date'] = df_clients['date'].dt.strftime('%d/%m/%Y')
+    # points1=df_all0['lim_sum'].values
+    points_1=df_all0_M_3['dinamic_saldo'].values
+    points_1_c=df_all0_M_1['clients_count'].values
+    points_2=df_all0_M_2['dinamic_saldo'].values
+    points_3=df_all0_M_3['dinamic_saldo'].values
+
+    # points3=df_all0['dinamic_saldo_X'].values
+    # points4=df_all0['dept_over_lim'].values
+    points_1_0=[0 for i in dates1_1]
+    points_2_0=[0 for i in dates1_2]
+    points_3_0=[0 for i in dates1_3]
+    print("5. Старт загрузки layout")
+
+    layout = html.Div(
+        [
+            html.Div(
+                html.H5("Отчет кредитных рисков"), className='row', 
+                style={'marginBottom': 15, 'margin-left': 30,'marginTop': 40}
+            ),
+            dcc.Graph(
+                id="all_bar",
+                figure=go.Figure(
+                    data=[
+                        go.Bar(name='Безлимитные', x=dates1_1, y=df_all0_M_1['dinamic_saldo'].values, xaxis='x1'),
+                        go.Bar(name='Лимитные', x=dates1_2, y=points_2, xaxis='x1'),
+                        go.Bar(name='Предоплатные', x=dates1_3, y=points_3, xaxis='x1')
+                    ],
+                    
+                    layout=go.Layout(
+                        title= 'Помесячная динамика дебиторской задолженности',
+                        barmode='stack',
+                        plot_bgcolor='white',
+                        paper_bgcolor='white',
+                        # xaxis=dict(
+                        #     showticklabels=False,
+                        #     overlaying='x2',
+                        #     showdividers=False),
+                        margin={'l': 30, 'b': 30, 't': 80, 'r': 0},
+                        legend={'x': 0, 'y': 1},
+                        showlegend=True
+                    )
+                ), style={'width': '80%'},
+                config={'displayModeBar': False}
+            ),
+            dcc.Graph(
+                id="all_limit",
+                figure=go.Figure(
+                    data=[
+                        go.Scatter(x=dates1_2, y=points_2, mode='lines',  name= 'Динамическое сальдо долг', #line_color='rgb(40,80,0)', 
+                        fill='tonexty',line_shape='spline', xaxis='x1'),
+                        # go.Bar(name='Динамическое сальдо долг', x=dates1_2, y=points_2, xaxis='x1'),
+                        go.Scatter(x=dates1_2, y=df_all0_M_2['lim_sum'].values, mode='lines', name= 'Кредитный лимит из SAP', line_color='rgb(207,0,15)', xaxis='x1'),
+                        go.Scatter(x=dates1_2, y=points_2_0, mode='lines', name= '', line_color='rgb(217,217,217)', line_width=0.5, xaxis='x2')
+                    ],
+                    layout=go.Layout(
+                        title= 'Динамика задолженности по клиентам с кредитным лимитом ',
+                        plot_bgcolor='white',
+                        paper_bgcolor='white',
+                        xaxis=dict(
+                            showticklabels=False,
+                            overlaying='x2',
+                            showdividers=False),
+                        margin={'l': 30, 'b': 30, 't': 80, 'r': 0},
+                        legend={'x': 0, 'y': 0},
+                        showlegend=True
+                    )
+                ), style={'width': '80%'},
+                config={'displayModeBar': False}
+            ),
+            html.Div(    dbc.Navbar(
+                [
+                    html.Div('Выберите начальную дату:', 
+                        style={'width': '15%', 
+                        'display': 'inline-block', 'marginBottom': 15, 'margin-left': 30,'marginTop': 25,
+                        'color': 'white'}
                     ),
-                     data= risks.to_dict(orient='records'),
-                    # columns=[{'id': c, 'name': c} for c in df.columns],
-                    # page_action='none',
+                    dcc.DatePickerSingle(
+                        # calendar_orientation='vertical',
+                        clearable=True,
+                        id='risk_str_date',
+                        date=min_date,
+                        min_date_allowed=min_date,
+                        max_date_allowed=max_date,
+                        initial_visible_month=min_date,
+                        number_of_months_shown = 3,
+                        display_format='DD.MM.YYYY',
+                        style={'width': '20%', 'display': 'inline-block', 'color': 'white'}
+                    ),
+                    html.Div('Выберите последнюю дату:', 
+                        style={'width': '15%', 'display': 'inline-block', 'color': 'white'}
+                    ),
+                    dcc.DatePickerSingle(
+                        calendar_orientation='vertical',
+                        clearable=True,
+                        id='risk_end_date',
+                        date=max_date,
+                        min_date_allowed=min_date,
+                        max_date_allowed=max_date,
+                        initial_visible_month=min_date,
+                        number_of_months_shown = 3,
+                        display_format='DD.MM.YYYY',
+                        style={'width': '20%', 'display': 'inline-block', 'color': 'white'}
+                    ),
+                    html.Button('Submit', id='submit-val', n_clicks=0,
+                        style={'width': '15%', 'display': 'inline-block', 'background-color': 'white', }),
+                ],dark=True, color='rgb(71, 71, 71)'
+                )
+            ),
+
+            html.Div([
+                html.H6('Таблица по клиентам с кредитным лимитом'),
+                dbc.Col(dash_table.DataTable(
+                    id='datatable_clients_limit',
+                    columns=[{"name": col_name_rus[i][0], "id": i,
+                    #  "deletable": True, 
+                     'type': col_name_rus[i][1]} if  col_name_rus[i][2]==0 else 
+                    {"name": col_name_rus[i][0], "id": i,
+                    #  "deletable": True, 
+                     'type': col_name_rus[i][1], 'format': dict(specifier=',.0f')}
+                     for i in    df_dog_2_1.columns],
+                    data=(df_dog_2_1).to_dict('records'),
+                    # editable=True,
                     filter_action="native",
-                    # filter_action='custom',
-                    # filter_query='',
-                    sort_action='native',
-                    sort_mode='multi',
-                    row_selectable='multi',
-                    selected_rows=risks.index.tolist(),
-                    page_action='native',
-                    style_table={'height': 530, 
+                    sort_action="native",
+                    sort_mode="multi",
+                    # column_selectable="single",
+                    # row_selectable="multi",
+                    # row_deletable=True,
+                    selected_columns=[],
+                    selected_rows=[],
+                    # page_action="native",
+                    # page_current= 0,
+                    page_size= 10, 
+                    # style_cell = {'textAlign': 'center'},
+                    style_cell={
+                            'minWidth': 10, 'maxWidth': 95, 'width': 10,'textAlign': 'right'
+                        },
+                    style_as_list_view=True,
+                    style_table={#'height': 530, 
                             # 'width':800,
                             'overflowY': 'auto',
                             'lineHeight': '30px'},
-
-                    editable=True,
-                    merge_duplicate_headers=True,
                     style_header={
-                                'backgroundColor': 'rgb(138,36,50)',
-                                'color': 'white',
+                                # 'backgroundColor': 'rgb(138,36,50)',
+                                # 'color': 'white',
                                 'whiteSpace':'normal',
-                                'fontWeight': 'bold',
-                                'font_size': '16px'
+                                # 'fontWeight': 'bold',
+                                # 'font_size': '16px'
+                                'overflowY': 'auto',
+                                'height': 'auto',
                     },
-                    style_data_conditional=[
-                                {
-                                    'if': {'row_index': 'odd'},
-                                    'backgroundColor': 'rgb(230, 230, 230)',
-                                }
-                    ],
-                    # fixed_rows={'headers': True},
                     style_data={
                             'whiteSpace': 'normal',
                             'height': 'auto',
@@ -174,79 +346,174 @@ def create_layout():
                             # 'maxWidth': '100px',
                             # 'minWidth': '100px',
                         },
+                    # style_data_conditional=[
+                    #     {'if': {'column_id': 'Лимит в SAP'},
+                    #     'width': '35px'},
+                    # ]
+                ), width=12),
+                dcc.Graph(
+                id="all_x",
+                figure=go.Figure(
+                    data=[
+                        go.Scatter(x=dates1_3, y=points_3, mode='lines', 
+                        name= 'Динамическое сальдо долг', line_color='rgb(40,80,0)', line_shape='spline', xaxis='x1'),
+                        go.Scatter(x=dates1_3, y=points_3_0, mode='lines', name= '', line_color='rgb(217,217,217)', line_width=0.5, xaxis='x2')
+                    ],
+                    layout=go.Layout(
+                        title= 'Общий уровень задолженности по клиентам с отсрочкой платежа без потолка лимита ',
+                        plot_bgcolor='white',
+                        paper_bgcolor='white',
+                        xaxis=dict(
+                            showticklabels=False,
+                            overlaying='x2',
+                            showdividers=False),
+                        margin={'l': 30, 'b': 30, 't': 80, 'r': 0},
+                        legend={'x': 0, 'y': 1},
+                        showlegend=True
+                    )
+                ), style={'width': '80%'},
+                config={'displayModeBar': False}
+            ),
+                html.H6('Таблица по клиентам с отсрочкой платежа'),
+                dbc.Col(dash_table.DataTable(
+                    id='datatable_clients_X',
+                    columns=[{"name": col_name_rus[i][0], "id": i,
+                     "deletable": True, 'type': col_name_rus[i][1]} if  col_name_rus[i][2]==0 else 
+                    {"name": col_name_rus[i][0], "id": i,
+                     "deletable": True, 'type': col_name_rus[i][1], 'format': dict(specifier=',.0f')}
+                     for i in    df_dog_3_1.columns],
+                    data=(df_dog_3_1).to_dict('records'),
+                    # editable=True,
+                    filter_action="native",
+                    sort_action="native",
+                    sort_mode="multi",
+                    # column_selectable="single",
+                    # row_selectable="multi",
+                    # row_deletable=True,
+                    selected_columns=[],
+                    selected_rows=[],
+                    page_action="native",
+                    page_current= 0,
+                    page_size= 10, 
+                   # style_cell = {'textAlign': 'center'},
                     style_cell={
-                            'minWidth': 10, 'maxWidth': 95, 'width': 10,'textAlign': 'left'
+                            'minWidth': 10, 'maxWidth': 95, 'width': 10,'textAlign': 'right'
                         },
-                    page_size=100,
-                    export_format='xlsx',
-                    # editable=True
+                    style_as_list_view=True,
+                    style_table={#'height': 530, 
+                            # 'width':800,
+                            'overflowY': 'auto',
+                            'lineHeight': '30px'},
+                    style_header={
+                                # 'backgroundColor': 'rgb(138,36,50)',
+                                # 'color': 'white',
+                                'whiteSpace':'normal',
+                                # 'fontWeight': 'bold',
+                                # 'font_size': '16px'
+                                'overflowY': 'auto',
+                                'height': 'auto',
+                    },
+                    style_data={
+                            'whiteSpace': 'normal',
+                            'height': 'auto',
+                            'font_size': '12px',
+                            'line-height': 0.9
+                            # 'width': '100px',
+                            # 'maxWidth': '100px',
+                            # 'minWidth': '100px',
+                        }, 
+                    # style_data_conditional=[
+                    #     {'if': {'column_id': 'Лимит в SAP'},
+                    #     'width': '35px'},
+                    # ]
+                ), width=12),
+                dcc.Graph(
+                    id="all_prepaid",
+                    figure=go.Figure(
+                        data=[
+                            go.Bar(x=dates1_1, y=points_1_c,  yaxis='y1',  width=500000000, name= 'Кредитный лимит из SAP', xaxis='x1', opacity=0.5),
+                            go.Scatter(x=dates1_1, y=points_1, mode='lines',  name= 'Динамическое сальдо долг', yaxis='y2',#line_color='rgb(40,80,0)', 
+                            line_shape='spline'),
+                            
+                            # go.Scatter(x=dates1_1, y=points_1_c, mode='bar', secondary_y=True,name= 'Кредитный лимит из SAP', line_color='rgb(207,0,15)', xaxis='x1'),
+                            go.Scatter(x=dates1_1, y=points_1_0, mode='lines', name= '', line_color='rgb(217,217,217)', line_width=0.5, yaxis='y1',xaxis='x2')
+                        ],
+                        layout=go.Layout(
+                            title= 'Динамика задолженности по предоплатным клиентам  ',
+                            plot_bgcolor='white',
+                            paper_bgcolor='white',
+                            xaxis=dict(
+                                showticklabels=False,
+                                overlaying='x2',
+                                showdividers=False),
+                            yaxis=dict(title='Кол-во клиентов', side='right'),
+                            yaxis2=dict(title='Долг',
+                                    overlaying='y',
+                                    side='left'),
+                            margin={'l': 30, 'b': 30, 't': 40, 'r': 0},
+                            legend={'x': 0, 'y': 0},
+                            showlegend=True
+                        )
+                    ), style={'width': '80%'},
+                    config={'displayModeBar': False}
                 ),
-                # html.Div([
-                #     dash_table.DataTable(
-                #             # https://dash.plotly.com/datatable/width
-                #             id='table_defect',
-                #             columns=[{"name": i, "id": i} for i in ['1', '2', '3']],
-                #             data={'1': '1', '2': '1', '3': '1'},
-                #             page_size=20,
-                #             style_table={'overflowX': 'auto'},
-                #             style_cell={
-                #                 # all three widths are needed
-                #                 'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
-                #                 'overflow': 'hidden',
-                #                 'textOverflow': 'ellipsis',
-                #                 'textAlign': 'left',
-                #             },
-                #             # style_cell_conditional=[
-                #             #     {'if': {'column_id': "Описание недостатка"},
-                #             #     'width': '20%'},
-                #             #     {'if': {'column_id': "Мероприятие"},
-                #             #     'width': '20%'},
-                #             #     {'if': {'column_id': "Первоначальная дата окончания"},
-                #             #     'width': '5%'},
-                #             #     {'if': {'column_id': "Пересмотренная дата окончания"},
-                #             #     'width': '5%'},
-                #             #     {'if': {'column_id': "Комментарий"},
-                #             #     'width': '50%'},
-                #             # ],
-                #             export_format='xlsx',
-                #             export_headers='display',
-                #             merge_duplicate_headers=True,
-                #             style_header={
-                #                 'backgroundColor': 'rgb(138,36,50)',
-                #                 'color': 'white',
-                #                 'whiteSpace':'normal',
-                #                 'fontWeight': 'bold'
-                #             },
-                #             style_data_conditional=[
-                #                 {
-                #                     'if': {'row_index': 'odd'},
-                #                     'backgroundColor': 'rgb(230, 230, 230)',
-                #                 }
-                #             ],
-                #             style_data={
-                #                 'whiteSpace': 'normal',
-                #                 'height': 'auto',
-                #             },
-                #     ),]),
-            ], style={'display': 'inline-block', 'width': '49%',
-             'verticalAlign': 'top','margin-right': '1px','margin-left': '1px',} ),
+                html.H6('Таблица по предоплатным клиентам '),
+                dbc.Col(dash_table.DataTable(
+                    id='datatable_clients_prepaid',
+                    columns=[{"name": col_name_rus[i][0], "id": i,
+                     "deletable": True, 'type': col_name_rus[i][1]} if  col_name_rus[i][2]==0 else 
+                    {"name": col_name_rus[i][0], "id": i,
+                     "deletable": True, 'type': col_name_rus[i][1], 'format': dict(specifier=',.0f')}
+                     for i in    df_dog_1_1.columns],
+                    data=(df_dog_1_1).to_dict('records'),
+                    # editable=True,
+                    filter_action="native",
+                    sort_action="native",
+                    sort_mode="multi",
+                    # column_selectable="single",
+                    # row_selectable="multi",
+                    # row_deletable=True,
+                    selected_columns=[],
+                    selected_rows=[],
+                    page_action="native",
+                    page_current= 0,
+                    page_size= 10, 
+                    # style_cell = {'textAlign': 'center'},
+                    style_cell={
+                            'minWidth': 10, 'maxWidth': 95, 'width': 10,'textAlign': 'right'
+                        },
+                    style_as_list_view=True,
+                    style_table={#'height': 530, 
+                            # 'width':800,
+                            'overflowY': 'auto',
+                            'lineHeight': '30px'},
+                    style_header={
+                                # 'backgroundColor': 'rgb(138,36,50)',
+                                # 'color': 'white',
+                                'whiteSpace':'normal',
+                                # 'fontWeight': 'bold',
+                                # 'font_size': '16px'
+                                'overflowY': 'auto',
+                                'height': 'auto',
+                    },
+                    style_data={
+                            'whiteSpace': 'normal',
+                            'height': 'auto',
+                            'font_size': '12px',
+                            'line-height': 0.9
+                            # 'width': '100px',
+                            # 'maxWidth': '100px',
+                            # 'minWidth': '100px',
+                        },
+                    # style_data_conditional=[
+                    #     {'if': {'column_id': 'Лимит в SAP'},
+                    #     'width': '35px'},
+                    # ]
+                ), width=12)
 
-            # # Row 4 - Закладки
-            # html.Div([
-            #     dcc.Tabs(id='dashboard2-tabs', value='tab-1', children=[
-            #         dcc.Tab(label='Динамика недостачи', value='tab-1', className="tab",),
-            #         dcc.Tab(label='По филиалам', value='tab-2', className="tab",),
-            #         dcc.Tab(label='По типам запчастей', value='tab-3', className="tab",),
-            #         dcc.Tab(label='По складам', value='tab-4', className="tab",),
-            #     ], className="row all-tabs"),
-            #     #html.Div(id='tabs-example-content')
-            # ]),
-
-            # Row 5 - Содержимое закладки
-            # html.Div(id='tab-content'),
-        ], className="sub_page", #style={'flex-basis': '45%', 'vertical-align': 'middle'}#'display': 'inline-block',}
-                ),
-    ], className="page_landscape_a3",
-    )
-
+ ], className='eleven columns', style={'marginBottom': 15, 'margin-left': 30,'marginTop': 25,
+                        }),
+        ], 
+        className='twelve columns', style={'fontSize': 12})
     return layout
+

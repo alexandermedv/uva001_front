@@ -70,18 +70,28 @@ def get_matrix_stat_1(df3_1, s_d=None, e_d=None):
         'dog_number',
        # 'date',  
         'dinamic_saldo', 'lim_sum',
-       'dept_over_lim', 'rating', 'garanty','res','max'] if (i in df3_1.columns) | (i in df6.columns )]
+       'dept_over_lim', #'rating', 'garanty',
+       'res','max'] if (i in df3_1.columns) | (i in df6.columns )]
+    
+    # df3_1=df3_1[[ i for i in df3_1.columns if i not in ['rating', 'garanty']]]
+    # df3_1=df3_1.loc[df3_1['date']==df3_1['date'].max(),].merge(df6, left_on='id_rcm', right_on='id_rcm')[col0].sort_values(['dept_over_lim','dinamic_saldo', ],  ascending=False)
+
     return df3_1.loc[df3_1['date']==df3_1['date'].max(),].merge(df6, left_on='id_rcm', right_on='id_rcm')[col0].sort_values(['dept_over_lim','dinamic_saldo', ],  ascending=False)
 def get_matrix_stat_2(df3_1,  e_d=None):
     if (e_d is None) :
         df3_1=df3_1.loc[df3_1['date']==df3_1['date'].max(),['client_name', 'dog_number', 
-         'dinamic_saldo', 'rating', 'garanty',]]
+         'dinamic_saldo', #'rating', 'garanty',
+         ]]
     else:
         df3_1=df3_1.loc[df3_1['date']==e_d,['client_name', 'dog_number', 
-         'dinamic_saldo', 'rating', 'garanty',]]
+         'dinamic_saldo', #'rating', 'garanty',
+         ]]
     df3_1['postpone_pay']=np.nan
     df3_1['prosrochka']=np.nan
     df3_1['percent']=np.nan
+        
+    # df3_1=df3_1[[ i for i in df3_1.columns if i not in ['rating', 'garanty']]]
+    
     return df3_1.sort_values(['dinamic_saldo', ],  ascending=False)
 
 def get_dates_for_table():
@@ -305,7 +315,7 @@ def create_layout():
                     {"name": col_name_rus[i][0], "id": i,
                     #  "deletable": True, 
                      'type': col_name_rus[i][1], 'format': dict(specifier=',.0f')}
-                     for i in    df_dog_2_1.columns],
+                     for i in    df_dog_2_1.columns if i not in ['rating', 'garanty']],
                     data=(df_dog_2_1).to_dict('records'),
                     # editable=True,
                     filter_action="native",

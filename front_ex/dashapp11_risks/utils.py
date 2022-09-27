@@ -21,7 +21,7 @@ def get_risk_table():
 	sql = '''
 		SELECT *
 		FROM '''+schema+'''.'''+Name_table
-	con = create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8')
+	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()
 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):

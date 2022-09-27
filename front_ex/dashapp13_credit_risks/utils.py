@@ -20,8 +20,8 @@ def get_credit_data():
 	chunksize=100000
 	sql = '''
 		SELECT *
-		FROM '''+schema+'''.'''+Name_table #+''' where
-	# date='2022-08-31' limit 100'''
+		FROM '''+schema+'''.'''+Name_table +''' where
+	date>='2021-11-01' '''
 	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()
@@ -37,8 +37,8 @@ def get_credit_data_clients():
 	chunksize=100000
 	sql = '''
 		SELECT *
-		FROM '''+schema+'''.'''+Name_table#+''' where
-	# date='2022-08-31' limit 100'''
+		FROM '''+schema+'''.'''+Name_table+''' where
+	date>='2021-11-01' '''
 	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()
@@ -55,7 +55,8 @@ def get_credit_data_all():
 	chunksize=100000
 	sql = '''
 		SELECT *
-		FROM '''+schema+'''.'''+Name_table
+		FROM '''+schema+'''.'''+Name_table +''' where
+	date>='2021-11-01' '''
 	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()

@@ -14,9 +14,6 @@ from sqlalchemy import create_engine
 def get_risk_table():
 	schema='analysis'
 	Name_table='risk_radar_base'
-	login='svc_app_uva'
-	# passwors=''
-	# ip_server=''
 	chunksize=100000
 	sql = '''
 		SELECT *

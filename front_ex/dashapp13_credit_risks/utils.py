@@ -14,15 +14,12 @@ from sqlalchemy import create_engine
 def get_credit_data():
 	schema='analysis'
 	Name_table='debitor_saldo_anlis_contracts'
-	login='svc_fs_uva'
-	passwors='Temp001'
-	ip_server='172.17.0.136:5432'
 	chunksize=100000
 	sql = '''
 		SELECT *
 		FROM '''+schema+'''.'''+Name_table +''' where
 	date>='2021-11-01' '''
-	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
+	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()
 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
@@ -31,15 +28,12 @@ def get_credit_data():
 def get_credit_data_clients():
 	schema='analysis'
 	Name_table='debitor_saldo_anlis_clients'
-	login='svc_fs_uva'
-	passwors='Temp001'
-	ip_server='172.17.0.136:5432'
 	chunksize=100000
 	sql = '''
 		SELECT *
 		FROM '''+schema+'''.'''+Name_table+''' where
 	date>='2021-11-01' '''
-	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
+	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 	
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()
 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
@@ -49,15 +43,12 @@ def get_credit_data_clients():
 def get_credit_data_all():
 	schema='analysis'
 	Name_table='debitor_saldo_anlis_all'
-	login='svc_fs_uva'
-	passwors='Temp001'
-	ip_server='172.17.0.136:5432'
 	chunksize=100000
 	sql = '''
 		SELECT *
 		FROM '''+schema+'''.'''+Name_table +''' where
 	date>='2021-11-01' '''
-	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
+	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()
 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):

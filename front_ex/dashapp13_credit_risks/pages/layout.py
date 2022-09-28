@@ -219,14 +219,14 @@ def create_layout():
                 id="all_bar",
                 figure=go.Figure(
                     data=[
-                        go.Bar(name='Безлимитные', x=dates1_1, y=df_all0_M_1['dinamic_saldo'].values,
+                        go.Bar(name='Отсрочка платежа без потолка лимита', x=dates1_1, y=df_all0_M_1['dinamic_saldo'].values,
                         hovertemplate =
                                 '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
                                 '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1'),
-                        go.Bar(name='Лимитные', x=dates1_2,hovertemplate =
+                        go.Bar(name='Кредитный лимит с отсрочкой платежа', x=dates1_2,hovertemplate =
                                 '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
                                 '<br><b>Дата</b>: %{x}<br><extra></extra>', y=points_2, xaxis='x1'),
-                        go.Bar(name='Предоплатные', x=dates1_3, y=points_3,hovertemplate =
+                        go.Bar(name='Предоплата', x=dates1_3, y=points_3,hovertemplate =
                                 '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
                                 '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1')
                     ],
@@ -268,7 +268,7 @@ def create_layout():
 
                         ],
                     layout=go.Layout(
-                        title= 'Динамика задолженности по клиентам с кредитным лимитом ',
+                        title= 'Динамика задолженности клиентов с кредитным лимитом с отсрочкой платежа',
                         plot_bgcolor='white',
                         paper_bgcolor='white',
                         xaxis=dict(
@@ -323,7 +323,7 @@ def create_layout():
             ),
 
             html.Div([
-                html.H6('Таблица по клиентам с кредитным лимитом'),
+                html.H6('Детальная информация по задолженности клиентов с кредитным лимитом с отсрочкой платежа'),
                 dbc.Col(dash_table.DataTable(
                     id='datatable_clients_limit',
                     columns=[{"name": col_name_rus[i][0], "id": i,
@@ -389,7 +389,7 @@ def create_layout():
                         go.Scatter(x=dates1_3, y=points_3_0, mode='lines',hoverinfo='none', name= '', line_color='rgb(217,217,217)', line_width=0.5, xaxis='x2')
                     ],
                     layout=go.Layout(
-                        title= 'Общий уровень задолженности по клиентам с отсрочкой платежа без потолка лимита ',
+                        title= 'Динамика задолженности клиентов с отсрочкой платежа без потолка лимита',
                         plot_bgcolor='white',
                         paper_bgcolor='white',
                         xaxis=dict(
@@ -403,7 +403,7 @@ def create_layout():
                 ), style={'width': '80%'},
                 config={'displayModeBar': False}
             ),
-                html.H6('Таблица по клиентам с отсрочкой платежа'),
+                html.H6('Детальная информация по задолженности клиентов с отсрочкой платежа без потолка лимита'),
                 dbc.Col(dash_table.DataTable(
                     id='datatable_clients_X',
                     columns=[{"name": col_name_rus[i][0], "id": i,
@@ -479,7 +479,7 @@ def create_layout():
                                 hoverinfo='none', name= '', line_color='rgb(217,217,217)', line_width=0.5, yaxis='y1',xaxis='x2')
                         ],
                         layout=go.Layout(
-                            title= 'Динамика задолженности по предоплатным клиентам  ',
+                            title= 'Динамика задолженности предоплатных клиентов ',
                             plot_bgcolor='white',
                             paper_bgcolor='white',
                             xaxis=dict(
@@ -497,7 +497,7 @@ def create_layout():
                     ), style={'width': '80%'},
                     config={'displayModeBar': False}
                 ),
-                html.H6('Таблица по предоплатным клиентам '),
+                html.H6('Детальная информация по задолженности предоплатных клиентов'),
                 dbc.Col(dash_table.DataTable(
                     id='datatable_clients_prepaid',
                     columns=[{"name": col_name_rus[i][0], "id": i,

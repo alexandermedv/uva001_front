@@ -91,6 +91,8 @@ def create_layout():
                                     
                                     hoverlabel=dict(
                                         bgcolor='rgb(0,0,0)',
+                                        namelength=-1,
+                                        font={'size': 11}
                                         # overflowY= 'auto',
                                     )
                                     #     textfont = dict(color='black', size = 15),
@@ -147,6 +149,12 @@ def create_layout():
                 ),            
             ], style={'width': radar.p*100, 'display': 'inline-block'}),
             html.Div([
+            #     dcc.Checklist(
+            #         options=['Select all'],
+            #         value=['Select all'],
+            #         style={'display': 'inline-block', 'width': '15%',
+            #  'horizontalAlign': 'right',}
+            #     ),
                 dash_table.DataTable(
                     id='table-risks',
                     columns=(
@@ -271,7 +279,7 @@ def create_layout():
                 #                 'height': 'auto',
                 #             },
                 #     ),]),
-            ], style={'display': 'inline-block', 'width': '49%',
+            ], style={'display': 'inline-block', 'width': '46%',
              'verticalAlign': 'top','margin-right': '1px','margin-left': '1px',} ),
 
             # # Row 4 - Закладки

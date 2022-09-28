@@ -219,9 +219,16 @@ def create_layout():
                 id="all_bar",
                 figure=go.Figure(
                     data=[
-                        go.Bar(name='Безлимитные', x=dates1_1, y=df_all0_M_1['dinamic_saldo'].values, xaxis='x1'),
-                        go.Bar(name='Лимитные', x=dates1_2, y=points_2, xaxis='x1'),
-                        go.Bar(name='Предоплатные', x=dates1_3, y=points_3, xaxis='x1')
+                        go.Bar(name='Безлимитные', x=dates1_1, y=df_all0_M_1['dinamic_saldo'].values,
+                        hovertemplate =
+                                '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
+                                '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1'),
+                        go.Bar(name='Лимитные', x=dates1_2,hovertemplate =
+                                '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
+                                '<br><b>Дата</b>: %{x}<br><extra></extra>', y=points_2, xaxis='x1'),
+                        go.Bar(name='Предоплатные', x=dates1_3, y=points_3,hovertemplate =
+                                '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
+                                '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1')
                     ],
                     
                     layout=go.Layout(
@@ -244,12 +251,22 @@ def create_layout():
                 id="all_limit",
                 figure=go.Figure(
                     data=[
-                        go.Scatter(x=dates1_2, y=points_2, mode='lines',  name= 'Динамическое сальдо долг', #line_color='rgb(40,80,0)', 
+                        go.Scatter(x=dates1_2, y=points_2, mode='lines',
+                        hovertemplate =
+                                '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
+                                '<br><b>Дата</b>: %{x}<br><extra></extra>',
+                          name= 'Динамическое сальдо долг', #line_color='rgb(40,80,0)', 
                         fill='tonexty',line_shape='spline', xaxis='x1'),
                         # go.Bar(name='Динамическое сальдо долг', x=dates1_2, y=points_2, xaxis='x1'),
-                        go.Scatter(x=dates1_2, y=df_all0_M_2['lim_sum'].values, mode='lines', name= 'Кредитный лимит из SAP', line_color='rgb(207,0,15)', xaxis='x1'),
-                        go.Scatter(x=dates1_2, y=points_2_0, mode='lines', name= '', line_color='rgb(217,217,217)', line_width=0.5, xaxis='x2')
-                    ],
+                        go.Scatter(x=dates1_2, y=df_all0_M_2['lim_sum'].values, mode='lines',
+                        hovertemplate =
+                                '<i><b>Лимит</b></i>: \u20bd %{y:,.0f}'+
+                                '<br><b>Дата</b>: %{x}<br><extra></extra>',
+                         name= 'Кредитный лимит из SAP', line_color='rgb(207,0,15)', xaxis='x1'),
+                        go.Scatter(x=dates1_2, y=points_2_0, mode='lines',hoverinfo='none', name= '', line_color='rgb(217,217,217)', line_width=0.5, xaxis='x2'),
+                        go.Scatter(x=dates1_2, y=[4500000000 for i in dates1_2], hoverinfo='none',mode='lines', name= '', line_color='rgb(217,217,217)', line_width=0.1, xaxis='x2')
+
+                        ],
                     layout=go.Layout(
                         title= 'Динамика задолженности по клиентам с кредитным лимитом ',
                         plot_bgcolor='white',
@@ -259,7 +276,7 @@ def create_layout():
                             overlaying='x2',
                             showdividers=False),
                         margin={'l': 30, 'b': 30, 't': 80, 'r': 0},
-                        legend={'x': 0, 'y': 0},
+                        legend={'x': 0, 'y': 1},
                         showlegend=True
                     )
                 ), style={'width': '80%'},
@@ -365,9 +382,11 @@ def create_layout():
                 id="all_x",
                 figure=go.Figure(
                     data=[
-                        go.Scatter(x=dates1_3, y=points_3, mode='lines', 
+                        go.Scatter(x=dates1_3, y=points_3, mode='lines', hovertemplate =
+                                '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
+                                '<br><b>Дата</b>: %{x}<br><extra></extra>',
                         name= 'Динамическое сальдо долг', line_color='rgb(40,80,0)', line_shape='spline', xaxis='x1'),
-                        go.Scatter(x=dates1_3, y=points_3_0, mode='lines', name= '', line_color='rgb(217,217,217)', line_width=0.5, xaxis='x2')
+                        go.Scatter(x=dates1_3, y=points_3_0, mode='lines',hoverinfo='none', name= '', line_color='rgb(217,217,217)', line_width=0.5, xaxis='x2')
                     ],
                     layout=go.Layout(
                         title= 'Общий уровень задолженности по клиентам с отсрочкой платежа без потолка лимита ',
@@ -441,12 +460,23 @@ def create_layout():
                     id="all_prepaid",
                     figure=go.Figure(
                         data=[
-                            go.Bar(x=dates1_1, y=points_1_c,  yaxis='y1',  width=500000000, name= 'Кредитный лимит из SAP', xaxis='x1', opacity=0.5),
-                            go.Scatter(x=dates1_1, y=points_1, mode='lines',  name= 'Динамическое сальдо долг', yaxis='y2',#line_color='rgb(40,80,0)', 
+                            go.Bar(x=dates1_1, y=points_1_c,  yaxis='y1',
+                            hovertemplate =
+                                '<i><b>Кол-во клиентов</b></i>:  %{y:,.0f}'+
+                                '<br><b>Дата</b>: %{x}<br><extra></extra>',  width=500000000, name= 'Кол-во клиентов', xaxis='x1', opacity=0.5),
+                            go.Scatter(x=dates1_1, y=points_1, mode='lines', name= 'Динамическое сальдо долг',
+                            hovertemplate =
+                                '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
+                                '<br><b>Дата</b>: %{x}<br><extra></extra>',
+                                   yaxis='y2',#line_color='rgb(40,80,0)', 
                             line_shape='spline'),
-                            
+                            go.Scatter(x=dates1_1, y=[12000000000 for i in dates1_1],
+                                hoverinfo='none', mode='lines', name= '', line_color='rgb(217,217,217)', line_width=0.1, yaxis='y2', xaxis='x2'),
+                            go.Scatter(x=dates1_1, y=[200 for i in dates1_1]
+                            , hoverinfo='none', mode='lines', name= '', line_color='rgb(217,217,217)', line_width=0.1, yaxis='y1', xaxis='x2'),
                             # go.Scatter(x=dates1_1, y=points_1_c, mode='bar', secondary_y=True,name= 'Кредитный лимит из SAP', line_color='rgb(207,0,15)', xaxis='x1'),
-                            go.Scatter(x=dates1_1, y=points_1_0, mode='lines', name= '', line_color='rgb(217,217,217)', line_width=0.5, yaxis='y1',xaxis='x2')
+                            go.Scatter(x=dates1_1, y=points_1_0, mode='lines',
+                                hoverinfo='none', name= '', line_color='rgb(217,217,217)', line_width=0.5, yaxis='y1',xaxis='x2')
                         ],
                         layout=go.Layout(
                             title= 'Динамика задолженности по предоплатным клиентам  ',
@@ -461,7 +491,7 @@ def create_layout():
                                     overlaying='y',
                                     side='left'),
                             margin={'l': 30, 'b': 30, 't': 40, 'r': 0},
-                            legend={'x': 0, 'y': 0},
+                            legend={'x': 0, 'y': 1},
                             showlegend=True
                         )
                     ), style={'width': '80%'},

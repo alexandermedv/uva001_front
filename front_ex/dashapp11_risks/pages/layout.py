@@ -149,12 +149,16 @@ def create_layout():
                 ),            
             ], style={'width': radar.p*100, 'display': 'inline-block'}),
             html.Div([
-            #     dcc.Checklist(
-            #         options=['Select all'],
-            #         value=['Select all'],
-            #         style={'display': 'inline-block', 'width': '15%',
-            #  'horizontalAlign': 'right',}
-            #     ),
+                dcc.Checklist(
+                    id='checklist_select_all',
+                    options=[
+                        {'label': 'Select all', 'value': 'Select all'},
+                    ],
+                    value=['Select all'],
+                    style={'display': 'inline-block', 'width': '25%',
+            #  'horizontalAlign': 'right',
+             }
+                ),
                 dash_table.DataTable(
                     id='table-risks',
                     columns=(

@@ -67,7 +67,77 @@ def show_marker(a_c,s_r,f,d_w_d,d):
         raise dash.exceptions.PreventUpdate
     return [f]
 
-#     bar_theta,bar_r,bar_bound,hover_sec_text,ball_text,trial_1_r,
+# Select all
+@dash_app.callback( 
+    [
+        Output('table-risks', 'selected_rows'),
+        Output('checklist_select_all', 'value'),
+    ],
+    [
+        Input('checklist_select_all', 'value'),
+        Input('table-risks', 'selected_rows'),
+    ],
+    [
+        State('table-risks', 'data'), 
+        ],  prevent_initial_call=True, background=True
+)
+def sellect_all(v,s_r,d):
+    ctx=dash.callback_context
+    if ctx.triggered[0]['prop_id']=='checklist_select_all.value':
+            if v==[]:
+                return [[],v]
+            else:
+                return [[i for i in range (len(d))],v]
+    else:
+        if ((v==[]) & (len(s_r)!=len(d))) | ((v!=[]) & (len(s_r)==len(d))) :
+            raise dash.exceptions.PreventUpdate
+        elif len(s_r)!=len(d):
+            return [s_r,[]]
+        else:
+            return [s_r,['Select all']]
+
+
+# @dash_app.callback( 
+#     [
+#         Output('table-risks', 'selected_rows'),
+#     ],
+#     [
+#         Input('checklist_select_all', 'value'),
+#     ],
+#     [
+#         State('table-risks', 'selected_rows'),  
+#         State('table-risks', 'data'), 
+#         ],  prevent_initial_call=True, background=True
+# )
+# def sellect_all(v,s_r,d):
+#     ctx=dash.callback_context
+#     if v==[]:
+#         return [[]]
+#     else:
+#         return [[i for i in range (len(d))]]
+# # unSelect all
+# @dash_app.callback( 
+#     [
+#         Output('checklist_select_all', 'value'),
+#     ],
+#     [
+#         Input('table-risks', 'selected_rows'),  
+#     ],
+#     [
+ 
+#         State('table-risks', 'data'), 
+#         State('checklist_select_all', 'value'),
+#         ],  prevent_initial_call=True, background=True
+# )
+# def unsellect_all(s_r,d,v):
+#     ctx=dash.callback_context
+#     if ((v==[]) & (len(s_r)!=len(d))) | ((v!=[]) & (len(s_r)==len(d))) :
+#         raise dash.exceptions.PreventUpdate
+#     elif len(s_r)!=len(d):
+#         return [[]]
+#     else:
+#          [['Select all']]
+# #     bar_theta,bar_r,bar_bound,hover_sec_text,ball_text,trial_1_r,
 # trial_1_theta,marker_size,hover_text,bar_color=radar.main0(d,s_r)
     
 #   

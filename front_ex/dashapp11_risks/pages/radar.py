@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 import numpy as np
 import os
 import seaborn as sns
@@ -216,9 +217,10 @@ def get_circl_info(resize_balles,bar_theta,bar_r,bar_bound,risks, max_p_rank,max
                             bar_width[0]=lb
                         else: # Шарик не угловой
 #                             set_trace() 
-                            if less_with_toll(alpa,trial_1_theta0[-1]+alpha0+2*alpha0*size_marker/size_marker0, toll=1):
-                                    lvl=lvl+1
-                                    is_new=True
+                            if (len(trial_1_theta0)!=0) :
+                                if  ((less_with_toll(alpa,trial_1_theta0[-1]+alpha0+2*alpha0*size_marker/size_marker0, toll=1))):
+                                        lvl=lvl+1
+                                        is_new=True
                             if is_new:# Первый в новом ряду
                                 is_new=False
                                 r0=[lb+size_marker,lvl]
@@ -299,11 +301,20 @@ resize_balles=0.7
 
  
 def main0(risks0,  bigest_size,b,koef,koef_r,try_resize_radius_bounds,resize_balles, masks=None):
+
     if masks is None:
         risks=risks0
     else:
         risks=risks0[np.array(masks)==1]
-    risks.columns = ['n', 'group_name', 'risk_name', 'probability', 'damage']
+    if risks.shape[0]==0:
+        return [],[],[],[],        [],[],[],[],[],[]
+    if risks.columns[3]=='Ущерб':
+        risks.columns = ['n', 'group_name', 'risk_name', 'damage', 'probability']
+        risks=risks[['n', 'group_name', 'risk_name', 'probability', 'damage']]
+    elif risks.columns[3]=='Probability':
+        risks.columns = ['n', 'group_name', 'risk_name', 'probability', 'damage']
+    else:
+        raise ValueError('Перепутаны столбцы')
     risks=risks.loc[(~risks['probability'].isnull() ) & ((~risks['damage'].isnull() ))]
     risks['group_name'] = risks['group_name'].apply(lambda x: str(x).strip())
     group_disk = {}

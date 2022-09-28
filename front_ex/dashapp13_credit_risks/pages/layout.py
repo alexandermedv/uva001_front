@@ -264,7 +264,7 @@ def create_layout():
                                 '<br><b>Дата</b>: %{x}<br><extra></extra>',
                          name= 'Кредитный лимит из SAP', line_color='rgb(207,0,15)', xaxis='x1'),
                         go.Scatter(x=dates1_2, y=points_2_0, mode='lines',hoverinfo='none', name= '', line_color='rgb(217,217,217)', line_width=0.5, xaxis='x2'),
-                        go.Scatter(x=dates1_2, y=[4500000000 for i in dates1_2], hoverinfo='none',mode='lines', name= '', line_color='rgb(217,217,217)', line_width=0.1, xaxis='x2')
+                        go.Scatter(x=dates1_2, y=[4800000000 for i in dates1_2], hoverinfo='none',mode='lines', name= '', line_color='rgb(217,217,217)', line_width=0.1, xaxis='x2')
 
                         ],
                     layout=go.Layout(

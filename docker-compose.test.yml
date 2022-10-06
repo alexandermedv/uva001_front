@@ -11,7 +11,8 @@ services:
          - .:/usr/src/app/
       ports: 
          # - "127.0.0.1:7008:7007"
-         - "7101:7102"
+         # - "7101:7102"
+         - "127.0.0.1:7101:7102"
       environment: 
          - TZ=Europe/Moscow
       # networks:

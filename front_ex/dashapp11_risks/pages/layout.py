@@ -39,12 +39,29 @@ risks_cols = ['Номер', 'Категория', 'Описание', 'Веро�
 # risks = pd.read_excel(path_xlsx, engine='openpyxl', header=1)
 # print(risks.head(3), flush=True)
 risks.columns = risks_cols
-
-params = [
-    'Weight', 'Torque', 'Width', 'Height',
-    'Efficiency', 'Power', 'Displacement'
-]
-
+risks=risks[['Номер', 'Категория', 'Описание', 'Ущерб', 'Вероятность']]
+# params = [
+#     'Weight', 'Torque', 'Width', 'Height',
+#     'Efficiency', 'Power', 'Displacement'
+# # ]
+# def format_str0(t,l=25):
+#     res=[]
+#     while len(t)>l:
+#         if t[l]!=' ':
+#             if " " in  t:
+#                 l0=t.find(' ', l)
+#                 res.append(t[:l0])
+#                 t=t[l0:]
+#             else:
+#                res.append(t)
+#                t=''
+#         else:
+#             res.append(t[:l0])
+#             t=t[l0:] 
+#     if len(t)>0:
+#         res.append(t)
+#     return res
+# t0=format_str0(radar.hover_text)
 def create_layout():
     """Создание шаблона"""
     # engine_cons = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
@@ -61,7 +78,7 @@ def create_layout():
                                     hoverinfo="text",
                                     r = radar.trial_1_r,
                                     theta = radar.trial_1_theta,
-                                    name = "Риск",
+                                    # name = "Риск",
                                     mode="markers+text", 
                                     marker=dict(size=radar.p*radar.koef_resize_markers*np.array(radar.marker_size), 
                                         color ='rgb(217,217,217)', 
@@ -71,8 +88,12 @@ def create_layout():
                                     ),
                                     #     hover_data={'r':False},
                                     text = radar.ball_text, 
+                                    
                                     hoverlabel=dict(
-                                        bgcolor='rgb(0,0,0)'
+                                        bgcolor='rgb(0,0,0)',
+                                        namelength=-1,
+                                        font={'size': 11}
+                                        # overflowY= 'auto',
                                     )
                                     #     textfont = dict(color='black', size = 15),
                                 ), 
@@ -128,10 +149,20 @@ def create_layout():
                 ),            
             ], style={'width': radar.p*100, 'display': 'inline-block'}),
             html.Div([
+                dcc.Checklist(
+                    id='checklist_select_all',
+                    options=[
+                        {'label': 'Select all', 'value': 'Select all'},
+                    ],
+                    value=['Select all'],
+                    style={'display': 'inline-block', 'width': '25%',
+            #  'horizontalAlign': 'right',
+             }
+                ),
                 dash_table.DataTable(
                     id='table-risks',
                     columns=(
-                        [{"name":i, "id":i} for i in risks_cols]
+                        [{"name":i, "id":i} for i in risks.columns]
                     ),
                      data= risks.to_dict(orient='records'),
                     # columns=[{'id': c, 'name': c} for c in df.columns],
@@ -159,10 +190,21 @@ def create_layout():
                                 'font_size': '16px'
                     },
                     style_data_conditional=[
+                        {'if': {'column_name':  'Ущерб'},
+                                    'width': '15%'},
+                                    {'if': {'column_name': 'Вероятность'},
+                                    'width': '20%'}, 
+                                    {'if': {'column_name': 'Номер'},
+                                    'width': '5%'},
+                                    {'if': {'column_name': 'Категория'},
+                                    'width': '15%'},
+                                    {'if': {'column_name': 'Описание'},
+                                    'width': '20%'},
                                 {
                                     'if': {'row_index': 'odd'},
                                     'backgroundColor': 'rgb(230, 230, 230)',
-                                }
+                                },
+                                 
                     ],
                     # fixed_rows={'headers': True},
                     style_data={
@@ -175,8 +217,21 @@ def create_layout():
                             # 'minWidth': '100px',
                         },
                     style_cell={
-                            'minWidth': 10, 'maxWidth': 95, 'width': 10,'textAlign': 'left'
+                            'minWidth': 5, 'maxWidth': 95, 'width': 10,
+                            'textAlign': 'left'
                         },
+                    # style_cell_conditional=[
+                    #     {'if': {'column_id':  'Ущерб'},
+                    #     'width': '10'},
+                    #     {'if': {'column_id': 'Вероятность'},
+                    #     'width': '5'}, 
+                    #     {'if': {'column_id': 'Номер'},
+                    #     'width': '5'},
+                    #     {'if': {'column_id': 'Категория'},
+                    #     'width': '10'},
+                    #     {'if': {'column_id': 'Описание'},
+                    #     'width': '10'},
+                    # ],
                     page_size=100,
                     export_format='xlsx',
                     # editable=True
@@ -228,7 +283,7 @@ def create_layout():
                 #                 'height': 'auto',
                 #             },
                 #     ),]),
-            ], style={'display': 'inline-block', 'width': '49%',
+            ], style={'display': 'inline-block', 'width': '46%',
              'verticalAlign': 'top','margin-right': '1px','margin-left': '1px',} ),
 
             # # Row 4 - Закладки

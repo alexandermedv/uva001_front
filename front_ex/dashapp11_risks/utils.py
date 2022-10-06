@@ -14,14 +14,11 @@ from sqlalchemy import create_engine
 def get_risk_table():
 	schema='analysis'
 	Name_table='risk_radar_base'
-	login='svc_app_uva'
-	# passwors=''
-	# ip_server=''
 	chunksize=100000
 	sql = '''
 		SELECT *
 		FROM '''+schema+'''.'''+Name_table
-	con = create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8')
+	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()
 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):

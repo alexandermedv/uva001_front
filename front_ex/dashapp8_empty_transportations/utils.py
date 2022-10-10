@@ -135,7 +135,7 @@ def get_trans_empty_by_type(railway='', start_date=None, end_date=None):
                             on s.rw_short_name = ra.file 
                         where (lower("Плательщик") like '%пгк%' 
                             or lower("Грузоотправитель") like '%пгк%' 
-                            or lower("Получатель") like '%пгк%')
+                            or (lower("Получатель") like '%пгк%' and not "РПС" in ('ЦС')))
                             and cn_short_name = 'РОССИЯ'
     '''
     if railway:
@@ -172,7 +172,7 @@ def get_trans_empty_by_money(railway, start_date=None, end_date=None):
                     where "Превышение даты истечение срока д" != 'Нет данных для оценки'
                             and (lower("Плательщик") like '%пгк%' 
                                 or lower("Грузоотправитель") like '%пгк%' 
-                                or lower("Получатель") like '%пгк%')
+                                or (lower("Получатель") like '%пгк%' and not "РПС" in ('ЦС')))
                              and cn_short_name = 'РОССИЯ'
     '''
     if railway:
@@ -196,7 +196,7 @@ def get_trans_empty_by_money(railway, start_date=None, end_date=None):
                         where "Превышение даты истечение срока д" = 'С просрочкой'
                             and (lower("Плательщик") like '%пгк%' 
                                 or lower("Грузоотправитель") like '%пгк%' 
-                                or lower("Получатель") like '%пгк%')
+                                or (lower("Получатель") like '%пгк%' and not "РПС" in ('ЦС')))
                             and cn_short_name = 'РОССИЯ'
     '''
     if railway:
@@ -231,7 +231,7 @@ def get_trans_empty_by_type_month(railway, start_date=None, end_date=None):
                         on s.rw_short_name = ra.file 
                     where (lower("Плательщик") like '%пгк%' 
 						or lower("Грузоотправитель") like '%пгк%' 
-						or lower("Получатель") like '%пгк%')
+						or (lower("Получатель") like '%пгк%' and not "РПС" in ('ЦС')))
                         and cn_short_name = 'РОССИЯ'
     '''
     if railway:
@@ -260,7 +260,7 @@ def get_trans_empty_by_money_month(railway, start_date=None, end_date=None):
                     on s.rw_short_name = ra.file 
                     where (lower("Плательщик") like '%пгк%' 
 						    or lower("Грузоотправитель") like '%пгк%' 
-						    or lower("Получатель") like '%пгк%') 
+						    or (lower("Получатель") like '%пгк%' and not "РПС" in ('ЦС'))) 
                         and "Превышение даты истечение срока д" = 'С просрочкой'
                         and cn_short_name = 'РОССИЯ'
     '''
@@ -297,7 +297,7 @@ def get_tab1_trans_empty_by_delay_stat(railway, start_date=None, end_date=None):
                                 on s.rw_short_name = ra.file 
                             where (lower("Плательщик") like '%пгк%' 
                                 or lower("Грузоотправитель") like '%пгк%' 
-                                or lower("Получатель") like '%пгк%') 
+                                or (lower("Получатель") like '%пгк%' and not "РПС" in ('ЦС'))) 
                                 and "Превышение даты истечение срока д" = 'С просрочкой'
                                 and cn_short_name = 'РОССИЯ'
     '''
@@ -349,7 +349,7 @@ def get_tab4_trans_empty_delay_by_rps(railway='', start_date=None, end_date=None
                             on s.rw_short_name = ra.file 
                              where (lower("Плательщик") like '%пгк%' 
 						        or lower("Грузоотправитель") like '%пгк%' 
-						        or lower("Получатель") like '%пгк%')
+						        or (lower("Получатель") like '%пгк%' and not "РПС" in ('ЦС')))
                                 and cn_short_name = 'РОССИЯ'
     ''' 
     if start_date and end_date:
@@ -381,7 +381,7 @@ def get_tab4_trans_empty_penalty_by_rps(railway='', start_date=None, end_date=No
                     where t."Превышение даты истечение срока д" = 'С просрочкой'
                         and (lower("Плательщик") like '%пгк%' 
 						        or lower("Грузоотправитель") like '%пгк%' 
-						        or lower("Получатель") like '%пгк%')
+						        or (lower("Получатель") like '%пгк%' and not "РПС" in ('ЦС')))
                         and cn_short_name = 'РОССИЯ'
                         and not t."РПС" in ('ТВЗ', 'РЛВ')
     '''
@@ -412,7 +412,7 @@ def get_tab4_trans_empty_mean_delay_by_rps(railway='', start_date=None, end_date
 		            where t."Превышение даты истечение срока д" = 'С просрочкой'
                             and (lower("Плательщик") like '%пгк%' 
 						        or lower("Грузоотправитель") like '%пгк%' 
-						        or lower("Получатель") like '%пгк%')
+						        or (lower("Получатель") like '%пгк%' and not "РПС" in ('ЦС')))
                             and cn_short_name = 'РОССИЯ'
                             and not t."РПС" in ('ТВЗ', 'РЛВ')
     '''

@@ -32,7 +32,7 @@ def get_credit_data_clients():
 	schema='analysis'
 	Name_table='debitor_saldo_anlis_clients'
 	login='svc_fs_uva'
-	passwors='Temp001'
+	passwors='Hfesb1th45xao2qhjkc'
 	ip_server='172.17.0.136:5432'
 	chunksize=100000
 	sql = '''

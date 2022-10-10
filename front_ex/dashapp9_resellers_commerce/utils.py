@@ -273,7 +273,7 @@ def get_resellers_by_branches_detailed(start_date, end_date, branches, gruz, rod
     """Выгрузка количества посреднических рейсов в разрезе филиалов - детальные данные для таблицы"""
     sql = """
         SELECT *
-        FROM dashboard.resellers_commerce_results
+        FROM dashboard.resellers_commerce_cube
         WHERE "Сбытовая организация" IN (
             SELECT "Сбытовая организация" FROM (
 
@@ -378,7 +378,7 @@ def get_resellers_by_rps_detailed(start_date, end_date, branches, gruz, rod, sor
     """Выгрузка количества посреднических рейсов в разрезе РПС - детальные данные для таблицы"""
     sql = '''
         SELECT *
-        FROM dashboard.resellers_commerce_results
+        FROM dashboard.resellers_commerce_cube
         WHERE "Род подвижного состава" IN (
             SELECT "Род подвижного состава" FROM (
 
@@ -484,7 +484,7 @@ def get_resellers_cargo_detailed(start_date, end_date, branches, gruz, rod, sort
     """Посреднические рейсы по грузам - детальные данные для таблицы"""
     sql = """
         SELECT *
-        FROM dashboard.resellers_commerce_results
+        FROM dashboard.resellers_commerce_cube
         WHERE "Код груза ЕТСНГ" IN (
             SELECT "Код груза ЕТСНГ" FROM (
 

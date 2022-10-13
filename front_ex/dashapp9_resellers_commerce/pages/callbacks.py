@@ -679,7 +679,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
         # elif sorting == 'Сумма, руб.':
         #     s = 'Стоимость рейсов'
         df1 = get_resellers_by_branches(start_date, end_date, branches, gruz, rod, sorting)
-        # df2 = get_resellers_by_branches_detailed(start_date, end_date, branches, gruz, rod, sorting)
+        df2 = get_resellers_by_branches_detailed(start_date, end_date, branches, gruz, rod, sorting)
 
         df1['Аббревиатура филиала'] = df1['Наименование филиала']
         df1['Аббревиатура филиала'] = df1['Аббревиатура филиала'].replace(
@@ -1084,7 +1084,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
         # elif sorting == 'Доля по количеству':
         #     s = 'Доля посреднических рейсов'
         df1 = get_resellers_by_rps(start_date, end_date, branches, gruz, rod, sorting)
-        # df2 = get_resellers_by_rps_detailed(start_date, end_date, branches, gruz, rod, sorting)
+        df2 = get_resellers_by_rps_detailed(start_date, end_date, branches, gruz, rod, sorting)
 
         x1_data = df1['Количество посреднических рейсов'].astype(str).tolist()
         x1_text = df1['Количество посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
@@ -1443,7 +1443,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
         elif sorting == 'Сумма, руб.':
             s = 'Стоимость рейсов'
         df1 = get_resellers_cargo(start_date, end_date, branches, gruz, rod, sorting).sort_values(by=s, ascending=True)
-        # df2 = get_resellers_cargo_detailed(start_date, end_date, branches, gruz, rod, sorting)
+        df2 = get_resellers_cargo_detailed(start_date, end_date, branches, gruz, rod, sorting)
 
         x1_data = df1['Количество посреднических рейсов'].astype(str).tolist()
         x1_text = df1['Количество посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(

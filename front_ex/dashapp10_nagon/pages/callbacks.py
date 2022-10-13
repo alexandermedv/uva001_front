@@ -1,4 +1,4 @@
-""" Интерактивные элементы для отчетов по запчастям."""
+""" Интерактивные элементы для отчета по нагону."""
 import datetime as dt
 import numpy as np
 from dash.dependencies import Input, Output
@@ -18,6 +18,7 @@ from ..utils import get_osv_detail_by_dates, get_osv_detail_by_dates2, get_osv_d
 from ..utils import get_branch_names, get_detail_type_names, get_warehouse_names
 from ..utils import get_defect, get_defect_count, get_transfer, get_transfer_count
 from ..utils import get_repair, get_repair_count, get_sale, get_sale_count
+from ..utils import get_nagon_results, get_nagon_dynamics
 from ..pages import dash_app
 
 #from flask_app import engine_analysis, engine_cons
@@ -35,6 +36,22 @@ from ..pages import dash_app
 #         else:
 #             return index_page
 #         # You could also return a 404 "URL not found" page here
+
+
+# Количество неотраженных операций
+@dash_app.callback(
+Output(component_id='nagon_count', component_property='children'),
+[Input('dashboard2-date-picker-range', 'start_date'),
+Input('dashboard2-date-picker-range', 'end_date')]
+)
+
+def update_markdown1(start_date,  end_date):
+    """Количество неотраженных операций"""
+
+    df1 = get_nagon_results(start_date,  end_date)
+    print('Количество непроведенных операций:', df1['oper_accepted_count'].sum())
+
+    return int(df1['oper_accepted_count'].sum())
 
 
 # Значения списка филиалов
@@ -286,8 +303,8 @@ def render_content(start_date, end_date, tab, filial, detail_type,
                     
                     dash_table.DataTable(
                         # https://dash.plotly.com/datatable/width
-                        id='table_defect',
-                        columns=[{"name": i, "id": i} for i in df_defect.columns],
+                        id='table_defect',                        columns=[{"name": i, "id": i} for i in df_defect.columns],
+
                         data=df_defect.to_dict('records'),
                         page_size=20,
                         style_table={'overflowX': 'auto'},
@@ -536,34 +553,200 @@ def render_content(start_date, end_date, tab, filial, detail_type,
 
         return content
 
+    elif tab == 'tab-6':
+        """Сводные результаты"""
+        
+        df1 = get_nagon_results(start_date,  end_date)
+        print('df1 =', df1)
+
+        df_v1 = pd.pivot_table(df1, values='oper_accepted_count', index=['year', 'operation'], columns=['filial_name']).reset_index()
+        df_v1.rename(columns = {'Владивостокский филиал' : 'Влд', 'Воронежский филиал' : 'Врж', 'Екатеринбургский филиал' : 'Екб',
+                                'Иркутский филиал' : 'Ирк', 'Красноярский филиал ': 'Крс', 'Нижегородский филиал' : 'Нжн',
+                                'Новосибирский филиал' : 'Нвб', 'Самарский филиал' : 'Смр', 'Головное отделение' : 'ГО',
+                                'Ростовский филиал' : 'Рст', 'Санкт-Петербургский филиал' : 'СПб', 'Саратовский филиал': 'Срт',
+                                'Челябинский филиал' : 'Члб', 'Ярославский филиал': 'Ярв'}, inplace = True) 
+        print('df_v1 =\n', df_v1)
+
+        df_v2 = pd.pivot_table(df1, values='percentage', index=['year', 'operation'], columns=['filial_name']).reset_index()
+        df_v2.rename(columns = {'Владивостокский филиал' : 'Влд', 'Воронежский филиал' : 'Врж', 'Екатеринбургский филиал' : 'Екб',
+                                'Иркутский филиал' : 'Ирк', 'Красноярский филиал ': 'Крс', 'Нижегородский филиал' : 'Нжн',
+                                'Новосибирский филиал' : 'Нвб', 'Самарский филиал' : 'Смр', 'Головное отделение' : 'ГО',
+                                'Ростовский филиал' : 'Рст', 'Санкт-Петербургский филиал' : 'СПб', 'Саратовский филиал': 'Срт',
+                                'Челябинский филиал' : 'Члб', 'Ярославский филиал': 'Ярв'}, inplace = True) 
+        print('df_v2 =\n', df_v2)
+
+        df_v3 = pd.pivot_table(df1, values='oper_count', index=['year', 'operation'], columns=['filial_name']).reset_index()
+        df_v3.rename(columns = {'Владивостокский филиал' : 'Влд', 'Воронежский филиал' : 'Врж', 'Екатеринбургский филиал' : 'Екб',
+                                'Иркутский филиал' : 'Ирк', 'Красноярский филиал ': 'Крс', 'Нижегородский филиал' : 'Нжн',
+                                'Новосибирский филиал' : 'Нвб', 'Самарский филиал' : 'Смр', 'Головное отделение' : 'ГО',
+                                'Ростовский филиал' : 'Рст', 'Санкт-Петербургский филиал' : 'СПб', 'Саратовский филиал': 'Срт',
+                                'Челябинский филиал' : 'Члб', 'Ярославский филиал': 'Ярв'}, inplace = True) 
+        print('df_v3 =\n', df_v3)
+        # sale_count = get_sale_count(start_date,  end_date)
+
+        content = html.Div([
+        # html.Output(sale_count),
+        html.Div([
+            html.Br(),
+                    dbc.Row(),
+                    html.H6('''Сводные результаты по нагону''',
+                        style={'text-align':'center',
+                                'font-size': '16pt',
+                                'font-weight': 'bold'}),
+                    
+                    dash_table.DataTable(
+                        # https://dash.plotly.com/datatable/width
+                        id='table_nagon_not_accepted',
+                        columns=[{"name": i, "id": i} for i in df_v1.columns],
+                        data=df_v1.to_dict('records'),
+                        page_size=20,
+                        style_table={'overflowX': 'auto'},
+                        style_cell={
+                            # all three widths are needed
+                            'minWidth': '10px', 'width': '180px', 'maxWidth': '180px',
+                            'overflow': 'hidden',
+                            'textOverflow': 'ellipsis',
+                            'textAlign': 'left',
+                        },
+                        # style_cell_conditional=[
+                        #     {'if': {'column_id': "Описание недостатка"},
+                        #     'width': '20%'},
+                        #     {'if': {'column_id': "Мероприятие"},
+                        #     'width': '20%'},
+                        #     {'if': {'column_id': "Первоначальная дата окончания"},
+                        #     'width': '5%'},
+                        #     {'if': {'column_id': "Пересмотренная дата окончания"},
+                        #     'width': '5%'},
+                        #     {'if': {'column_id': "Комментарий"},
+                        #     'width': '50%'},
+                        # ],
+                        export_format='xlsx',
+                        export_headers='display',
+                        merge_duplicate_headers=True,
+                        style_header={
+                            'backgroundColor': 'rgb(138,36,50)',
+                            'color': 'white',
+                            'whiteSpace':'normal',
+                            'fontWeight': 'bold'
+                        },
+                        style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': 'rgb(230, 230, 230)',
+                            }
+                        ],
+                        style_data={
+                            'whiteSpace': 'normal',
+                            'height': 'auto',
+                        },
+                    ),
+
+                    dash_table.DataTable(
+                        # https://dash.plotly.com/datatable/width
+                        id='table_nagon_all_operations',
+                        columns=[{"name": i, "id": i} for i in df_v2.columns],
+                        data=df_v2.to_dict('records'),
+                        page_size=20,
+                        style_table={'overflowX': 'auto'},
+                        style_cell={
+                            # all three widths are needed
+                            'minWidth': '10px', 'width': '180px', 'maxWidth': '180px',
+                            'overflow': 'hidden',
+                            'textOverflow': 'ellipsis',
+                            'textAlign': 'left',
+                        },
+                        # style_cell_conditional=[
+                        #     {'if': {'column_id': "Описание недостатка"},
+                        #     'width': '20%'},
+                        #     {'if': {'column_id': "Мероприятие"},
+                        #     'width': '20%'},
+                        #     {'if': {'column_id': "Первоначальная дата окончания"},
+                        #     'width': '5%'},
+                        #     {'if': {'column_id': "Пересмотренная дата окончания"},
+                        #     'width': '5%'},
+                        #     {'if': {'column_id': "Комментарий"},
+                        #     'width': '50%'},
+                        # ],
+                        export_format='xlsx',
+                        export_headers='display',
+                        merge_duplicate_headers=True,
+                        style_header={
+                            'backgroundColor': 'rgb(138,36,50)',
+                            'color': 'white',
+                            'whiteSpace':'normal',
+                            'fontWeight': 'bold'
+                        },
+                        style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': 'rgb(230, 230, 230)',
+                            }
+                        ],
+                        style_data={
+                            'whiteSpace': 'normal',
+                            'height': 'auto',
+                        },
+                    ),
+
+                    dash_table.DataTable(
+                        # https://dash.plotly.com/datatable/width
+                        id='table_nagon_all_operations',
+                        columns=[{"name": i, "id": i} for i in df_v3.columns],
+                        data=df_v3.to_dict('records'),
+                        page_size=20,
+                        style_table={'overflowX': 'auto'},
+                        style_cell={
+                            # all three widths are needed
+                            'minWidth': '10px', 'width': '180px', 'maxWidth': '180px',
+                            'overflow': 'hidden',
+                            'textOverflow': 'ellipsis',
+                            'textAlign': 'left',
+                        },
+                        # style_cell_conditional=[
+                        #     {'if': {'column_id': "Описание недостатка"},
+                        #     'width': '20%'},
+                        #     {'if': {'column_id': "Мероприятие"},
+                        #     'width': '20%'},
+                        #     {'if': {'column_id': "Первоначальная дата окончания"},
+                        #     'width': '5%'},
+                        #     {'if': {'column_id': "Пересмотренная дата окончания"},
+                        #     'width': '5%'},
+                        #     {'if': {'column_id': "Комментарий"},
+                        #     'width': '50%'},
+                        # ],
+                        export_format='xlsx',
+                        export_headers='display',
+                        merge_duplicate_headers=True,
+                        style_header={
+                            'backgroundColor': 'rgb(138,36,50)',
+                            'color': 'white',
+                            'whiteSpace':'normal',
+                            'fontWeight': 'bold'
+                        },
+                        style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': 'rgb(230, 230, 230)',
+                            }
+                        ],
+                        style_data={
+                            'whiteSpace': 'normal',
+                            'height': 'auto',
+                        },
+                    ),
+        ]),
+        ])
+
+        return content
+
     elif tab == 'tab-1':
-        """Динамика недостачи"""
-        # global graph_data
-        # global d_start
-        # global d_end
-        # print('graph_data', graph_data)
+        """Динамика нагона по данным УДВ"""
+        
+        df1 = get_nagon_dynamics(start_date, end_date)
+        print('df1 =', df1)
+        df1_aggr = df1.groupby(['start_date', 'end_date']).sum().reindex()
+        print('df1_aggr =', df1_aggr)
 
-        # print('Начало периода', start_date)
-        # print(end_date)
-        # if data is None or (d_start != start_date) or (d_end != end_date):
-        #     data = pd.read_sql(sql, engine_cons)
-        #     d_start = start_date
-        #     d_end = end_date
-
-        # data = get_osv_detail_by_dates(dt.datetime.strptime(start_date,'%Y-%m-%d'
-        #   ), dt.datetime.strptime(end_date, '%Y-%m-%d'), debug=False)
-        # data_left = get_osv_detail_by_dates(dt.datetime.strptime('1900-01-01','%Y-%m-%d')\
-        #     , dt.datetime.strptime(start_date, '%Y-%m-%d') - dt.timedelta(days=1), debug=False)
-        # d_start = start_date
-        # d_end = end_date
-
-
-
-        # graph_data = get_osv_detail_by_dates2(start_date, end_date, debug=False)
-        # data_left = get_osv_detail_by_dates2(dt.datetime.strptime('1900-01-01','%Y-%m-%d'
-        #     ), start_date - dt.timedelta(days=1), debug=False)
-
-        #         # --> Алгоримт расчета динамического сальдо
         df0['Дата'] = df0['Дата проводки'].apply(lambda x: dt.datetime.strptime(x, '%Y%m%d'))
         df0['Неделя'] = df0['Дата проводки'].apply(lambda x: dt.datetime.strptime(x, '%Y%m%d')).apply(lambda x: x - dt.timedelta(x.weekday()))
         next_month = df0['Дата'].apply(lambda x: x.replace(day=28) + dt.timedelta(days=4))   # this will never fail

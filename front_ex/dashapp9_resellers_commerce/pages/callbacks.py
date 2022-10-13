@@ -6,6 +6,7 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 import plotly.graph_objects as go
+import plotly.express as px
 import pandas as pd
 import dash_table
 import dash
@@ -371,7 +372,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     text=x1_text,
                                     hoverinfo='skip',
                                     hovertemplate=
-                                        """Контрагент: %{y} <br>Количество посреднических рейсов: %{y}""",
+                                        """Контрагент: %{y} <br>Количество посреднических рейсов: %{text}""",
                                     name='',
                                     orientation='h',
                                     textposition='auto',
@@ -638,20 +639,6 @@ def render_content(tab, start_date, end_date, filial, cargo,
                     'textOverflow': 'ellipsis',
                     'textAlign': 'left',
                 },
-                # style_cell_conditional=[
-                #     {'if': {'column_id': "Область риска"},
-                #     'width': '5%'},
-                #     {'if': {'column_id': "Описание недостатка"},
-                #     'width': '20%'},
-                #     {'if': {'column_id': "Длительность устранения план/факт, мес."},
-                #     'width': '5%'},
-                #     {'if': {'column_id': "Срок завершения мероприятий"},
-                #     'width': '10%'},
-                #     {'if': {'column_id': "Статус"},
-                #     'width': '40%'},
-                #     {'if': {'column_id': "Причины длительного устранения"},
-                #     'width': '20%'},
-                # ],
                 export_format='xlsx',
                 export_headers='display',
                 merge_duplicate_headers=True,
@@ -1021,83 +1008,69 @@ def render_content(tab, start_date, end_date, filial, cargo,
 
             html.Br(),
             dbc.Row(),
-            # html.H6('''Подробные данные''',
-            #     style={'text-align':'center',
-            #             'font-size': '16pt',
-            #             'font-weight': 'bold'}),
+            html.H6('''Подробные данные''',
+                style={'text-align':'center',
+                        'font-size': '16pt',
+                        'font-weight': 'bold'}),
 
-            # dash_table.DataTable(
-            #     # https://dash.plotly.com/datatable/width
-            #     id='detailed_table1',
-            #     columns=[{"name": i, "id": i} for i in df2.columns],
-            #     data=df2.to_dict('records'),
-            #     filter_action='native',
-            #     page_size=15,
-            #     style_table={'overflowX': 'auto'},
-            #     css=[{
-            #         'selector': '.dash-spreadsheet td div',
-            #         'rule': '''
-            #             line-height: 15px;
-            #             max-height: 30px; min-height: 30px; height: 30px;
-            #             display: block;
-            #             overflow-y: hidden;
-            #         '''
-            #     }],
-            #     style_cell={
-            #         # all three widths are needed
-            #         'minWidth': '180px', 
-            #         'width': '180px', 
-            #         # 'whiteSpace': 'nowrap',
-            #         'maxWidth': '180px',
-            #         # 'overflow': 'hidden',
-            #         # 'textOverflow': 'ellipsis',
-            #         'textAlign': 'left',
+            dash_table.DataTable(
+                # https://dash.plotly.com/datatable/width
+                id='detailed_table1',
+                columns=[{"name": i, "id": i} for i in df2.columns],
+                data=df2.to_dict('records'),
+                filter_action='native',
+                page_size=15,
+                style_table={'overflowX': 'auto'},
+                css=[{
+                    'selector': '.dash-spreadsheet td div',
+                    'rule': '''
+                        line-height: 15px;
+                        max-height: 30px; min-height: 30px; height: 30px;
+                        display: block;
+                        overflow-y: hidden;
+                    '''
+                }],
+                style_cell={
+                    # all three widths are needed
+                    'minWidth': '180px', 
+                    'width': '180px', 
+                    # 'whiteSpace': 'nowrap',
+                    'maxWidth': '180px',
+                    # 'overflow': 'hidden',
+                    # 'textOverflow': 'ellipsis',
+                    'textAlign': 'left',
 
-            #         # 'overflow': 'hidden',
-            #         # 'textOverflow': 'ellipsis',
-            #         # 'maxWidth': 0
-            #     },
-            #     tooltip_data=[
-            #         {
-            #             column: {'value': str(value), 'type': 'markdown'}
-            #             for column, value in row.items()
-            #         } for row in df2.to_dict('records')
-            #     ],
-            #     tooltip_duration=None,
-            #     # style_cell_conditional=[
-            #     #     {'if': {'column_id': "Область риска"},
-            #     #     'width': '5%'},
-            #     #     {'if': {'column_id': "Описание недостатка"},
-            #     #     'width': '20%'},
-            #     #     {'if': {'column_id': "Длительность устранения план/факт, мес."},
-            #     #     'width': '5%'},
-            #     #     {'if': {'column_id': "Срок завершения мероприятий"},
-            #     #     'width': '10%'},
-            #     #     {'if': {'column_id': "Статус"},
-            #     #     'width': '40%'},
-            #     #     {'if': {'column_id': "Причины длительного устранения"},
-            #     #     'width': '20%'},
-            #     # ],
-            #     export_format='xlsx',
-            #     export_headers='display',
-            #     merge_duplicate_headers=True,
-            #     style_header={
-            #         'backgroundColor': 'rgb(138,36,50)',
-            #         'color': 'white',
-            #         'whiteSpace':'normal',
-            #         'fontWeight': 'bold'
-            #     },
-            #     style_data_conditional=[
-            #         {
-            #             'if': {'row_index': 'odd'},
-            #             'backgroundColor': 'rgb(230, 230, 230)',
-            #         }
-            #     ],
-            #     style_data={
-            #         'whiteSpace': 'normal',
-            #         'height': 'auto',
-            #     },
-            # ),
+                    # 'overflow': 'hidden',
+                    # 'textOverflow': 'ellipsis',
+                    # 'maxWidth': 0
+                },
+                tooltip_data=[
+                    {
+                        column: {'value': str(value), 'type': 'markdown'}
+                        for column, value in row.items()
+                    } for row in df2.to_dict('records')
+                ],
+                tooltip_duration=None,
+                export_format='xlsx',
+                export_headers='display',
+                merge_duplicate_headers=True,
+                style_header={
+                    'backgroundColor': 'rgb(138,36,50)',
+                    'color': 'white',
+                    'whiteSpace':'normal',
+                    'fontWeight': 'bold'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': 'rgb(230, 230, 230)',
+                    }
+                ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                },
+            ),
 
             
         ])
@@ -1408,62 +1381,48 @@ def render_content(tab, start_date, end_date, filial, cargo,
 
             ], className="row"),
 
-            # html.Br(),
-            # dbc.Row(),
-            # html.H6('''Подробные данные''',
-            #     style={'text-align':'center',
-            #             'font-size': '16pt',
-            #             'font-weight': 'bold'}),
+            html.Br(),
+            dbc.Row(),
+            html.H6('''Подробные данные''',
+                style={'text-align':'center',
+                        'font-size': '16pt',
+                        'font-weight': 'bold'}),
 
-            # dash_table.DataTable(
-            #     # https://dash.plotly.com/datatable/width
-            #     id='detailed_table1',
-            #     columns=[{"name": i, "id": i} for i in df2.columns],
-            #     data=df2.to_dict('records'),
-            #     filter_action='native',
-            #     page_size=15,
-            #     style_table={'overflowX': 'auto'},
-            #     style_cell={
-            #         # all three widths are needed
-            #         'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
-            #         'overflow': 'hidden',
-            #         'textOverflow': 'ellipsis',
-            #         'textAlign': 'left',
-            #     },
-            #     # style_cell_conditional=[
-            #     #     {'if': {'column_id': "Область риска"},
-            #     #     'width': '5%'},
-            #     #     {'if': {'column_id': "Описание недостатка"},
-            #     #     'width': '20%'},
-            #     #     {'if': {'column_id': "Длительность устранения план/факт, мес."},
-            #     #     'width': '5%'},
-            #     #     {'if': {'column_id': "Срок завершения мероприятий"},
-            #     #     'width': '10%'},
-            #     #     {'if': {'column_id': "Статус"},
-            #     #     'width': '40%'},
-            #     #     {'if': {'column_id': "Причины длительного устранения"},
-            #     #     'width': '20%'},
-            #     # ],
-            #     export_format='xlsx',
-            #     export_headers='display',
-            #     merge_duplicate_headers=True,
-            #     style_header={
-            #         'backgroundColor': 'rgb(138,36,50)',
-            #         'color': 'white',
-            #         'whiteSpace':'normal',
-            #         'fontWeight': 'bold'
-            #     },
-            #     style_data_conditional=[
-            #         {
-            #             'if': {'row_index': 'odd'},
-            #             'backgroundColor': 'rgb(230, 230, 230)',
-            #         }
-            #     ],
-            #     style_data={
-            #         'whiteSpace': 'normal',
-            #         'height': 'auto',
-            #     },
-            # ),
+            dash_table.DataTable(
+                # https://dash.plotly.com/datatable/width
+                id='detailed_table1',
+                columns=[{"name": i, "id": i} for i in df2.columns],
+                data=df2.to_dict('records'),
+                filter_action='native',
+                page_size=15,
+                style_table={'overflowX': 'auto'},
+                style_cell={
+                    # all three widths are needed
+                    'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+                    'overflow': 'hidden',
+                    'textOverflow': 'ellipsis',
+                    'textAlign': 'left',
+                },
+                export_format='xlsx',
+                export_headers='display',
+                merge_duplicate_headers=True,
+                style_header={
+                    'backgroundColor': 'rgb(138,36,50)',
+                    'color': 'white',
+                    'whiteSpace':'normal',
+                    'fontWeight': 'bold'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': 'rgb(230, 230, 230)',
+                    }
+                ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                },
+            ),
 
         ])
         return content
@@ -1485,8 +1444,6 @@ def render_content(tab, start_date, end_date, filial, cargo,
             s = 'Стоимость рейсов'
         df1 = get_resellers_cargo(start_date, end_date, branches, gruz, rod, sorting).sort_values(by=s, ascending=True)
         # df2 = get_resellers_cargo_detailed(start_date, end_date, branches, gruz, rod, sorting)
-
-        # print('df2 =', df2)
 
         x1_data = df1['Количество посреднических рейсов'].astype(str).tolist()
         x1_text = df1['Количество посреднических рейсов'].map('{:,.0f}'.format).astype(str).replace(
@@ -1777,71 +1734,57 @@ def render_content(tab, start_date, end_date, filial, cargo,
 
             ], className="row"),
 
-            # html.Br(),
-            # dbc.Row(),
-            # html.H6('''Подробные данные''',
-            #     style={'text-align':'center',
-            #             'font-size': '16pt',
-            #             'font-weight': 'bold'}),
+            html.Br(),
+            dbc.Row(),
+            html.H6('''Подробные данные''',
+                style={'text-align':'center',
+                        'font-size': '16pt',
+                        'font-weight': 'bold'}),
 
-            # dash_table.DataTable(
-            #     # https://dash.plotly.com/datatable/width
-            #     id='detailed_table1',
-            #     columns=[{"name": i, "id": i} for i in df2.columns],
-            #     data=df2.to_dict('records'),
-            #     filter_action='native',
-            #     page_size=15,
-            #     style_table={'overflowX': 'auto'},
-            #     css=[{
-            #         'selector': '.dash-spreadsheet td div',
-            #         'rule': '''
-            #             line-height: 15px;
-            #             max-height: 30px; min-height: 30px; height: 30px;
-            #             display: block;
-            #             overflow-y: hidden;
-            #         '''
-            #     }],
-            #     style_cell={
-            #         # all three widths are needed
-            #         'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
-            #         'overflow': 'hidden',
-            #         'textOverflow': 'ellipsis',
-            #         'textAlign': 'left',
-            #     },
-            #     # style_cell_conditional=[
-            #     #     {'if': {'column_id': "Область риска"},
-            #     #     'width': '5%'},
-            #     #     {'if': {'column_id': "Описание недостатка"},
-            #     #     'width': '20%'},
-            #     #     {'if': {'column_id': "Длительность устранения план/факт, мес."},
-            #     #     'width': '5%'},
-            #     #     {'if': {'column_id': "Срок завершения мероприятий"},
-            #     #     'width': '10%'},
-            #     #     {'if': {'column_id': "Статус"},
-            #     #     'width': '40%'},
-            #     #     {'if': {'column_id': "Причины длительного устранения"},
-            #     #     'width': '20%'},
-            #     # ],
-            #     export_format='xlsx',
-            #     export_headers='display',
-            #     merge_duplicate_headers=True,
-            #     style_header={
-            #         'backgroundColor': 'rgb(138,36,50)',
-            #         'color': 'white',
-            #         'whiteSpace':'normal',
-            #         'fontWeight': 'bold'
-            #     },
-            #     style_data_conditional=[
-            #         {
-            #             'if': {'row_index': 'odd'},
-            #             'backgroundColor': 'rgb(230, 230, 230)',
-            #         }
-            #     ],
-            #     style_data={
-            #         'whiteSpace': 'normal',
-            #         'height': 'auto',
-            #     },
-            # ),
+            dash_table.DataTable(
+                # https://dash.plotly.com/datatable/width
+                id='detailed_table1',
+                columns=[{"name": i, "id": i} for i in df2.columns],
+                data=df2.to_dict('records'),
+                filter_action='native',
+                page_size=15,
+                style_table={'overflowX': 'auto'},
+                css=[{
+                    'selector': '.dash-spreadsheet td div',
+                    'rule': '''
+                        line-height: 15px;
+                        max-height: 30px; min-height: 30px; height: 30px;
+                        display: block;
+                        overflow-y: hidden;
+                    '''
+                }],
+                style_cell={
+                    # all three widths are needed
+                    'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+                    'overflow': 'hidden',
+                    'textOverflow': 'ellipsis',
+                    'textAlign': 'left',
+                },
+                export_format='xlsx',
+                export_headers='display',
+                merge_duplicate_headers=True,
+                style_header={
+                    'backgroundColor': 'rgb(138,36,50)',
+                    'color': 'white',
+                    'whiteSpace':'normal',
+                    'fontWeight': 'bold'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': 'rgb(230, 230, 230)',
+                    }
+                ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                },
+            ),
 
         ])
         return content
@@ -1858,32 +1801,6 @@ def render_content(tab, start_date, end_date, filial, cargo,
         df1 = get_resellers_dynamics(start_date, end_date, branches, gruz, rod)
 
         content = html.Div([
-            # html.Div([
-            #     html.Div([
-            #         html.Br(),
-            #         dash_table.DataTable(
-            #             id='resellers_table',
-            #             columns=[{"name": i, "id": i} for i in df0.columns],
-            #             data=df0.to_dict('records'),
-            #             page_size=10,
-            #             style_table={'overflowX': 'auto'},
-            #             style_cell={
-            #                 # all three widths are needed
-            #                 'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
-            #                 'overflow': 'hidden',
-            #                 'textOverflow': 'ellipsis',
-            #             },
-            #             export_format='xlsx',
-            #             export_headers='display',
-            #             merge_duplicate_headers=True,
-            #             style_header={
-            #                 'backgroundColor': 'rgb(230, 230, 230)',
-            #                 'fontWeight': 'bold'
-            #             },
-            #         ),
-            #     ]),
-            # ], className="row"),
-
             html.Div([
                 html.Div([
                     dcc.Graph(
@@ -1891,48 +1808,15 @@ def render_content(tab, start_date, end_date, filial, cargo,
                         config={"displayModeBar": True},
                         figure={
                             'data': [
-                                # go.Bar(x = df1['Начало месяца'],
-                                #     y=df1['Количество рейсов'],
-                                #     textposition='auto',
-                                #     hoverinfo='skip',
-                                #     hovertemplate="Дата: %{x}" +
-                                #         "<br>Обороты по дебету, тыс. руб.: %{y:,.0f}",
-                                #     marker={
-                                #         "color": "#97151c",
-                                #     },
-                                #     name = 'Обороты по дебету',
-                                #     yaxis="y1",
-
-                                # ),
-                                # go.Bar(x = df1['Месяц'],
-                                #     y = df1['Количество рейсов'],
-                                #     hoverinfo='skip',
-                                #     hovertemplate="Дата: %{x}" +
-                                #         "<br>Обороты по кредиту, тыс. руб.: %{y:,.0f}",
-                                #     marker={
-                                #         "color": "#006B19",
-                                #     },
-                                #     name='Обороты по кредиту',
-                                #     yaxis="y1",
-                                # ),
                                 go.Scatter(x=df1['Начало месяца'],
                                     y=df1['Количество посред рейсов'],
                                     hoverinfo='skip',
                                     hovertemplate="Дата: %{x}" + "<br>Количество рейсов, шт.: %{y:,.0f}",
                                     name='Динамика посреднических рейсов',
                                     mode='lines+markers',
-                                    line={"color": "#6E6E6E"},
+                                    line={"color": "#d30909"}, #6E6E6E
                                     yaxis = "y2"
                                 ),
-                                # go.Scatter(x=df1['Начало месяца'],
-                                #     y=df1['Количество рейсов'],
-                                #     hoverinfo='skip',
-                                #     hovertemplate="Дата: %{x}" + "<br>Количество рейсов, шт.: %{y:,.0f}",
-                                #     name='Динамика посреднических рейсов',
-                                #     mode='lines+markers',
-                                #     line={"color": "#6E6E6E"},
-                                #     yaxis = "y2"
-                                # ),
                             ],
                             'layout':go.Layout(
                                 title_text='''
@@ -2013,7 +1897,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     hovertemplate="Дата: %{x}" + "<br>Доля посред рейсов, %: %{y:,.0f}",
                                     name='Доля посреднических рейсов в шт',
                                     mode='lines+markers',
-                                    line={"color": "#6E6E6E"},
+                                    line={"color": "#d30909"}, #6E6E6E
                                     yaxis = "y2"
                                 ),
                             ],
@@ -2098,7 +1982,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     hovertemplate="Дата: %{x}" + "<br>Стоимость рейсов, руб.: %{y:,.0f}",
                                     name='Количество посреднических рейсов',
                                     mode='lines+markers',
-                                    line={"color": "#6E6E6E"},
+                                    line={"color": "#d30909"}, #6E6E6E
                                     yaxis = "y2"
                                 ),
                             ],
@@ -2180,7 +2064,7 @@ def render_content(tab, start_date, end_date, filial, cargo,
                                     hovertemplate="Дата: %{x}" + "<br>Доля посред рейсов, %: %{y:,.0f}",
                                     name='Доля посреднических рейсов в руб',
                                     mode='lines+markers',
-                                    line={"color": "#6E6E6E"},
+                                    line={"color": "#d30909"}, #6E6E6E
                                     yaxis = "y2"
                                 ),
                             ],

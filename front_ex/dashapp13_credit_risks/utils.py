@@ -18,7 +18,21 @@ def get_credit_data():
 	sql = '''
 		SELECT *
 		FROM '''+schema+'''.'''+Name_table +''' where
-	date>='2021-11-01' '''
+	date>='2021-11-01'  '''
+	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
+	df2=con.execute(sql).fetchall()
+	df2=pd.DataFrame()
+	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
+		df2=df2.append(chunk)
+	return df2
+def get_credit_data_bseg():
+	schema='analysis'
+	Name_table='saldo_bseg_contracts'
+	chunksize=100000
+	sql = '''
+		SELECT *
+		FROM '''+schema+'''.'''+Name_table +''' where
+	date>='2021-11-01' and date<'2022-10-01' '''
 	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()
@@ -55,6 +69,20 @@ def get_credit_data_all():
 		df2=df2.append(chunk)
 	return df2
 
+def get_credit_data_all_bseg():
+	schema='analysis'
+	Name_table='saldo_bseg_all'
+	chunksize=100000
+	sql = '''
+		SELECT *
+		FROM '''+schema+'''.'''+Name_table +''' where
+	date>='2020-11-01'  --and date<'2022-10-01' '''
+	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
+	df2=con.execute(sql).fetchall()
+	df2=pd.DataFrame()
+	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
+		df2=df2.append(chunk)
+	return df2
 
 
 

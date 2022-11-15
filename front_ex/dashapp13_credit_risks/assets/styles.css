@@ -414,3 +414,39 @@ a:active {
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
+.dash-dropdown{
+  min-width: 30ch;
+  min-height: 5ch;
+  height: auto;
+  width: auto;
+  /* white-space: nowrap;  */
+  /* width: 200px;        */
+  /* overflow: hidden; */
+  /* text-overflow: ellipsis */
+  white-space: pre-line  ;
+  /* text-overflow: ellipsis; */
+  /* overflow:auto; */
+  /* border: 1px solid #ddd; */
+  margin: 0;
+}
+.Select-control{
+  min-height: 5ch;
+  height: auto;
+  /* white-space: pre-line  ; */
+  /* overflow:auto; */
+}
+
+.Select-value{
+  min-height: 5ch;
+  height: auto;
+  
+} 
+.Select-value-label{
+  min-height: 5ch;
+  height: auto; 
+  white-space: pre-line  ;
+  overflow:auto;
+  /* line-height: 0.5; */
+  position:relative
+} 
+

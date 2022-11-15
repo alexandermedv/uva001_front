@@ -16,7 +16,7 @@ import numpy as np
 
 from sqlalchemy import create_engine
 from . import dash_app as app
-from ..utils import  get_credit_data, get_credit_data_all, get_credit_data_clients, get_credit_data_all_bseg, get_credit_data_bseg#get_credit_data_filials,
+from ..utils import  get_saldo_bseg, get_credit_data, get_credit_data_all, get_credit_data_clients, get_credit_data_all_bseg, get_credit_data_bseg#get_credit_data_filials,
 # from .utils import get_limit_oper_client_zuonr_data, get_limit1, get_limit
 def sum_nonlimit(s , n=0.13):
     if n in s.values:
@@ -144,7 +144,9 @@ def get_matrix_stat_1_bseg(df3_1, s_d=None, e_d=None, tol_dept=1):
     'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max',  'lim_sum', 
-     'rating', 'garanty', 'dept_over_lim','res','max']
+     'rating', #'garanty', 
+     'lim_warr_garanty', 'lim_guar_garanty',
+     'dept_over_lim','res','max']
        if (i in df3_1.columns) | (i in df6.columns )]
     
     # df3_1=df3_1[[ i for i in df3_1.columns if i not in ['rating', 'garanty']]]
@@ -157,15 +159,17 @@ def get_matrix_stat_2_bseg(df3_1,  e_d=None, tol_dept=1):
          'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max', 'rcm_categ', #'rating', 'garanty',
+         'lim_warr_garanty', 'lim_guar_garanty',
          ]]
     else:
         df3_1=df3_1.loc[df3_1['date']==e_d,['client_name', 'dog_number', 
          'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max', 'rcm_categ', #'rating', 'garanty',
+         'lim_warr_garanty', 'lim_guar_garanty',
          ]]
-    df3_1['postpone_pay']=np.nan
-    df3_1['prosrochka']=np.nan
+    # df3_1['postpone_pay']=np.nan
+    # df3_1['prosrochka']=np.nan
     df3_1['percent']=np.nan
         
     # df3_1=df3_1[[ i for i in df3_1.columns if i not in ['rating', 'garanty']]]
@@ -200,17 +204,21 @@ def get_dates_for_table_bseg():
     'rcm_categ', 'date', 'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max',  'lim_sum', 
-     'rating', 'garanty', 'dept_over_lim']]
+     'rating', #'garanty', 
+     'lim_warr_garanty', 'lim_guar_garanty',
+     'dept_over_lim']]
     df_dog_3=df.loc[(df['3_group']==3) , ['id_rcm', 'client_name', 'yur_hold','dog_number', 
      'rcm_categ', 'date', 'debitor_saldo_sum', 
       'days_off_cur_sum', 
-     'dept_days_off_sum', 'dept_days_off_max',  'rating', 'garanty'
+     'dept_days_off_sum', 'dept_days_off_max',  'rating', #'garanty', 
+     'lim_warr_garanty', 'lim_guar_garanty',
        ]]
     df_dog_1=df.loc[(df['3_group']==1) , ['id_rcm', 'client_name', 'yur_hold',
     'dog_number',  'rcm_categ', 'date', 'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max',  
-     'rating', 'garanty', 'dept_over_lim'
+     'rating', #'garanty', 
+     'lim_warr_garanty', 'lim_guar_garanty', 'dept_over_lim'
        ]]
     # df_dog_2_1=get_matrix_stat_1(df_dog_2)
     # df_dog_3_1=get_matrix_stat_2(df_dog_3)
@@ -221,7 +229,7 @@ def create_layout():
     df_dog_2_1=get_matrix_stat_1(df_dog_2)
     df_dog_3_1=get_matrix_stat_2(df_dog_3)
     df_dog_1_1=get_matrix_stat_1(df_dog_1)
-    is_need_bseg=False
+    is_need_bseg=True
     if is_need_bseg:
         df_dog_1_bseg,df_dog_2_bseg,df_dog_3_bseg=get_dates_for_table_bseg()
         df_dog_2_1_bseg=get_matrix_stat_1_bseg(df_dog_2_bseg)
@@ -265,6 +273,8 @@ def create_layout():
         'dog_number':['Договор','str', 0],
         'dinamic_saldo':['Сальдо','numeric', 1],
         'lim_sum':['Лимит','numeric', 1], 
+        'lim_warr_garanty' :['Обеспечение','numeric', 1],
+        'lim_guar_garanty' :['Гарантии','numeric', 1],
         'dept_over_lim':['Превышение лимита','numeric', 1], 
         'dinamic_saldo_X':['Сальдо безлимитных','numeric', 1],
         'debitor':['debitor','numeric', 1],   
@@ -374,10 +384,22 @@ def create_layout():
     points_1_0_bseg=[0 for i in dates1_1_bseg]
     points_2_0_bseg=[0 for i in dates1_2_bseg]
     points_3_0_bseg=[0 for i in dates1_3_bseg]
+    print("saldo")
+    global df_saldo
+    df_saldo=get_saldo_bseg()
+    # global df_dog_uniq
+    df_dog_uniq=df_saldo[['rcm_vid', 'rcm_categ','name1','yur_hold']].drop_duplicates()
+    df_result_t=df_saldo[(df_saldo[ 'name1'].isin([#'ПАО "НЛМК"',
+                                                        'ПАО "СЕВЕРСТАЛЬ"'])) ]#[( 'yur_hold',   '')].isin(['ГК НЛМК','СЕВЕРСТАЛЬ'])]
+    df_result_t=df_result_t.set_index('date')
+    
+    df_result_t_m=df_result_t.groupby([pd.Grouper( freq="1M"),'zuonr', 'kunnr', 'rcm_vid', 'rcm_categ', 'name1', 'yur_hold', 'rcm_dognum_reg']).mean().reset_index(1)
+    df_result_t_m=df_result_t_m.reset_index([1,2,3,4,5,6])
+
     print("5. Старт загрузки layout")
 
     layout = html.Div(
-        [
+        [   dcc.Store(id='intermediate-value', data=df_dog_uniq.to_dict('records')),
             html.Div(
                 html.H5("Отчет кредитных рисков"), className='row', 
                 style={'marginBottom': 15, 'margin-left': 30,'marginTop': 40}
@@ -449,7 +471,8 @@ def create_layout():
                 ), style={'width': '80%'},
                 config={'displayModeBar': False}
             ),
-            html.Div(    dbc.Navbar(
+            html.Div(    
+                dbc.Navbar(
                 [
                     html.Div('Выберите начальную дату:', 
                         style={'width': '15%', 
@@ -819,7 +842,7 @@ def create_layout():
                         display_format='DD.MM.YYYY',
                         style={'width': '20%', 'display': 'inline-block', 'color': 'white'}
                     ),
-                    html.Button('Submit', id='submit-val', n_clicks=0,
+                    html.Button('Submit', id='submit-val_bseg', n_clicks=0,
                         style={'width': '15%', 'display': 'inline-block', 'background-color': 'white', }),
                 ],dark=True, color='rgb(71, 71, 71)'
                 ),
@@ -1049,7 +1072,155 @@ def create_layout():
                     #     {'if': {'column_id': 'Лимит в SAP'},
                     #     'width': '35px'},
                     # ]
-                ), width=12)
+                ), width=12),
+                dbc.Navbar(
+                [
+                    dbc.Container(
+                            children=[
+                                html.Details([
+                                    html.Summary('Тип договоров...',
+                                        style={'font-size': '1.3rem'}),
+                                    html.Br(),
+                                    dbc.Col([
+                                        dcc.Checklist(
+                                            id='checklist-DRO',
+                                            options=[
+                                            {'label': 'Доходный', 'value': 'D'},
+                                            {'label': 'Расходный', 'value': 'R'},
+                                            {'label': 'Доходнорасходный', 'value': 'O'},
+                                            ],
+                                            value=['D', 'R', 'O'],
+                                            labelStyle = {'display': 'block'}
+                                        )   
+                                    ])
+                                ])
+                            ],
+                        style={'width': '13%', 
+                        'display': 'inline-block', #'marginBottom': 15,
+                        'margin-left': 30,
+                        'marginTop': 25,
+                        'color': 'white',
+                        'vertical-align':'top'}
+                        ),
+                    dbc.Container(
+                            children=[
+                                html.Details([
+                                    html.Summary('Категория договоров...',
+                                        style={'font-size': '1.3rem'}
+                                    ),
+                                    html.Br(),
+                                    dbc.Col([
+                                        dcc.Checklist(
+                                            id='checklist-categ',
+                                            options=[ {'label': i, 'value': i} for i in df_saldo['rcm_categ'].unique()],
+                                            value=df_saldo['rcm_categ'].unique(),
+                                            labelStyle = {'display': 'block'},
+                                            style={'column-count': '4'}
+                                        )   
+                                    ])
+                                ])
+                            ],
+                        style={'width': '15%', 
+                        'display': 'inline-block', 'marginBottom': 15,
+                         'margin-left': 10,
+                         'marginTop': 25,
+                        'color': 'white',
+                        'vertical-align':'top'}
+                        ),
+                    dbc.Col([
+                        html.H6('Детализация'),
+                        dcc.RadioItems(
+                            id='RI-OS',
+                            options=[
+                                {'label': 'Отдельные договора', 'value': 'O'},
+                                {'label': 'Суммарно по клиенту', 'value': 'S'},
+                            ],
+                            value='O'
+                        ),
+                        ],
+                        style={'width': '15%', 
+                            'display': 'inline-block', 'marginBottom': 15, 'margin-left': 30,'marginTop': 25,
+                            'color': 'white',
+                        'vertical-align':'top'}
+                    ),
+                    dbc.Col(
+                        [
+                        html.H6('Холдинг\компания'),
+                        dcc.RadioItems(
+                            id='RI-CH',
+                            options=[
+                                {'label': 'Компании', 'value': 'C'},
+                                {'label': 'Холдинги', 'value': 'H'},
+                            ],
+                            value='C'
+                        ),
+                        ],
+                        style={'width': '20%', 
+                            'display': 'inline-block', 'marginBottom': 15, 'margin-left': 30,'marginTop': 25,
+                            'color': 'white',
+                        'vertical-align':'top'}
+                    ),
+                     dcc.Dropdown(
+                        id="dashboard13-dropdown-company",
+                        options=[ {'label': i, 'value': i} for i in df_saldo[ 'name1'].unique()],
+                        value='ПАО "СЕВЕРСТАЛЬ"',
+                        clearable=False,
+                        style={"display": "flex",
+                            "justify-content": "center",
+                            # 'width': '20%', 
+                            'display': 'inline-block', #'marginBottom': 15, 'margin-left': 10,
+                            'marginTop': 25,
+                        'vertical-align':'top',
+                        'text-align': 'left',
+                        # 'padding': '0 10px',
+                        # 'margin-bottom': '5px',
+                            },
+                        # className='three-columns'
+                        
+                        ),
+                ],dark=True, color='rgb(71, 71, 71)',
+                style={'marginBottom': 15, 'margin-left': 15,'marginTop': 40}
+                ),
+                
+
+                dcc.Graph(
+                    id="nlmk_severstal",
+                    figure=go.Figure(
+                        data=[go.Bar(
+                                x=df_result_t_m[df_result_t_m['zuonr']==i].index,
+                                y=df_result_t_m[df_result_t_m['zuonr']==i]['dmbtr'],
+                                name=df_result_t_m[df_result_t_m['zuonr']==i][ 'rcm_dognum_reg'].values[0],
+                            #     xperiod="M3",
+                            #     xperiodalignment="middle",
+                            #     xhoverformat="Q%q",
+                                customdata=df_result_t_m[df_result_t_m['zuonr']==i][['rcm_vid', 'rcm_categ', 'rcm_dognum_reg']],
+                                hovertemplate='<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
+                                                        '<br><b>Дата</b>: %{x}'+
+                                '<br><b>Тип договора</b>: %{customdata[0]}'+
+                                '<br><b>Категория договора</b>: %{customdata[1]}'+
+                                '<br><b>Номер договора</b>: %{customdata[2]}'+'<br><extra></extra>'
+                            ) for i  in df_result_t_m['zuonr'].unique()
+                                                    ],
+                        layout=go.Layout(
+                            title= 'Динамика сальдо клиентов(в млрд руб.)_bseg ',
+                            plot_bgcolor='white',
+                            paper_bgcolor='white',
+                            # xaxis=dict(
+                            #     showticklabels=False,
+                            #     overlaying='x2',
+                            #     showdividers=False),
+                            # yaxis=dict(title='Кол-во клиентов', side='right'),
+                            # yaxis2=dict(title='Долг',
+                            #         overlaying='y',
+                            #         side='left'),
+                            margin={'l': 30, 'b': 30, 't': 40, 'r': 0},
+                            legend={'x': 0, 'y': 1},
+                            barmode='relative',
+                            showlegend=True
+                        )
+                    ), style={'width': '80%'},
+                    config={'displayModeBar': False}
+                ),
 
 
 

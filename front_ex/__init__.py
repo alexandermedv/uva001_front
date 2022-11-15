@@ -80,10 +80,10 @@ def create_user():
 
 # Create directory
 path = op.join(op.dirname(__file__), 'files')
-try:
-    os.mkdir(path)
-except OSError:
-    pass
+# try:
+#     os.mkdir(path)
+# except OSError:
+#     pass
 
 # добавление административной формы
 admin = Admin(app, name = 'Администрирование', template_mode='bootstrap3', \

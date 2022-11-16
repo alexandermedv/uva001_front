@@ -16,7 +16,7 @@ import numpy as np
 import dash
 from sqlalchemy import create_engine
 from . import dash_app as app
-from ..utils import  get_credit_data, get_credit_data_bseg, get_saldo_bseg, get_distinct_comp_bseg, get_credit_data_all, get_credit_data_clients#get_credit_data_filials,
+from ..utils import  get_credit_data, get_credit_data_bseg, get_saldo_bseg, get_saldo_bseg_group#, get_distinct_comp_bseg, get_credit_data_all, get_credit_data_clients#get_credit_data_filials,
 # from .utils import get_limit_oper_client_zuonr_data, get_limit1, get_limit
 def sum_nonlimit(s , n=0.13):
     if n in s.values:
@@ -293,9 +293,9 @@ def chose_period_bseg(n_c, s_d, e_d):
         State('intermediate-value', 'data'), 
         background=True,
         prevent_initial_call=True,
-        # running=[
-        # ( Output("submit-val_bseg", "disabled"), True, False),
-        # ]
+        running=[
+        ( Output("submit-val_f", "disabled"), True, False),
+        ]
 )
 def chose_filter(rcm_vid_v, rcm_categ_v, ch_v,  categ_op, df):
     # df=get_distinct_comp_bseg()
@@ -323,38 +323,61 @@ def chose_filter(rcm_vid_v, rcm_categ_v, ch_v,  categ_op, df):
     
 @app.callback(
         [
-        Output('nlmk_severstal', 'data'),
+        Output('nlmk_severstal', 'figure'),
         ],
+        Input('submit-val_f', 'n_clicks')
+        ,
+        State('RI-OS', 'value'),
         State('checklist-DRO', 'value'),
         State('checklist-categ', 'value'),
-        Input('RI-OS', 'value'),
+        
         State('RI-CH', 'value'),
         State('dashboard13-dropdown-company', 'value'),
-        Output('nlmk_severstal', 'figure'),
+        State('nlmk_severstal', 'figure'),
         background=True,
         prevent_initial_call=True,
-        # running=[
-        # ( Output("submit-val_bseg", "disabled"), True, False),
-        # ]
+        running=[
+        ( Output("submit-val_f", "disabled"), True, False),
+        ]
 )
-def make_graph(rcm_vid_v, rcm_categ_v, os_v,ch_v, drop_v, categ_op,f):
-    ctx=dash.callback_context
-    df_result_t_m=get_saldo_bseg(rcm_vid=rcm_vid_v, rcm_categ=rcm_categ_v, name1=None, yur_hold=None)
-    df_result_t_m=df_result_t_m.set_index('date')
-    data=[go.Bar(
-                                x=df_result_t_m[df_result_t_m['zuonr']==i].index,
-                                y=df_result_t_m[df_result_t_m['zuonr']==i]['dmbtr'],
-                                name=df_result_t_m[df_result_t_m['zuonr']==i][ 'rcm_dognum_reg'].values[0],
-                            #     xperiod="M3",
-                            #     xperiodalignment="middle",
-                            #     xhoverformat="Q%q",
-                                customdata=df_result_t_m[df_result_t_m['zuonr']==i][['rcm_vid', 'rcm_categ', 'rcm_dognum_reg']],
-                                hovertemplate='<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
-                                                        '<br><b>Дата</b>: %{x}'+
-                                '<br><b>Тип договора</b>: %{customdata[0]}'+
-                                '<br><b>Категория договора</b>: %{customdata[1]}'+
-                                '<br><b>Номер договора</b>: %{customdata[2]}'+'<br><extra></extra>'
-                            ) for i  in df_result_t_m['zuonr'].unique()
-                                                    ]
-    return [data]
+def make_graph(n_c, os_v,rcm_vid_v, rcm_categ_v, ch_v, drop_v,f):
+    # ctx=dash.callback_context
+    if os_v=='O':
+        if ch_v=='C':
+            df_result_t_m=get_saldo_bseg(rcm_vid=rcm_vid_v, rcm_categ=rcm_categ_v, name1=drop_v)
+        else :
+            df_result_t_m=get_saldo_bseg(rcm_vid=rcm_vid_v, rcm_categ=rcm_categ_v, yur_hold=drop_v)
+        df_result_t_m=df_result_t_m.set_index('date')
+        data=[go.Bar(
+                                    x=df_result_t_m[df_result_t_m['zuonr']==i].index,
+                                    y=df_result_t_m[df_result_t_m['zuonr']==i]['dmbtr'],
+                                    name=df_result_t_m[df_result_t_m['zuonr']==i][ 'rcm_dognum_reg'].values[0],
+                                    customdata=df_result_t_m[df_result_t_m['zuonr']==i][['rcm_vid', 'rcm_categ', 'rcm_dognum_reg']],
+                                    hovertemplate='<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
+                                                            '<br><b>Дата</b>: %{x}'+
+                                    '<br><b>Тип договора</b>: %{customdata[0]}'+
+                                    '<br><b>Категория договора</b>: %{customdata[1]}'+
+                                    '<br><b>Номер договора</b>: %{customdata[2]}'+'<br><extra></extra>'
+                                ) for i  in df_result_t_m['zuonr'].unique()
+                                                        ]
+        f['layout']['title']='Сальдо по договорам '+drop_v
+    else:
+        if ch_v=='C':
+            df_result_t_m=get_saldo_bseg_group(rcm_vid=rcm_vid_v, rcm_categ=rcm_categ_v, name1=drop_v)
+        else :
+            df_result_t_m=get_saldo_bseg_group(rcm_vid=rcm_vid_v, rcm_categ=rcm_categ_v, yur_hold=drop_v)
+        df_result_t_m=df_result_t_m.set_index('date')
+        data=[go.Bar(
+                                    x=df_result_t_m.index,
+                                    y=df_result_t_m['dmbtr'],
+                                    name=drop_v,
+                                    hovertemplate='<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
+                                                            '<br><b>Дата</b>: %{x}'+
+                                                            '<br><extra></extra>'
+                                ) 
+                                                        ]
+        f['layout']['title']='Сальдо '+drop_v
+    f['data']=data
+
+    return [f]
     

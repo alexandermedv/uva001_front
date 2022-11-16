@@ -9,10 +9,10 @@ from sqlalchemy import create_engine
 
 # engine_cons = create_engine("""postgresql://locadm:Temp001@msc199-
 # sdb04.domain.local:8031/uva_cons""", max_identifier_length=128, encoding='utf-8')
-def make_str_from_list(col0):
-    return ', '.join(str(x) for x in col0)
-def makestr_if_exist(col0, s1, s2):
-	return s1+make_str_from_list(col0)+s2 if col0 is not None else ''
+def make_str_from_list(col0, s=''):
+    return (s+', '+s).join(str(x) for x in col0)
+def makestr_if_exist(col0, s1, s2,s=''):
+	return s1+make_str_from_list(col0,s=s)+s2 if col0 is not None else ''
 
 # Выгрузка таблицы по рискам
 def get_credit_data():
@@ -98,11 +98,42 @@ def get_saldo_bseg(rcm_vid=None, rcm_categ=None, name1=None, yur_hold=None):
 	Name_table='saldo_bsegall_all_h_bldatmonth'
 	chunksize=100000
 	sql = '''
-		SSELECT date, zuonr, kunnr, rcm_vid, rcm_categ, name1, yur_hold, rcm_dognum_reg, dmbtr
+		SELECT date, zuonr, kunnr, rcm_vid, rcm_categ, name1, yur_hold, rcm_dognum_reg, dmbtr
 	FROM  '''+schema+'''.'''+Name_table +''' where
-	''' +makestr_if_exist(rcm_vid, ' rcm_vid in ( ', ') and')+	makestr_if_exist(rcm_categ, ' rcm_categ in ( ', ') and')+	makestr_if_exist(name1, ' name1=', ' and')+	makestr_if_exist(yur_hold, ' yur_hold = ', ' and')+''' 
-
+	''' +makestr_if_exist(rcm_vid, " rcm_vid in ( '", "') and",s="'")+	makestr_if_exist(rcm_categ, " rcm_categ in ( '", "') and",s="'")+ ((""" name1='"""+name1 +"""' and""") if name1 is not None else '' )+	((""" yur_hold='"""+yur_hold +"""' and""") if yur_hold is not None else '') +'''
 	date>='2022-08-01'  and date<'2022-10-01' '''
+	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
+	df2=con.execute(sql).fetchall()
+	df2=pd.DataFrame()
+	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
+		df2=df2.append(chunk)
+	return df2
+def get_saldo_bseg_uniq():
+	
+	schema='analysis'
+	Name_table='saldo_bsegall_all_h_bldatmonth'
+	chunksize=100000
+	sql = '''
+		SELECT  distinct  rcm_vid, rcm_categ, name1, yur_hold
+	FROM  '''+schema+'''.'''+Name_table +''' where
+	date>='2022-08-01'  and date<'2022-10-01' '''
+	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
+	df2=con.execute(sql).fetchall()
+	df2=pd.DataFrame()
+	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
+		df2=df2.append(chunk)
+	return df2
+def get_saldo_bseg_group(rcm_vid=None, rcm_categ=None, name1=None, yur_hold=None):
+	
+	schema='analysis'
+	Name_table='saldo_bsegall_all_h_bldatmonth'
+	chunksize=100000
+	sql = '''
+		SELECT date, '''+((', name1') if name1 is not None else '')+''', yur_hold, sum(dmbtr) as dmbtr
+	FROM  '''+schema+'''.'''+Name_table +''' where
+	''' +makestr_if_exist(rcm_vid, " rcm_vid in ( '", "') and",s="'")+	makestr_if_exist(rcm_categ, " rcm_categ in ( '", "') and",s="'")+ ((""" name1='"""+name1 +"""' and""") if name1 is not None else '' )+	((""" yur_hold='"""+yur_hold +"""' and""") if yur_hold is not None else '') +'''
+	date>='2022-08-01'  and date<'2022-10-01' 
+	group by date,yur_hold,dmbtr'''+((', name1') if name1 is not None else '')
 	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()

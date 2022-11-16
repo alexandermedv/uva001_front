@@ -16,7 +16,7 @@ import numpy as np
 
 from sqlalchemy import create_engine
 from . import dash_app as app
-from ..utils import  get_saldo_bseg, get_credit_data, get_credit_data_all, get_credit_data_clients, get_credit_data_all_bseg, get_credit_data_bseg#get_credit_data_filials,
+from ..utils import  get_saldo_bseg_uniq, get_saldo_bseg, get_credit_data, get_credit_data_all, get_credit_data_clients, get_credit_data_all_bseg, get_credit_data_bseg#get_credit_data_filials,
 # from .utils import get_limit_oper_client_zuonr_data, get_limit1, get_limit
 def sum_nonlimit(s , n=0.13):
     if n in s.values:
@@ -198,32 +198,33 @@ def get_dates_for_table():
 def get_dates_for_table_bseg():
     print('1. Загрузка данных')
     df = get_credit_data_bseg()
-
+    factoring_dogs=df[df['id_rcm'].isin([1968, 1855, 1867, 6508, 1949, 10300])]['dog_number'].unique()
     print('2. Все контракты')
     df_dog_2=df.loc[(df['3_group']==2) , ['id_rcm', 'client_name', 'yur_hold','dog_number',  
     'rcm_categ', 'date', 'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max',  'lim_sum', 
-     'rating', #'garanty', 
+     #'rating',  
      'lim_warr_garanty', 'lim_guar_garanty',
      'dept_over_lim']]
     df_dog_3=df.loc[(df['3_group']==3) , ['id_rcm', 'client_name', 'yur_hold','dog_number', 
      'rcm_categ', 'date', 'debitor_saldo_sum', 
       'days_off_cur_sum', 
-     'dept_days_off_sum', 'dept_days_off_max',  'rating', #'garanty', 
+     'dept_days_off_sum', 'dept_days_off_max',  #'rating',  
      'lim_warr_garanty', 'lim_guar_garanty',
        ]]
     df_dog_1=df.loc[(df['3_group']==1) , ['id_rcm', 'client_name', 'yur_hold',
     'dog_number',  'rcm_categ', 'date', 'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max',  
-     'rating', #'garanty', 
-     'lim_warr_garanty', 'lim_guar_garanty', 'dept_over_lim'
+     #'rating', 
+    #  'lim_warr_garanty', 'lim_guar_garanty',
+     'dept_over_lim'
        ]]
     # df_dog_2_1=get_matrix_stat_1(df_dog_2)
     # df_dog_3_1=get_matrix_stat_2(df_dog_3)
     # df_dog_1_1=get_matrix_stat_1(df_dog_1)
-    return [df_dog_1,df_dog_2,df_dog_3]
+    return [df_dog_1,df_dog_2,df_dog_3,factoring_dogs]
 def create_layout(): 
     df_dog_1,df_dog_2,df_dog_3=get_dates_for_table()
     df_dog_2_1=get_matrix_stat_1(df_dog_2)
@@ -231,12 +232,12 @@ def create_layout():
     df_dog_1_1=get_matrix_stat_1(df_dog_1)
     is_need_bseg=True
     if is_need_bseg:
-        df_dog_1_bseg,df_dog_2_bseg,df_dog_3_bseg=get_dates_for_table_bseg()
+        df_dog_1_bseg,df_dog_2_bseg,df_dog_3_bseg,factoring_dogs=get_dates_for_table_bseg()
         df_dog_2_1_bseg=get_matrix_stat_1_bseg(df_dog_2_bseg)
         df_dog_3_1_bseg=get_matrix_stat_2_bseg(df_dog_3_bseg)
         df_dog_1_1_bseg=get_matrix_stat_1_bseg(df_dog_1_bseg)
     else:
-        df_dog_1_bseg,df_dog_2_bseg,df_dog_3_bseg=(df_dog_1,df_dog_2,df_dog_3)
+        df_dog_1_bseg,df_dog_2_bseg,df_dog_3_bseg,factoring_dogs=(df_dog_1,df_dog_2,df_dog_3)
         df_dog_2_1_bseg=df_dog_2_1
         df_dog_3_1_bseg=df_dog_3_1
         df_dog_1_1_bseg=df_dog_1_1
@@ -386,11 +387,8 @@ def create_layout():
     points_3_0_bseg=[0 for i in dates1_3_bseg]
     print("saldo")
     global df_saldo
-    df_saldo=get_saldo_bseg()
-    # global df_dog_uniq
-    df_dog_uniq=df_saldo[['rcm_vid', 'rcm_categ','name1','yur_hold']].drop_duplicates()
-    df_result_t=df_saldo[(df_saldo[ 'name1'].isin([#'ПАО "НЛМК"',
-                                                        'ПАО "СЕВЕРСТАЛЬ"'])) ]#[( 'yur_hold',   '')].isin(['ГК НЛМК','СЕВЕРСТАЛЬ'])]
+    df_result_t=get_saldo_bseg( name1='ПАО "НЛМК"')
+    df_dog_uniq=get_saldo_bseg_uniq()
     df_result_t=df_result_t.set_index('date')
     
     df_result_t_m=df_result_t.groupby([pd.Grouper( freq="1M"),'zuonr', 'kunnr', 'rcm_vid', 'rcm_categ', 'name1', 'yur_hold', 'rcm_dognum_reg']).mean().reset_index(1)
@@ -944,6 +942,36 @@ def create_layout():
                     # row_deletable=True,
                     selected_columns=[],
                     selected_rows=[],
+                    tooltip_conditional=
+                    [
+                        {
+                            'if': {
+                                'filter_query': "{{dog_number}} = '{}'".format(i),
+                                'column_id': 'dog_number',
+                            },
+                            'backgroundColor': '#7FDBFF',
+                            'color': 'white',
+                            'type': 'markdown',
+                            'value': 'Факторинг 10,5 млрд.'
+                        }
+                        for i in factoring_dogs
+                    ],
+
+                    style_data_conditional=[
+                                    {
+                                        'if': {
+                                            'filter_query': "{{dog_number}} = '{}'".format(i),
+                                            'column_id': 'dog_number',
+                                        },
+                                        'backgroundColor': '#0074D9',
+                                        'color': 'white',
+                                        'textDecoration': 'underline',
+                                        'textDecorationStyle': 'dotted',
+                                    }
+                                    for i in factoring_dogs
+                                ],
+                    tooltip_delay=0,
+                    tooltip_duration=None,
                     page_action="native",
                     page_current= 0,
                     page_size= 10, 
@@ -1038,6 +1066,36 @@ def create_layout():
                     # row_deletable=True,
                     selected_columns=[],
                     selected_rows=[],
+                    tooltip_conditional=
+                    [
+                        {
+                            'if': {
+                                'filter_query': '{{dog_number}} = {}'.format(i),
+                                'column_id': 'dog_number',
+                            },
+                            'backgroundColor': '#7FDBFF',
+                            'color': 'white',
+                            'type': 'markdown',
+                            'value': 'Факторинг 10,5 млрд.'
+                        }
+                        for i in factoring_dogs
+                    ],
+
+                    style_data_conditional=[
+                                    {
+                                        'if': {
+                                            'filter_query': '{{dog_number}} = {}'.format(i),
+                                            'column_id': 'dog_number',
+                                        },
+                                        'backgroundColor': '#0074D9',
+                                        'color': 'white',
+                                        'textDecoration': 'underline',
+                                        'textDecorationStyle': 'dotted',
+                                    }
+                                    for i in factoring_dogs
+                                ],
+                    tooltip_delay=0,
+                    tooltip_duration=None,
                     page_action="native",
                     page_current= 0,
                     page_size= 10, 
@@ -1112,8 +1170,8 @@ def create_layout():
                                     dbc.Col([
                                         dcc.Checklist(
                                             id='checklist-categ',
-                                            options=[ {'label': i, 'value': i} for i in df_saldo['rcm_categ'].unique()],
-                                            value=df_saldo['rcm_categ'].unique(),
+                                            options=[ {'label': i, 'value': i} for i in df_dog_uniq['rcm_categ'].unique()],
+                                            value=df_dog_uniq['rcm_categ'].unique(),
                                             labelStyle = {'display': 'block'},
                                             style={'column-count': '4'}
                                         )   
@@ -1138,8 +1196,8 @@ def create_layout():
                             value='O'
                         ),
                         ],
-                        style={'width': '15%', 
-                            'display': 'inline-block', 'marginBottom': 15, 'margin-left': 30,'marginTop': 25,
+                        style={'width': '13%', 
+                            'display': 'inline-block', 'marginBottom': 15, 'margin-left': 20,'marginTop': 25,
                             'color': 'white',
                         'vertical-align':'top'}
                     ),
@@ -1155,14 +1213,14 @@ def create_layout():
                             value='C'
                         ),
                         ],
-                        style={'width': '20%', 
-                            'display': 'inline-block', 'marginBottom': 15, 'margin-left': 30,'marginTop': 25,
+                        style={'width': '15%', 
+                            'display': 'inline-block', 'marginBottom': 15, 'margin-left': 10,'marginTop': 25,
                             'color': 'white',
                         'vertical-align':'top'}
                     ),
                      dcc.Dropdown(
                         id="dashboard13-dropdown-company",
-                        options=[ {'label': i, 'value': i} for i in df_saldo[ 'name1'].unique()],
+                        options=[ {'label': i, 'value': i} for i in df_dog_uniq[ 'name1'].unique()],
                         value='ПАО "СЕВЕРСТАЛЬ"',
                         clearable=False,
                         style={"display": "flex",
@@ -1181,7 +1239,9 @@ def create_layout():
                 ],dark=True, color='rgb(71, 71, 71)',
                 style={'marginBottom': 15, 'margin-left': 15,'marginTop': 40}
                 ),
-                
+                html.Button('Submit', id='submit-val_f', n_clicks=0,
+                style={'width': '15%', 'display': 'inline-block', 'background-color': 'white', }),
+
 
                 dcc.Graph(
                     id="nlmk_severstal",

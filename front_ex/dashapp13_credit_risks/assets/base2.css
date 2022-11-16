@@ -414,6 +414,7 @@ legend {
   margin-bottom: 0.5rem;
   font-weight: 600;
   position:relative;
+  width:auto;
 }
 
 fieldset {

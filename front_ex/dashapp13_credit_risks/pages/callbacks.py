@@ -18,6 +18,7 @@ from sqlalchemy import create_engine
 from . import dash_app as app
 from ..utils import  get_credit_data, get_credit_data_bseg, get_saldo_bseg, get_saldo_bseg_group#, get_distinct_comp_bseg, get_credit_data_all, get_credit_data_clients#get_credit_data_filials,
 # from .utils import get_limit_oper_client_zuonr_data, get_limit1, get_limit
+factoring=10500000000
 def sum_nonlimit(s , n=0.13):
     if n in s.values:
         return n
@@ -86,21 +87,23 @@ def get_matrix_stat_2(df3_1,  e_d=None, tol_dept=1):
         df3_1=df3_1.loc[df3_1['date']==e_d,['client_name', 'dog_number', 'yur_hold',
          'dinamic_saldo', #'rating', 'garanty',
          ]]
-    df3_1['postpone_pay']=np.nan
-    df3_1['prosrochka']=np.nan
-    df3_1['percent']=np.nan
+    # df3_1['postpone_pay']=np.nan
+    # df3_1['prosrochka']=np.nan
+    # df3_1['percent']=np.nan
         
     # df3_1=df3_1[[ i for i in df3_1.columns if i not in ['rating', 'garanty']]]
     
     return df3_1.loc[ (df3_1['dinamic_saldo']>tol_dept)].sort_values(['dinamic_saldo', ],  ascending=False)
 
-def get_matrix_stat_1_bseg(df3_1, s_d=None, e_d=None, tol_dept=1):
+def get_matrix_stat_1_bseg(df3_1,sum_fact, s_d=None, e_d=None, tol_dept=1):
     if s_d is not None:
         df3_1=df3_1[df3_1['date']>=s_d]
+        sum_fact=sum_fact[sum_fact['date']>=s_d]
     if e_d is not None:
         df3_1=df3_1[df3_1['date']<=e_d]
+        sum_fact=sum_fact[sum_fact['date']<=e_d]
     if df3_1.shape[0]==0:
-        return pd.DataFrame()
+        return pd.DataFrame(),0
     df3_1=df3_1.sort_values([ 'id_rcm', 'client_name','date'])
     df6=pd.DataFrame()
     i0=0
@@ -152,29 +155,31 @@ def get_matrix_stat_1_bseg(df3_1, s_d=None, e_d=None, tol_dept=1):
     # df3_1=df3_1[[ i for i in df3_1.columns if i not in ['rating', 'garanty']]]
     # df3_1=df3_1.loc[df3_1['date']==df3_1['date'].max(),].merge(df6, left_on='id_rcm', right_on='id_rcm')[col0].sort_values(['dept_over_lim','dinamic_saldo', ],  ascending=False)
 
-    return df3_1.loc[(df3_1['date']==df3_1['date'].max()) & (df3_1['debitor_saldo_sum']>tol_dept),].merge(df6, left_on='id_rcm', right_on='id_rcm')[col0].sort_values(['dept_over_lim','debitor_saldo_sum', ],  ascending=False)
-def get_matrix_stat_2_bseg(df3_1,  e_d=None, tol_dept=1):
+    return df3_1.loc[(df3_1['date']==df3_1['date'].max()) & (df3_1['debitor_saldo_sum']>tol_dept),].merge(df6, left_on='id_rcm', right_on='id_rcm')[col0].sort_values(['dept_over_lim','debitor_saldo_sum', ],  ascending=False), sum_fact.loc[(sum_fact['date']==sum_fact['date'].max())]['debitor_saldo_sum'].values[0]
+def get_matrix_stat_2_bseg(df3_1,sum_fact,  e_d=None, tol_dept=1):
     if (e_d is None) :
         df3_1=df3_1.loc[df3_1['date']==df3_1['date'].max(),['client_name', 'yur_hold','dog_number', 
          'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max', 'rcm_categ', #'rating', 'garanty',
-         'lim_warr_garanty', 'lim_guar_garanty',
+        #  'lim_warr_garanty', 'lim_guar_garanty',
          ]]
+        sum_fact=sum_fact.loc[(sum_fact['date']==sum_fact['date'].max())]['debitor_saldo_sum'].values[0]
     else:
         df3_1=df3_1.loc[df3_1['date']==e_d,['client_name', 'dog_number', 
          'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max', 'rcm_categ', #'rating', 'garanty',
-         'lim_warr_garanty', 'lim_guar_garanty',
+        #  'lim_warr_garanty', 'lim_guar_garanty',
          ]]
+        sum_fact=sum_fact[sum_fact['date']<=e_d]
     # df3_1['postpone_pay']=np.nan
     # df3_1['prosrochka']=np.nan
     df3_1['percent']=np.nan
         
     # df3_1=df3_1[[ i for i in df3_1.columns if i not in ['rating', 'garanty']]]
     
-    return df3_1.loc[(df3_1['debitor_saldo_sum']>tol_dept)].sort_values(['debitor_saldo_sum', ],  ascending=False)
+    return df3_1.loc[(df3_1['debitor_saldo_sum']>tol_dept)].sort_values(['debitor_saldo_sum', ],  ascending=False), sum_fact
 
 
 def get_dates_for_table():
@@ -198,32 +203,35 @@ def get_dates_for_table():
 def get_dates_for_table_bseg():
     print('1. Загрузка данных')
     df = get_credit_data_bseg()
-
+    factoring_dogs=df[df['id_rcm'].isin([1968, 1855, 1867, 6508, 1949, 10300])]
+    sum_fact=factoring_dogs.groupby('date')['debitor_saldo_sum'].sum().reset_index()
+    factoring_dogs=factoring_dogs['dog_number'].unique()
     print('2. Все контракты')
     df_dog_2=df.loc[(df['3_group']==2) , ['id_rcm', 'client_name', 'yur_hold','dog_number',  
     'rcm_categ', 'date', 'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max',  'lim_sum', 
-     'rating', #'garanty', 
+     #'rating',  
      'lim_warr_garanty', 'lim_guar_garanty',
      'dept_over_lim']]
     df_dog_3=df.loc[(df['3_group']==3) , ['id_rcm', 'client_name', 'yur_hold','dog_number', 
      'rcm_categ', 'date', 'debitor_saldo_sum', 
       'days_off_cur_sum', 
-     'dept_days_off_sum', 'dept_days_off_max',  'rating', #'garanty', 
+     'dept_days_off_sum', 'dept_days_off_max',  #'rating',  
      'lim_warr_garanty', 'lim_guar_garanty',
        ]]
     df_dog_1=df.loc[(df['3_group']==1) , ['id_rcm', 'client_name', 'yur_hold',
     'dog_number',  'rcm_categ', 'date', 'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max',  
-     'rating', #'garanty', 
-     'lim_warr_garanty', 'lim_guar_garanty', 'dept_over_lim'
+     #'rating', 
+    #  'lim_warr_garanty', 'lim_guar_garanty',
+     'dept_over_lim'
        ]]
     # df_dog_2_1=get_matrix_stat_1(df_dog_2)
     # df_dog_3_1=get_matrix_stat_2(df_dog_3)
     # df_dog_1_1=get_matrix_stat_1(df_dog_1)
-    return [df_dog_1,df_dog_2,df_dog_3]
+    return [df_dog_1,df_dog_2,df_dog_3,factoring_dogs, sum_fact]
 
 @app.callback(
         [
@@ -246,8 +254,10 @@ def get_dates_for_table_bseg():
 def chose_period(n_c, s_d, e_d):
     df_dog_1,df_dog_2,df_dog_3=get_dates_for_table()
     df_dog_2_1=get_matrix_stat_1(df_dog_2, s_d=s_d, e_d= e_d)
-    df_dog_3_1=get_matrix_stat_2(df_dog_3)
-    df_dog_1_1=get_matrix_stat_1(df_dog_1)
+    df_dog_3_1=get_matrix_stat_2(df_dog_3,  e_d= e_d)
+    df_dog_1_1=get_matrix_stat_1(df_dog_1, s_d=s_d, e_d= e_d)
+    df_dog_1_1=df_dog_1_1[[i for i in df_dog_1_1.columns if i not in ['res','max']]]
+
     return [df_dog_2_1.to_dict('records'),df_dog_3_1.to_dict('records'),df_dog_1_1.to_dict('records'),]
 
     
@@ -256,6 +266,9 @@ def chose_period(n_c, s_d, e_d):
         Output('datatable_clients_limit_bseg', 'data'),
         Output('datatable_clients_X_bseg', 'data'),
         Output('datatable_clients_prepaid_bseg', 'data'),
+        Output('datatable_clients_limit_bseg', 'style_data_conditional'),
+        Output('datatable_clients_X_bseg', 'style_data_conditional'),
+        Output('datatable_clients_prepaid_bseg', 'style_data_conditional'),
         ]
         ,
         Input('submit-val_bseg', 'n_clicks')
@@ -270,11 +283,27 @@ def chose_period(n_c, s_d, e_d):
         ]
 )
 def chose_period_bseg(n_c, s_d, e_d):
-    df_dog_1,df_dog_2,df_dog_3=get_dates_for_table_bseg()
-    df_dog_2_1=get_matrix_stat_1_bseg(df_dog_2, s_d=s_d, e_d= e_d)
-    df_dog_3_1=get_matrix_stat_2_bseg(df_dog_3)
-    df_dog_1_1=get_matrix_stat_1_bseg(df_dog_1)
-    return [df_dog_2_1.to_dict('records'),df_dog_3_1.to_dict('records'),df_dog_1_1.to_dict('records'),]
+    df_dog_1,df_dog_2,df_dog_3,factoring_dogs, sum_fact=get_dates_for_table_bseg()
+    df_dog_2_1,sum_fact0=get_matrix_stat_1_bseg(df_dog_2,sum_fact, s_d=s_d, e_d= e_d)
+    df_dog_3_1,sum_fact0=get_matrix_stat_2_bseg(df_dog_3,sum_fact, e_d= e_d)
+    df_dog_1_1,sum_fact0=get_matrix_stat_1_bseg(df_dog_1,sum_fact, s_d=s_d, e_d= e_d)
+    df_dog_1_1=df_dog_1_1[[i for i in df_dog_1_1.columns if i not in ['res','max']]]
+
+    style_data_conditional=[
+                                    {
+                                        'if': {
+                                            'filter_query': "{{dog_number}} = '{}'".format(i),
+                                            'column_id': 'dog_number',
+                                        },
+                                        'backgroundColor': ('#0074D9'if sum_fact0 < factoring else '#FF3333'),
+                                        'color': 'white',
+                                        'textDecoration': 'underline',
+                                        'textDecorationStyle': 'dotted',
+                                    }
+                                    for i in factoring_dogs
+                                ]
+
+    return [df_dog_2_1.to_dict('records'),df_dog_3_1.to_dict('records'),df_dog_1_1.to_dict('records'),style_data_conditional,style_data_conditional,style_data_conditional]
     
 @app.callback(
         [

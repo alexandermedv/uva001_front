@@ -17,7 +17,7 @@ import numpy as np
 
 from sqlalchemy import create_engine
 from . import dash_app as app
-from ..utils import  get_saldo_bseg_uniq, get_saldo_bseg, get_credit_data, get_credit_data_all, get_credit_data_clients, get_credit_data_all_bseg, get_credit_data_bseg#get_credit_data_filials,
+from ..utils import  get_saldo_bseg_uniq, get_saldo_bseg,get_saldo_bseg_group, get_credit_data, get_credit_data_all, get_credit_data_clients, get_credit_data_all_bseg, get_credit_data_bseg#get_credit_data_filials,
 # from .utils import get_limit_oper_client_zuonr_data, get_limit1, get_limit
 factoring=10500000000
 def sum_nonlimit(s , n=0.13):
@@ -392,10 +392,15 @@ def create_layout():
     global df_saldo
     df_result_t=get_saldo_bseg( name1='ПАО "НЛМК"')
     df_dog_uniq=get_saldo_bseg_uniq()
-    df_result_t=df_result_t.set_index('date')
+    df_result_t_m=get_saldo_bseg_group( name1='ПАО "НЛМК"')
+    df_result_t_m=df_result_t_m.set_index('date')
     
-    df_result_t_m=df_result_t.groupby([pd.Grouper( freq="1M"),'zuonr', 'kunnr', 'rcm_vid', 'rcm_categ', 'name1', 'yur_hold', 'rcm_dognum_reg']).mean().reset_index(1)
-    df_result_t_m=df_result_t_m.reset_index([1,2,3,4,5,6])
+    # df_result_t_m=df_result_t.groupby([pd.Grouper( freq="1M"),#'zuonr', 
+    # #'kunnr', 'rcm_vid', 'rcm_categ', 
+    # 'name1', 'yur_hold',# 'rcm_dognum_reg'
+    # ]).mean().reset_index(1)
+    # df_result_t_m=df_result_t_m.reset_index([1,2,3,4,#5,6
+    # ])
 
     print("5. Старт загрузки layout")
 
@@ -412,13 +417,13 @@ def create_layout():
                         go.Bar(name='Отсрочка платежа без потолка лимита', x=dates1_1, y=df_all0_M_1['dinamic_saldo'].values,
                         hovertemplate =
                                 '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'
-                                '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1', marker_color='rgb(206, 205, 181)'),
+                                '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1', marker_color="#97151c"),
                         go.Bar(name='Кредитный лимит с отсрочкой платежа', x=dates1_2,hovertemplate =
                                 '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
-                                '<br><b>Дата</b>: %{x}<br><extra></extra>', y=points_2, xaxis='x1', marker_color='#006B19'),
+                                '<br><b>Дата</b>: %{x}<br><extra></extra>', y=points_2, xaxis='x1', marker_color='rgb(193, 122, 117)'),#'#006B19'
                         go.Bar(name='Предоплата', x=dates1_3, y=points_3,hovertemplate =
                                 '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
-                                '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1', marker_color="#97151c")
+                                '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1', marker_color='rgb(206, 205, 181)')
                     ],
                     
                     layout=go.Layout(
@@ -750,13 +755,13 @@ def create_layout():
                             go.Bar(name='Отсрочка платежа без потолка лимита', x=dates1_1_bseg, y=df_all0_M_1_bseg['debitor_saldo_sum'].values,
                             hovertemplate =
                                     '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
-                                    '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1', marker_color='rgb(206, 205, 181)'),
+                                    '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1', marker_color="#97151c"),
                             go.Bar(name='Кредитный лимит с отсрочкой платежа', x=dates1_2_bseg,hovertemplate =
                                     '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
-                                    '<br><b>Дата</b>: %{x}<br><extra></extra>', y=points_2_bseg, xaxis='x1', marker_color='#006B19'),
+                                    '<br><b>Дата</b>: %{x}<br><extra></extra>', y=points_2_bseg, xaxis='x1', marker_color='rgb(193, 122, 117)'),#'#006B19'
                             go.Bar(name='Предоплата', x=dates1_3_bseg, y=points_3_bseg,hovertemplate =
                                     '<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
-                                    '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1', marker_color="#97151c")
+                                    '<br><b>Дата</b>: %{x}<br><extra></extra>', xaxis='x1', marker_color='rgb(206, 205, 181)')
                         ],
                         
                         layout=go.Layout(
@@ -889,7 +894,7 @@ def create_layout():
                                             'filter_query': "{{dog_number}} = '{}'".format(i),
                                             'column_id': 'debitor_saldo_sum',
                                         },
-                                        'backgroundColor': ('#0074D9' if sum_fact0 < factoring else '#FF3333'),
+                                        'backgroundColor': ('#0074D9' if sum_fact0 < factoring else '#97151c'),
                                         'color': 'white',
                                         'textDecoration': 'underline',
                                         'textDecorationStyle': 'dotted',
@@ -956,7 +961,8 @@ def create_layout():
                             showticklabels=False,
                             overlaying='x2',
                             showdividers=False),
-                        yaxis=dict(title='Доля просроченной задолжности', side='right'),
+                        yaxis=dict(title='Доля просроченной задолжности', side='right',
+                        tickformat= ',.0%'),
                         yaxis2=dict(title='Долг',
                                     overlaying='y',
                                     side='left'),
@@ -1006,7 +1012,7 @@ def create_layout():
                                             'filter_query': "{{dog_number}} = '{}'".format(i),
                                             'column_id': 'debitor_saldo_sum',
                                         },
-                                        'backgroundColor': ('#0074D9' if sum_fact0 < factoring else '#FF3333'),
+                                        'backgroundColor': ('#0074D9' if sum_fact0 < factoring else '#97151c'),
                                         'color': 'white',
                                         'textDecoration': 'underline',
                                         'textDecorationStyle': 'dotted',
@@ -1130,7 +1136,7 @@ def create_layout():
                                             'filter_query': "{{dog_number}} = '{}'".format(i),
                                             'column_id': 'debitor_saldo_sum',
                                         },
-                                        'backgroundColor': ('#0074D9' if sum_fact0 < factoring else '#FF3333'),
+                                        'backgroundColor': ('#0074D9' if sum_fact0 < factoring else '#97151c'),
                                         'color': 'white',
                                         'textDecoration': 'underline',
                                         'textDecorationStyle': 'dotted',
@@ -1293,23 +1299,31 @@ def create_layout():
                 dcc.Graph(
                     id="nlmk_severstal",
                     figure=go.Figure(
-                        data=[go.Bar(
-                                x=df_result_t_m[df_result_t_m['zuonr']==i].index,
-                                y=df_result_t_m[df_result_t_m['zuonr']==i]['dmbtr'],
-                                name=df_result_t_m[df_result_t_m['zuonr']==i][ 'rcm_dognum_reg'].values[0],
-                            #     xperiod="M3",
-                            #     xperiodalignment="middle",
-                            #     xhoverformat="Q%q",
-                                customdata=df_result_t_m[df_result_t_m['zuonr']==i][['rcm_vid', 'rcm_categ', 'rcm_dognum_reg']],
-                                hovertemplate='<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
-                                                        '<br><b>Дата</b>: %{x}'+
-                                '<br><b>Тип договора</b>: %{customdata[0]}'+
-                                '<br><b>Категория договора</b>: %{customdata[1]}'+
-                                '<br><b>Номер договора</b>: %{customdata[2]}'+'<br><extra></extra>'
-                            ) for i  in df_result_t_m['zuonr'].unique()
+                        data=[#go.Bar(
+                            #     x=df_result_t_m[df_result_t_m['zuonr']==i].index,
+                            #     y=df_result_t_m[df_result_t_m['zuonr']==i]['dmbtr'],
+                            #     name=df_result_t_m[df_result_t_m['zuonr']==i][ 'rcm_dognum_reg'].values[0],
+                            # #     xperiod="M3",
+                            # #     xperiodalignment="middle",
+                            # #     xhoverformat="Q%q",
+                            #     customdata=df_result_t_m[df_result_t_m['zuonr']==i][['rcm_vid', 'rcm_categ', 'rcm_dognum_reg']],
+                            #     hovertemplate='<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
+                            #                             '<br><b>Дата</b>: %{x}'+
+                            #     '<br><b>Тип договора</b>: %{customdata[0]}'+
+                            #     '<br><b>Категория договора</b>: %{customdata[1]}'+
+                            #     '<br><b>Номер договора</b>: %{customdata[2]}'+'<br><extra></extra>'
+                            # ) for i  in df_result_t_m['zuonr'].unique()
+                            go.Bar(
+                                    x=df_result_t_m.index,
+                                    y=df_result_t_m['dmbtr'],
+                                    name='ПАО "НЛМК"',
+                                    hovertemplate='<i><b>Сальдо</b></i>: \u20bd %{y:,.0f}'+
+                                                            '<br><b>Дата</b>: %{x}'+
+                                                            '<br><extra></extra>'
+                                ) 
                                                     ],
                         layout=go.Layout(
-                            title= 'Сальдо по договорам ПАО "НЛМК"',
+                            title= 'Сальдо ПАО "НЛМК"',
                             # title={
                             #         'text': 'Сальдо по договорам ПАО "НЛМК"',
                             #         'style':{'font-weight': 'bold'}},

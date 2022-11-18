@@ -140,6 +140,7 @@ def get_matrix_stat_1_bseg(df3_1,sum_fact, s_d=None, e_d=None, tol_dept=1):
             'res': [res],
             'max': [m]})
     df6=pd.concat([df6, df6_1], ignore_index=True)
+    df3_1['percent']=df3_1['dept_days_off_sum']/np.array([i if i>0 else 0.1 for i in df3_1['debitor_saldo_sum'].values])
     col0=[i  for i in 
        [ 'client_name','yur_hold','dog_number',  
     'rcm_categ', 
@@ -147,11 +148,10 @@ def get_matrix_stat_1_bseg(df3_1,sum_fact, s_d=None, e_d=None, tol_dept=1):
     'debitor_saldo_sum', 
       'days_off_cur_sum', 
      'dept_days_off_sum', 'dept_days_off_max',  'lim_sum', 
-     'rating', #'garanty', 
+     'rating', 'percent', 
      'lim_warr_garanty', 'lim_guar_garanty',
      'dept_over_lim','res','max']
        if (i in df3_1.columns) | (i in df6.columns )]
-    
     # df3_1=df3_1[[ i for i in df3_1.columns if i not in ['rating', 'garanty']]]
     # df3_1=df3_1.loc[df3_1['date']==df3_1['date'].max(),].merge(df6, left_on='id_rcm', right_on='id_rcm')[col0].sort_values(['dept_over_lim','dinamic_saldo', ],  ascending=False)
 
@@ -175,7 +175,8 @@ def get_matrix_stat_2_bseg(df3_1,sum_fact,  e_d=None, tol_dept=1):
         sum_fact=sum_fact[sum_fact['date']<=e_d]
     # df3_1['postpone_pay']=np.nan
     # df3_1['prosrochka']=np.nan
-    df3_1['percent']=np.nan
+    df3_1['percent']=df3_1['dept_days_off_sum']/np.array([i if i>0 else 0.1 for i in df3_1['debitor_saldo_sum'].values])
+
         
     # df3_1=df3_1[[ i for i in df3_1.columns if i not in ['rating', 'garanty']]]
     
@@ -287,15 +288,16 @@ def chose_period_bseg(n_c, s_d, e_d):
     df_dog_2_1,sum_fact0=get_matrix_stat_1_bseg(df_dog_2,sum_fact, s_d=s_d, e_d= e_d)
     df_dog_3_1,sum_fact0=get_matrix_stat_2_bseg(df_dog_3,sum_fact, e_d= e_d)
     df_dog_1_1,sum_fact0=get_matrix_stat_1_bseg(df_dog_1,sum_fact, s_d=s_d, e_d= e_d)
-    df_dog_1_1=df_dog_1_1[[i for i in df_dog_1_1.columns if i not in ['res','max']]]
+    df_dog_1_1=df_dog_1_1[[i for i in df_dog_1_1.columns if i not in ['res','max', 'percent','days_off_cur_sum', 
+     'dept_days_off_sum', 'dept_days_off_max','dept_over_lim']]]
 
     style_data_conditional=[
                                     {
                                         'if': {
                                             'filter_query': "{{dog_number}} = '{}'".format(i),
-                                            'column_id': 'dog_number',
+                                            'column_id': 'debitor_saldo_sum',
                                         },
-                                        'backgroundColor': ('#0074D9'if sum_fact0 < factoring else '#FF3333'),
+                                        'backgroundColor': ('#0074D9' if sum_fact0 < factoring else '#97151c'),
                                         'color': 'white',
                                         'textDecoration': 'underline',
                                         'textDecorationStyle': 'dotted',

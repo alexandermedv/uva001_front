@@ -7,9 +7,13 @@ import dash_core_components as dcc
 from .. import app
 # , db, engine_cons
 
+external_scripts = [
+    {'src': 'https://code.jquery.com/jquery-3.5.1.js'},
+]
+
 dash_app = Dash(__name__, server=app,
                 url_base_pathname='/dashboards/spark_api_count_request_dash/',
-                suppress_callback_exceptions=True)
+                 suppress_callback_exceptions=True, external_scripts=external_scripts)
 dash_app.config.update(app.config)
 dash_app.layout = html.Div()
 

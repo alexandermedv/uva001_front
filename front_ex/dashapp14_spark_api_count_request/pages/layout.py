@@ -34,12 +34,14 @@ def create_layout():
             html.Div(id="actual_time", className="row"),
             html.Div(
                 [
-                    html.Div([dcc.Graph(id="pie")], className="six columns"),
+                    html.Div([dcc.Graph(id="pie")], className="thith columns"),
                     html.Div([dcc.Graph(id="bar")], className="six columns"),
                 ], className="row",
             )
-        ], className="sub_page",)
-    ], className="page_landscape_a3",
+        # ], className="sub_page",)
+        ],)
+    # ], className="page_landscape_a3",
+    ],
     )
 
     return layout

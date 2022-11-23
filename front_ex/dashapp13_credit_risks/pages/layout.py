@@ -283,9 +283,9 @@ def create_layout():
         'debitor':['debitor','numeric', 1],   
         'debitor_X':['debitor_X','numeric', 1], 
         'debitor_saldo_sum':['Дебиторское сальдо','numeric', 1], 
-        'days_off_cur_sum':['Дней просрочки суммарно','numeric', 1], 
-        'dept_days_off_sum':['Долг просроченный суммарно','numeric', 1], 
-        'dept_days_off_max':['Долг просроченный максимальный','numeric', 1],
+        'days_off_cur_sum':['Дней просрочки на дату','numeric', 1], 
+        'dept_days_off_sum':['Долг просроченный на дату','numeric', 1], 
+        'dept_days_off_max':['Максимальный просроченный долг за период','numeric', 1],
 
 
         'dinamic_saldo_min':['Минимальное сальдо','numeric', 1], 
@@ -407,7 +407,9 @@ def create_layout():
     layout = html.Div(
         [   dcc.Store(id='intermediate-value', data=df_dog_uniq.to_dict('records')),
             html.Div(
-                html.H5("Отчет кредитных рисков", className='row' ),
+                html.H5("Отчет кредитных рисков", className='row' ,
+                style={'font-size': '3rem', 'padding-top':'30px'}
+                ),
                 className='product'
             ),
             dcc.Graph(
@@ -1221,8 +1223,8 @@ def create_layout():
                                             id='checklist-categ',
                                             options=[ {'label': i, 'value': i} for i in df_dog_uniq['rcm_categ'].unique()],
                                             value=df_dog_uniq['rcm_categ'].unique(),
-                                            labelStyle = {'display': 'block'},
-                                            style={'column-count': '4'}
+                                            # labelStyle = {'display': 'block'},
+                                            # style={'column-count': '2', 'white-space': 'pre-line'  ,  'overflow':'auto'}
                                         )   
                                     ])
                                 ])

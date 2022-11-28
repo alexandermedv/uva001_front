@@ -22,10 +22,10 @@ def get_get_open_ap_by_groups_182():
                         i.open_actplans,
                         TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY') AS "Sent_to_Itrack",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2022-05-01') AS "Reporting_date",
+                        DATE('2022-11-01') AS "Reporting_date",
                         CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2022-05-01') - DATE(j."AP_date")
-						ELSE DATE('2022-05-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+						THEN DATE('2022-11-01') - DATE(j."AP_date")
+						ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -72,8 +72,8 @@ def get_get_open_ap_by_groups_182():
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
                         AND CASE WHEN i."Sent_to_Itrack" IS NULL
-                            THEN DATE('2022-05-01') - DATE(j."AP_date")
-                            ELSE DATE('2022-05-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+                            THEN DATE('2022-11-01') - DATE(j."AP_date")
+                            ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
                             END < 182
                 
             ) z
@@ -104,10 +104,10 @@ def get_get_open_ap_by_groups_365():
                         i.open_actplans,
                         TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY') AS "Sent_to_Itrack",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2022-05-01') AS "Reporting_date",
+                        DATE('2022-11-01') AS "Reporting_date",
                         CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2022-05-01') - DATE(j."AP_date")
-						ELSE DATE('2022-05-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+						THEN DATE('2022-11-01') - DATE(j."AP_date")
+						ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -154,8 +154,8 @@ def get_get_open_ap_by_groups_365():
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
                         AND CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2022-05-01') - DATE(j."AP_date")
-						ELSE DATE('2022-05-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+						THEN DATE('2022-11-01') - DATE(j."AP_date")
+						ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 						END BETWEEN 183 AND 365
                 
             ) z
@@ -187,10 +187,10 @@ def get_get_open_ap_by_groups_366():
                         TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY') AS "Sent_to_Itrack",
                         i."Close_date",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2022-05-01') AS "Reporting_date",
+                        DATE('2022-11-01') AS "Reporting_date",
                         CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2022-05-01') - DATE(j."AP_date")
-						ELSE DATE('2022-05-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+						THEN DATE('2022-11-01') - DATE(j."AP_date")
+						ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -240,8 +240,8 @@ def get_get_open_ap_by_groups_366():
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
                         AND (CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2022-05-01') - DATE(j."AP_date")
-						ELSE DATE('2022-05-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+						THEN DATE('2022-11-01') - DATE(j."AP_date")
+						ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 						END) > 365
                 
             ) z

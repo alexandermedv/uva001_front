@@ -15,6 +15,8 @@ services:
          - "127.0.0.1:7101:7102"
       environment: 
          - TZ=Europe/Moscow
+         - HTTP_PROXY=msc01-cfw01.pgk.rzd:9090
+         - HTTPS_PROXY=msc01-cfw01.pgk.rzd:9090 
       # networks:
       #    - test_net_nginx
       network_mode: bridge   

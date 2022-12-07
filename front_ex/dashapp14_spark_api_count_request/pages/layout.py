@@ -29,19 +29,20 @@ def create_layout():
                 )
             ], className="row",
             ),
-            html.Button('Обновление отчета', id='button'),
-            html.Div(id="period", className="row"),
-            html.Div(id="actual_time", className="row"),
             html.Div(
                 [
-                    html.Div([dcc.Graph(id="pie")], className="thith columns"),
-                    html.Div([dcc.Graph(id="bar")], className="six columns"),
+                    html.Div(
+                        [
+                            html.Div(id="content"),
+                            html.Br(),
+                            html.Button('Обновление отчета', id='button'),
+                        ], className="six columns"
+                    ),
+                    html.Div([dcc.Graph(id="pie")], className="six columns"),
                 ], className="row",
-            )
-        # ], className="sub_page",)
-        ],)
-    # ], className="page_landscape_a3",
-    ],
-    )
+            ),
+            html.Div([dcc.Graph(id="bar")])
+        ], className="sub_page",)
+    ], className="page_landscape_a3",)
 
     return layout

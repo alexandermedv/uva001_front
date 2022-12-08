@@ -323,16 +323,17 @@ def chose_period_bseg(n_c, s_d, e_d):
         Input('RI-CH', 'value'),
         # State('dashboard13-dropdown-company', 'options'), 
         State('checklist-categ', 'options'),
-        State('intermediate-value', 'data'), 
+        # State('intermediate-value', 'data'), 
         background=True,
         prevent_initial_call=True,
         running=[
         ( Output("submit-val_f", "disabled"), True, False),
         ]
 )
-def chose_filter(rcm_vid_v, rcm_categ_v, ch_v,  categ_op, df):
+def chose_filter(rcm_vid_v, rcm_categ_v, ch_v,  categ_op):#, df):
     # df=get_distinct_comp_bseg()
-    df=pd.DataFrame.from_dict(df)
+    # df=pd.DataFrame.from_dict(df)
+    df=get_saldo_bseg_uniq()
     ctx=dash.callback_context
     op1=categ_op
     v1=rcm_categ_v
@@ -419,10 +420,10 @@ def make_graph(n_c, os_v,rcm_vid_v, rcm_categ_v, ch_v, drop_v,f):
     [
     Input('dashboard13-tabs', 'value'),
 ],
-State('intermediate-value', 'data')
+# State('intermediate-value', 'data')
 )
 
-def render_content( tab,df):
+def render_content( tab):#,df):
     if tab=='tab-1':
         print("Старт выгрузги данных динсальдо")
         df_dog_1,df_dog_2,df_dog_3=get_dates_for_table()
@@ -1381,9 +1382,10 @@ def render_content( tab,df):
                         })
     elif tab=='tab-3':
         print("Старт выгрузги saldo")
-        df_result_t=get_saldo_bseg( name1='ПАО "НЛМК"')
+        # df_result_t=get_saldo_bseg( name1='ПАО "НЛМК"')
         # df_dog_uniq=get_saldo_bseg_uniq()
-        df_dog_uniq=pd.DataFrame.from_dict(df)
+        # df_dog_uniq=pd.DataFrame.from_dict(df)
+        df_dog_uniq=get_saldo_bseg_uniq()
         df_result_t_m=get_saldo_bseg_group( name1='ПАО "НЛМК"')
         df_result_t_m=df_result_t_m.set_index('date')
         print("Рисуем layout3")

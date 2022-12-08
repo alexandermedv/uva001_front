@@ -424,6 +424,7 @@ State('intermediate-value', 'data')
 
 def render_content( tab,df):
     if tab=='tab-1':
+        print("Старт выгрузги данных динсальдо")
         df_dog_1,df_dog_2,df_dog_3=get_dates_for_table()
         df_dog_2_1=get_matrix_stat_1(df_dog_2)
         df_dog_3_1=get_matrix_stat_2(df_dog_3)
@@ -509,7 +510,7 @@ def render_content( tab,df):
         points_1_0=[0 for i in dates1_1]
         points_2_0=[0 for i in dates1_2]
         points_3_0=[0 for i in dates1_3]
-        
+        print("Рисуем layout1")
         layout=html.Div(
         [   html.Div([
             dcc.Graph(
@@ -853,6 +854,7 @@ def render_content( tab,df):
         ], className='eleven columns', style={'marginBottom': 15, 'margin-left': 30,'marginTop': 25,
                         }) ])
     elif tab=='tab-2':
+        print("Старт выгрузги данных bseg")
         df_dog_1_bseg,df_dog_2_bseg,df_dog_3_bseg,factoring_dogs, sum_fact=get_dates_for_table_bseg()
         df_dog_2_1_bseg, sum_fact0=get_matrix_stat_1_bseg(df_dog_2_bseg,sum_fact)
         df_dog_3_1_bseg, sum_fact0=get_matrix_stat_2_bseg(df_dog_3_bseg, sum_fact)
@@ -940,7 +942,7 @@ def render_content( tab,df):
         points_1_0_bseg=[0 for i in dates1_1_bseg]
         points_2_0_bseg=[0 for i in dates1_2_bseg]
         points_3_0_bseg=[0 for i in dates1_3_bseg]
-
+        print("Рисуем layout2")
         layout=html.Div(
         [
             dcc.Graph(
@@ -1378,13 +1380,13 @@ def render_content( tab,df):
         ], className='eleven columns', style={'marginBottom': 15, 'margin-left': 30,'marginTop': 25,
                         })
     elif tab=='tab-3':
-        print("saldo")
+        print("Старт выгрузги saldo")
         df_result_t=get_saldo_bseg( name1='ПАО "НЛМК"')
         # df_dog_uniq=get_saldo_bseg_uniq()
         df_dog_uniq=pd.DataFrame.from_dict(df)
         df_result_t_m=get_saldo_bseg_group( name1='ПАО "НЛМК"')
         df_result_t_m=df_result_t_m.set_index('date')
-
+        print("Рисуем layout3")
         layout=html.Div([
             dbc.Navbar(
                 [

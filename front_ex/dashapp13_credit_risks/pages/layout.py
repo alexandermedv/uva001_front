@@ -376,7 +376,7 @@ def create_layout():
     print("Рисуем вкладки")
 
     layout = html.Div(
-        [   dcc.Store(id='intermediate-value', data=df_dog_uniq.to_dict('records')),
+        [   #dcc.Store(id='intermediate-value', data=df_dog_uniq.to_dict('records')),
             html.Div(
                 html.H5("Отчет кредитных рисков", className='row' ,
                 style={'font-size': '3rem', 'padding-top':'30px'}

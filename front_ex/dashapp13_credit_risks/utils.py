@@ -16,6 +16,7 @@ def makestr_if_exist(col0, s1, s2,s=''):
 
 # Выгрузка таблицы по рискам
 def get_credit_data():
+	print("def get_credit_data")
 	schema='analysis'
 	Name_table='debitor_saldo_anlis_contracts'
 	chunksize=100000
@@ -32,6 +33,7 @@ def get_credit_data():
 		df2=df2.append(chunk)
 	return df2
 def get_credit_data_bseg():
+	print("def get_credit_data_bseg")
 	schema='analysis'
 	Name_table='saldo_bseg_contracts'
 	chunksize=100000
@@ -48,6 +50,7 @@ def get_credit_data_bseg():
 		df2=df2.append(chunk)
 	return df2
 def get_credit_data_clients():
+	print("def get_credit_data_clients")
 	schema='analysis'
 	Name_table='debitor_saldo_anlis_clients'
 	chunksize=100000
@@ -63,6 +66,7 @@ def get_credit_data_clients():
 	return df2
 
 def get_credit_data_all():
+	print("def get_credit_data_all")
 	schema='analysis'
 	Name_table='debitor_saldo_anlis_all'
 	chunksize=100000
@@ -78,6 +82,7 @@ def get_credit_data_all():
 	return df2
 
 def get_credit_data_all_bseg():
+	print("def get_credit_data_all_bseg")
 	schema='analysis'
 	Name_table='saldo_bseg_all'
 	chunksize=100000
@@ -93,7 +98,7 @@ def get_credit_data_all_bseg():
 	return df2
 
 def get_saldo_bseg(rcm_vid=None, rcm_categ=None, name1=None, yur_hold=None):
-	
+	print("def get_saldo_bseg")
 	schema='analysis'
 	Name_table='saldo_bsegall_all_h_bldatmonth'
 	chunksize=100000
@@ -109,7 +114,7 @@ def get_saldo_bseg(rcm_vid=None, rcm_categ=None, name1=None, yur_hold=None):
 		df2=df2.append(chunk)
 	return df2
 def get_saldo_bseg_uniq():
-	
+	print("def get_saldo_bseg_uniq")
 	schema='analysis'
 	Name_table='saldo_bsegall_all_h_bldatmonth'
 	chunksize=100000
@@ -124,7 +129,7 @@ def get_saldo_bseg_uniq():
 		df2=df2.append(chunk)
 	return df2
 def get_saldo_bseg_group(rcm_vid=None, rcm_categ=None, name1=None, yur_hold=None):
-	
+	print("def get_saldo_bseg_group")
 	schema='analysis'
 	Name_table='saldo_bsegall_all_h_bldatmonth'
 	chunksize=100000

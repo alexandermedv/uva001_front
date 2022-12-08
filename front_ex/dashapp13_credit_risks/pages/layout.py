@@ -373,7 +373,7 @@ def create_layout():
     # df_result_t_m=get_saldo_bseg_group( name1='ПАО "НЛМК"')
     # df_result_t_m=df_result_t_m.set_index('date')
     
-    print("5. Старт загрузки layout")
+    print("Рисуем вкладки")
 
     layout = html.Div(
         [   dcc.Store(id='intermediate-value', data=df_dog_uniq.to_dict('records')),

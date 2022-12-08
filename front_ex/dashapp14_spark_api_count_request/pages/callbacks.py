@@ -15,8 +15,7 @@ from ..pages import dash_app
 from ..utils import spark_GetStateAccount 
 import xml.etree.ElementTree as ET
 
-@dash_app.callback(Output(component_id='period', component_property='children'),
-                    Output(component_id="actual_time", component_property='children'),
+@dash_app.callback(Output(component_id='content', component_property='children'),
                     Output(component_id='pie', component_property='figure'),
                     Output(component_id='bar', component_property='figure'),
                    [Input('button', 'n_clicks')])
@@ -25,14 +24,27 @@ def count_request_func(n_ckicks):
     root = ET.fromstring(xml)
     conn_dt = root.iter('ReportPeriod')
     for i in conn_dt:
-        period_to = i.attrib.get("To")
-        period_from = i.attrib.get("From")
-    content_period = html.H5('Период действия тарифа: с {} по {}'.format(period_from, period_to))
-    
+        period_to = pd.to_datetime(i.attrib.get("To"))
+        period_from = pd.to_datetime(i.attrib.get("From"))
+
+    client_parse = root.iter('Client')
+    for i in client_parse:
+        client = i.text
+
     actual_dt = root.iter('ResultInfo')
     for i in actual_dt:
         act_dt = pd.to_datetime(i.attrib.get("DateTime"))
-    content_actual = html.H5('Отчет актуален на: {}'.format(act_dt))
+
+    content = html.Div(
+        [
+            html.Br(),
+            html.H6('Пользователь: {}'.format(client)),
+            html.Br(),
+            html.H6('Отчетный период: с {} по {}.'.format(period_from.strftime("%d.%m.%Y"), period_to.strftime("%d.%m.%Y"))),
+            html.Br(),
+            html.H6('Отчет актуален на: {}'.format(act_dt.strftime("%H:%M:%S  %d.%m.%Y")))
+        ]
+    )
 
     calls = root.iter('Methods')
     df_calls = pd.DataFrame(columns=['limit_call' 'total_call', 'left_call',])
@@ -43,9 +55,10 @@ def count_request_func(n_ckicks):
                     ignore_index=True)
     fig = px.pie(names=['Использованные запросы', 'Оставшиеся запросы'],
                 values=[df_calls['total_call'][0], df_calls['left_call'][0]],
-                title='Лимит запросов',
-                color_discrete_sequence=['#FBFF9B', '#A4FF63'], #['#A4FF63', '#FBFF9B'],
-                hole=0.85) #, category_orders={"names":['Использованные запросы','Оставшиеся запросы']}
+                #title='Лимит запросов',
+                color_discrete_sequence=['#287233', '#FCD975'],
+                hole=0.85, 
+                category_orders={"names":['Использованные запросы','Оставшиеся запросы']}) 
     fig.update_traces(textinfo='value+label', 
                     textposition="outside")
     fig.update_layout(showlegend=False,
@@ -101,4 +114,4 @@ def count_request_func(n_ckicks):
     fig2.update_xaxes(showgrid=False, visible=False)
     fig2.update_yaxes(showgrid=False)
 
-    return content_period, content_actual, fig, fig2
+    return content, fig, fig2

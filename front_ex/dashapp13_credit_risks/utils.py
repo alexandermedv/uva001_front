@@ -39,7 +39,7 @@ def get_credit_data_bseg():
 		SELECT *
 		FROM '''+schema+'''.'''+Name_table +''' where
 	date>='2020-08-01' and date<'2022-10-01' 
-	--date='2021-08-31' 
+	--and date='2021-08-31' 
 	'''
 	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
 	df2=con.execute(sql).fetchall()
@@ -69,7 +69,7 @@ def get_credit_data_all():
 	sql = '''
 		SELECT *
 		FROM '''+schema+'''.'''+Name_table +''' where
-	date>='2020-11-01' '''
+	date>='2020-11-01'  '''
 	con=create_engine(os.environ['POSTGRE_URL_DASH'] , max_identifier_length=128, encoding='utf-8') 
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()

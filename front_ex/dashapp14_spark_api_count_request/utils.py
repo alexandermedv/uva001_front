@@ -16,6 +16,10 @@ from zeep import Client  # type: ignore
 def get_client(login, password, wdsl_url=ENDPOINT_prod) -> Client:
     """Клиент для использования в конструкции with"""
     client = Client(wdsl_url)
+    # client.transport.session.proxies = {
+    #     'https': 'http://msc01-cfw01.pgk.rzd:9090',
+    #     'http': 'http://msc01-cfw01.pgk.rzd:9090'
+    # }
     result = client.service.Authmethod(login, password)
     #print('login =, password=, wdsl_url=, result=', login, password, wdsl_url, result, flush=True)
     try:

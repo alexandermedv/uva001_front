@@ -148,7 +148,7 @@ def get_top_resellers(start_date, end_date, branches, gruz, rod, sorting):
         ORDER BY (CASE '%s' WHEN 'Количество посреднических рейсов' THEN c."Количество"::int
                     WHEN 'Доля по количеству' THEN round(c."Количество"::numeric/sum(a."Количество рейсов")::numeric*100, 2)
                     WHEN 'Количество рейсов' THEN sum(a."Количество рейсов")
-                    WHEN 'Сумма посреднических рейсов, руб.' THEN sum(a."Стоимость")::bigint
+                    WHEN 'Сумма посреднических рейсов, руб.' THEN c."Стоимость"::bigint
                     WHEN 'Доля по сумме' THEN round(c."Стоимость"::numeric/sum(a."Стоимость")::numeric*100, 2)
                     WHEN 'Сумма, руб.' THEN sum(a."Стоимость")::bigint
                 END) DESC
@@ -201,7 +201,7 @@ def get_top_resellers_detailed(start_date, end_date, branches, gruz, rod, sortin
                 ORDER BY (CASE '%s' WHEN 'Количество посреднических рейсов' THEN c."Количество"::int
                             WHEN 'Доля по количеству' THEN round(c."Количество"::numeric/sum(a."Количество рейсов")::numeric*100, 2)
                             WHEN 'Количество рейсов' THEN sum(a."Количество рейсов")
-                            WHEN 'Сумма посреднических рейсов, руб.' THEN sum(a."Стоимость")::bigint
+                            WHEN 'Сумма посреднических рейсов, руб.' THEN c."Стоимость"::bigint
                             WHEN 'Доля по сумме' THEN round(c."Стоимость"::numeric/sum(a."Стоимость")::numeric*100, 2)
                             WHEN 'Сумма, руб.' THEN sum(a."Стоимость")::bigint
                         END) DESC

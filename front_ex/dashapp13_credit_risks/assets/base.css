@@ -137,9 +137,7 @@ table.tiny-header tr:first-child {
 
 /* .columns{ margin-left: 0 !important; } */
 
-/* .row > .columns:not(:first-child){
-padding-left: 20px;
-} */
+
 
 td,
 th {

@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 
 # Переменные окружения
-load_dotenv(os.path.abspath(os.path.dirname(__file__))+'/.prod.env')
+load_dotenv(os.path.abspath(os.path.dirname(__file__))+'/.test.env')
 print('База данных приложения', os.environ['SQLALCHEMY_DATABASE_URI'])
 print('База данных для отчетов и дэшбордов', os.environ['POSTGRE_URL_DASH'])
 print('База SAP S4', os.environ['SAP_HOST_S4'])

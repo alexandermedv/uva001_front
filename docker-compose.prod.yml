@@ -13,10 +13,12 @@ services:
            - .:/usr/src/app/
         ports: 
         #    - "127.0.0.1:7003:7002"
-           - "127.0.0.1:7001:7002"
+            - "127.0.0.1:7001:7002"
         #    - "7001:7002"
         environment: 
-           - TZ=Europe/Moscow
+            - TZ=Europe/Moscow
+            - HTTP_PROXY=msc01-cfw01.pgk.rzd:9090
+            - HTTPS_PROXY=msc01-cfw01.pgk.rzd:9090 
         networks: 
            - net_nginx_prod
 

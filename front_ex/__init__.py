@@ -2,6 +2,7 @@
 import os
 from os import path as op
 from flask import Flask, redirect, url_for, request
+from healthcheck import HealthCheck
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 
@@ -30,6 +31,7 @@ from flask_login import LoginManager
 from flask_cors import CORS
 
 app = Flask(__name__)
+
 # app.config.update(
 #     USE_TZ = os.environ['USE_TZ'],
 #     TIMEZONE = os.environ['TIMEZONE'],   
@@ -137,3 +139,39 @@ dispatch_app = DispatcherMiddleware(app.wsgi_app, {
     'dashapp13': dashapp13_credit_risks.server,
     'dashapp14': dashapp14_spark_api_count_request.server,
     })
+
+
+# Healthcheck
+health = HealthCheck()
+from .utils import get_postgre_con_str, get_log_con_str
+
+# Проверка доступности баз данных
+def front_db_available():
+    front_db_engine = get_postgre_con_str()
+    if front_db_engine:
+        result = True
+    else:
+        result = False
+    return result, "front_db_checked"
+
+def log_db_available():
+    sap_s4p_engine = get_log_con_str()
+    if sap_s4p_engine:
+        result = True
+    else:
+        result = False
+    return result, "log_db_checked"
+
+# def get_sap_s4_con_str():
+#     """Строка подключения к S4 прод"""
+#     return os.environ['SAP_HOST_S4']
+
+# def get_udv_con_str():
+#     """Строка подключения к УДВ прод"""
+#     return os.environ['UDV']
+
+
+health.add_check(front_db_available)
+health.add_check(log_db_available)
+
+app.add_url_rule('/healthcheck', 'healthcheck', view_func=lambda: health.run())

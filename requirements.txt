@@ -102,6 +102,7 @@ flask-cors
 seaborn
 xmlschema==1.9.2
 zeep==4.1.0
+py-healthcheck==1.10.1
 
 # sas13
 # alembic==1.6.0

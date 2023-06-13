@@ -13,6 +13,10 @@ def get_postgre_con_str():
     """Строка подключения к postgre прод"""
     return os.environ['POSTGRE_URL_DASH']
 
+def get_log_con_str():
+    """Строка подключения к log прод"""
+    return os.environ['LOG_DB']
+
 def get_sap_s4_con_str():
     """Строка подключения к S4 прод"""
     return os.environ['SAP_HOST_S4']

@@ -5,8 +5,9 @@ import csv
 from datetime import datetime
 from sqlalchemy import create_engine
 from flask_security import login_required, current_user, login_user, logout_user
+from .models import Log
 
-from . import app
+from . import app, db
 
 
 def get_postgre_con_str():
@@ -77,15 +78,19 @@ def logger(path):
     def _logger(old_function):
 
         def new_function(*args, **kwargs):
-
-            with open(path, 'a') as file:
-                if current_user.is_authenticated:
-                    file.write(f'Логин: {current_user.ldap_account}\n')
-                else:
-                    file.write(f'Логин: неавторизованный пользователь\n')
-                file.write(f'Дата и время: {str(datetime.now())}\n')
-                file.write(f'Вызвана функция: {old_function.__name__}\n')
-                file.write('-------------------------------------------' + '\n')
+            if current_user.is_authenticated:
+                log_item = Log(login=current_user.ldap_account, timestamp=str(datetime.now()), message=old_function.__name__)
+                db.session.add(log_item)
+                db.session.commit()
+            # with open(path, 'a') as file:
+                # if current_user.is_authenticated:
+                #     file.write(f'Логин: {current_user.ldap_account}\n')
+                # else:
+                #     file.write(f'Логин: неавторизованный пользователь\n')
+                # file.write(f'Дата и время: {str(datetime.now())}\n')
+                # file.write(f'Вызвана функция: {old_function.__name__}\n')
+                # file.write('-------------------------------------------' + '\n')
+                
 
             result = old_function(*args, **kwargs)
 

@@ -48,10 +48,12 @@ babel = Babel(app)
 
 # Добавляем базы данных и логин-менеджер
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
+app.config['SQLALCHEMY_BINDS'] = {'log': os.environ['SQLALCHEMY_DATABASE_LOG']}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.urandom(24)
 db = SQLAlchemy(app)
-db.create_all()
+db.create_all(bind=None)
+db.create_all(bind=['log'])
 
 # Миграция - создание и обновление структуры баз данных
 migrate = Migrate(app, db, compare_type=True)
@@ -74,7 +76,8 @@ security.init_app(app=app, datastore = user_datastore)
 # декоратор под первого пользователя
 @app.before_first_request
 def create_user():
-    db.create_all()
+    db.create_all(bind=None)
+    db.create_all(bind=['log'])
     user = User.query.first()
     if not user:
         user_datastore.create_user(ldap_account='svc_fs-uva', email='svc_fs-uva@pgkweb.ru', active=True)

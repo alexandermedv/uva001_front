@@ -20,9 +20,7 @@ from ..utils import get_manual_table1, get_manual_table2, get_manual_table3, get
 def render_content():
     """Построение содержимого дашборда"""
 
-    print('Запуск вкладки 1')
     df1 = get_get_open_ap_by_groups_182()
-    print('df1 =', df1)
     # df1 = get_monitoring().sort_values(by=s, ascending=True)
 
     kol = 0
@@ -33,8 +31,6 @@ def render_content():
     x1_text_bold = []
     for item in x1_text:
         x1_text_bold.append('<b>' + item + '</b>')
-    print('x1_data =', x1_data)
-    print('y1_data =', y1_data)
 
     x2_data = df1['count'][df1['issue_risk_level']=='Средний'].astype(str).tolist()
     x2_text = df1['count'][df1['issue_risk_level']=='Средний'].astype(str)
@@ -42,8 +38,6 @@ def render_content():
     x2_text_bold = []
     for item in x2_text:
         x2_text_bold.append('<b>' + item + '</b>')
-    print('x2_data =', x2_data)
-    print('y2_data =', y2_data)
 
     x3_data = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str).tolist()
     x3_text = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str)
@@ -51,11 +45,7 @@ def render_content():
     x3_text_bold = []
     for item in x3_text:
         x3_text_bold.append('<b>' + item + '</b>')
-    print('x3_data =', x3_data)
-    print('y3_data =', y3_data)
 
-    print('x1_data =', x1_data)
-    print('sum(x1_data) =', sum(map(int, x1_data)))
     sum1 = sum(map(int, x1_data)) + sum(map(int, x2_data)) + sum(map(int, x3_data))
 
     df1 = get_get_open_ap_by_groups_365()
@@ -81,7 +71,6 @@ def render_content():
     for item in x6_text:
         x6_text_bold.append('<b>' + item + '</b>')
 
-    print('df2 =', df1)
     sum2 = sum(map(int, x4_data)) + sum(map(int, x5_data)) + sum(map(int, x6_data))
 
 
@@ -108,8 +97,6 @@ def render_content():
     for item in x9_text:
         x9_text_bold.append('<b>' + item + '</b>')
 
-    print('df3 =', df1)
-
     sum3 = sum(map(int, x7_data)) + sum(map(int, x8_data)) + sum(map(int, x9_data))
 
     incoming_ap = get_incoming_ap()
@@ -120,7 +107,6 @@ def render_content():
     y11 = incoming_ap[incoming_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]
     y11_bold = '<b>' + str(incoming_ap[incoming_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]) + '</b>'
     if not increase_ap[increase_ap['issue_risk_level'] == 'Высокий'].empty:
-        print('increase_ap =', increase_ap)
         y12 = increase_ap[increase_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]
         y12_bold = '<b>' + str(increase_ap[increase_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]) + '</b>'
     else:

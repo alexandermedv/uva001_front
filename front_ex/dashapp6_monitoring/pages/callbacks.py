@@ -439,12 +439,13 @@ def render_content():
                             "data": [
                                 go.Waterfall(
                                     measure = ['relative', 'relative', 'relative', 'relative'],
-                                    x=["Мониторинг <br>на 01.04.2022", "Выявлено по <br>проверкам 2022", "Сняты с контроля <br>на 31.03.2023", "Мониторинг <br>на 31.03.2023"],
+                                    x=["Мониторинг <br>на 01.04.2023", "Выявлено по <br>проверкам 2023", "Сняты с контроля <br>на 19.07.2023", "Мониторинг <br>на 19.07.2023"],
                                     y=[y11, y12, y13, y14],
                                     # y=[49, 43, -23, -69],
                                     increasing = {"marker":{"color":"rgb(138,36,50)"}},
                                     decreasing = {"marker":{"color":"rgb(197, 116, 137)"}},
-                                    textposition = "inside",
+                                    # textposition = "inside",
+                                    textposition = "auto",
                                     cliponaxis = False,
                                     connector={'visible': False},
                                     text=[y11_bold, y12_bold, y13_bold, y14_bold],
@@ -482,12 +483,13 @@ def render_content():
                             "data": [
                                 go.Waterfall(
                                     measure = ['relative', 'relative', 'relative', 'relative'],
-                                    x=["Мониторинг <br>на 01.04.2022", "Выявлено по <br>проверкам 2022", "Сняты с контроля <br>на 31.03.2023", "Мониторинг <br>на 31.03.2023"],
+                                    x=["Мониторинг <br>на 01.04.2023", "Выявлено по <br>проверкам 2023", "Сняты с контроля <br>на 19.07.2023", "Мониторинг <br>на 19.07.2023"],
                                     y=[y21, y22, y23, y24],
                                     # y=[49, 43, -23, -69],
                                     increasing = {"marker":{"color":"rgb(250,216,89)"}},
                                     decreasing = {"marker":{"color":"rgb(251, 231, 152)"}},
-                                    textposition = "inside",
+                                    # textposition = "inside",
+                                    textposition = "auto",
                                     connector={'visible': False},
                                     text=[y21_bold, y22_bold, y23_bold, y24_bold],
                                     hoverinfo='skip',
@@ -523,12 +525,13 @@ def render_content():
                             "data": [
                                 go.Waterfall(
                                     measure = ['relative', 'relative', 'relative', 'relative'],
-                                    x=["Мониторинг <br>на 01.04.2022", "Выявлено по <br>проверкам 2022", "Сняты с контроля <br>на 31.03.2023", "Мониторинг <br>на 31.03.2023"],
+                                    x=["Мониторинг <br>на 01.04.2023", "Выявлено по <br>проверкам 2023", "Сняты с контроля <br>на 19.07.2023", "Мониторинг <br>на 19.07.2023"],
                                     y=[y31, y32, y33, y34],
                                     # y=[49, 43, -23, -69],
                                     increasing = {"marker":{"color":"rgb(112,149,51)"}},
                                     decreasing = {"marker":{"color":"rgb(169, 191, 133)"}},
-                                    textposition = "inside",
+                                    # textposition = "inside",
+                                    textposition = "auto",
                                     connector={'visible': False},
                                     text=[y31_bold, y32_bold, y33_bold, y34_bold],
                                     hoverinfo='skip',

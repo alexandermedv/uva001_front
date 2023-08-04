@@ -55,6 +55,7 @@ def get_get_open_ap_by_groups_182():
                         WHERE "APADate" IS NULL
                             AND "APStatus" <> '61'
                             AND "Deleted" = '-1'
+                            AND "Sent_to_Itrack" IS NOT NULL
                         GROUP BY "OrigID"
                         ) i
                         ON a."IDFld" = i."OrigID"
@@ -138,6 +139,7 @@ def get_get_open_ap_by_groups_365():
                         WHERE "APADate" IS NULL
                             AND "APStatus" <> '61'
                             AND "Deleted" = '-1'
+                            AND "Sent_to_Itrack" IS NOT NULL
                         GROUP BY "OrigID"
                         ) i
                         ON a."IDFld" = i."OrigID"
@@ -224,6 +226,7 @@ def get_get_open_ap_by_groups_366():
                         WHERE "APADate" IS NULL
                             AND "APStatus" <> '61'
                             AND "Deleted" = '-1'
+                            AND "Sent_to_Itrack" IS NOT NULL
                         GROUP BY "OrigID"
                         ) i
                         ON a."IDFld" = i."OrigID"
@@ -486,6 +489,7 @@ def get_decrease_ap():
             WHERE "APADate" IS NULL
                 AND "APStatus" <> '61'
                 AND "Deleted" = '-1'
+                AND "Sent_to_Itrack" IS NOT NULL
             GROUP BY "OrigID"
             ) i
             ON a."IDFld" = i."OrigID"
@@ -577,6 +581,7 @@ def get_outcoming_ap():
             WHERE "APADate" IS NULL
                 AND "APStatus" <> '61'
                 AND "Deleted" = '-1'
+                AND "Sent_to_Itrack" IS NOT NULL
             GROUP BY "OrigID"
             ) i
             ON a."IDFld" = i."OrigID"
@@ -714,6 +719,7 @@ def get_delayed_actplans():
         WHERE g."Language3" = 'Высокий'
             AND i.open_actplans IS NOT NULL
             AND j."APREDate" IS NOT NULL
+            AND j."APADate" IS NULL
             AND j."APCmt" IS NOT NULL -- Убрать эту строчку
             '''
 

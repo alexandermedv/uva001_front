@@ -22,10 +22,10 @@ def get_get_open_ap_by_groups_182():
                         i.open_actplans,
                         TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY') AS "Sent_to_Itrack",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2023-07-19') AS "Reporting_date",
+                        DATE('2023-08-04') AS "Reporting_date",
                         CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2023-07-19') - DATE(j."AP_date")
-						ELSE DATE('2023-07-19') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+						THEN DATE('2023-08-04') - DATE(j."AP_date")
+						ELSE DATE('2023-08-04') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -73,8 +73,8 @@ def get_get_open_ap_by_groups_182():
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
                         AND CASE WHEN i."Sent_to_Itrack" IS NULL
-                            THEN DATE('2023-07-19') - DATE(j."AP_date")
-                            ELSE DATE('2023-07-19') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+                            THEN DATE('2023-08-04') - DATE(j."AP_date")
+                            ELSE DATE('2023-08-04') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
                             END < 183
                         --AND k."Sent_to_Itrack" IS NOT NULL
                 
@@ -106,10 +106,10 @@ def get_get_open_ap_by_groups_365():
                         i.open_actplans,
                         TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY') AS "Sent_to_Itrack",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2023-07-19') AS "Reporting_date",
+                        DATE('2023-08-04') AS "Reporting_date",
                         CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2023-07-19') - DATE(j."AP_date")
-						ELSE DATE('2023-07-19') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+						THEN DATE('2023-08-04') - DATE(j."AP_date")
+						ELSE DATE('2023-08-04') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -157,8 +157,8 @@ def get_get_open_ap_by_groups_365():
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
                         AND CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2023-07-19') - DATE(j."AP_date")
-						ELSE DATE('2023-07-19') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+						THEN DATE('2023-08-04') - DATE(j."AP_date")
+						ELSE DATE('2023-08-04') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 						END BETWEEN 183 AND 365
                 
             ) z
@@ -190,10 +190,10 @@ def get_get_open_ap_by_groups_366():
                         TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY') AS "Sent_to_Itrack",
                         i."Close_date",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2023-07-19') AS "Reporting_date",
+                        DATE('2023-08-04') AS "Reporting_date",
                         CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2023-07-19') - DATE(j."AP_date")
-						ELSE DATE('2023-07-19') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+						THEN DATE('2023-08-04') - DATE(j."AP_date")
+						ELSE DATE('2023-08-04') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -245,8 +245,8 @@ def get_get_open_ap_by_groups_366():
                         AND a."Dispos" = '52'
                         AND i."Sent_to_Itrack" IS NOT NULL
                         AND (CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2023-07-19') - DATE(j."AP_date")
-						ELSE DATE('2023-07-19') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+						THEN DATE('2023-08-04') - DATE(j."AP_date")
+						ELSE DATE('2023-08-04') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 						END) > 365
                 
             ) z
@@ -337,13 +337,13 @@ def get_incoming_ap():
             AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
 							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) < TO_DATE('20230401', 'YYYYMMDD')
+							END) < TO_DATE('20230101', 'YYYYMMDD')
             AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
 							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) IS NOT NULL
             AND k."Sent_to_Itrack" IS NOT NULL
-            AND NOT (k."Close_date" < TO_DATE('20230401', 'YYYYMMDD') AND i.open_actplans IS NULL)
+            AND NOT (k."Close_date" < TO_DATE('20230101', 'YYYYMMDD') AND i.open_actplans IS NULL)
         ) z
         GROUP BY z.issue_risk_level
     '''
@@ -432,7 +432,7 @@ def get_increase_ap():
 			AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
 							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) >= TO_DATE('20230401', 'YYYYMMDD')
+							END) >= TO_DATE('20230101', 'YYYYMMDD')
         ) z
         GROUP BY z.issue_risk_level
     '''
@@ -520,7 +520,7 @@ def get_decrease_ap():
 							THEN j."AP_date"
 							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) IS NOT NULL
-			AND k."Close_date" >= TO_DATE('20230401', 'YYYYMMDD')
+			AND k."Close_date" >= TO_DATE('20230101', 'YYYYMMDD')
             AND k."Sent_to_Itrack" IS NOT NULL
         ) z
         GROUP BY z.issue_risk_level

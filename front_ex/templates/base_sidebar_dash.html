@@ -124,6 +124,9 @@
               {% if current_user.check_dash_roles('spark_api_count_request') %}
               <li><a href="/spark_api_count_request_dash"><i class="fa fa-dashboard"></i>Кол-во запросов СПАРК</a></li>
               {% endif %}
+              {% if current_user.check_dash_roles('airflow') %}
+              <li><a href="/airflow_dash"><i class="fa fa-dashboard"></i>Кол-во запросов СПАРК</a></li>
+              {% endif %}
               {% if current_user.check_report_roles('admin') %}
                 <li><a href="https://jira.pgk.ru/projects/CITA/issues"><i class="fa fa-dashboard"></i>Jira</a></li>
               {% endif %}

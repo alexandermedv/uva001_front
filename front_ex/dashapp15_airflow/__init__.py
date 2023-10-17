@@ -3,17 +3,17 @@ from dash import Dash
 from dash.dependencies import Input, Output
 import dash_html_components as html
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc 
 
 from .. import app
 # , db, engine_cons
 
-external_scripts = [
-    {'src': 'https://code.jquery.com/jquery-3.5.1.js'},
-]
+external_scripts = {'src': '../static/styles/additional.css'}
 
 dash_app = Dash(__name__, server=app,
                 url_base_pathname='/dashboards/airflow_dash/',
-                suppress_callback_exceptions=True, external_scripts=external_scripts)
+                suppress_callback_exceptions=True, 
+                external_stylesheets=[dbc.themes.BOOTSTRAP])
 dash_app.config.update(app.config)
 dash_app.layout = html.Div()
 

@@ -18,7 +18,7 @@ from .ldap import ldap_authentication
 from .utils import logger
 
 # Руты к дэшбордам
-@app.route('/airflow/')
+@app.route('/airflow_dash/')
 @login_required
 @logger(os.environ['USER_ACTIONS_FILE'])
 def render_dashapp15():

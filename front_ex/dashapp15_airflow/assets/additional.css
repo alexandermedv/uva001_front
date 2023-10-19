@@ -1,0 +1,61 @@
+
+body {
+    background-color: #F5F7F9    
+}
+
+.row {
+    margin-right: 0px!important;
+    margin-left: 0px!important;
+}  
+
+.col-1, .col-2, .col-3, .col-4, .col-5,
+.col-6, .col-7, .col-8, .col-9, .col-10 {
+    padding-right: 0px!important;
+    padding-left: 0px!important;
+}
+
+.dash-graph {
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: 0.25rem;
+    margin-left: 5px!important;
+    margin-top: 5px!important;
+}
+
+.dash-table-container {
+    border-left: 1px solid rgba(0,0,0,.125); 
+    border-right: 1px solid rgba(0,0,0,.125); 
+    border-radius: 0.25rem;
+    margin-left: 5px!important;
+    margin-top: 5px!important;  
+}
+
+.tab {
+    padding: 7px!important;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 15px!important;
+    color: rgb(101,102,105);
+}
+
+.tab--selected {
+    background-color:inherit!important;
+}
+
+.tab-parent {
+    margin-left: 5px!important;
+    margin-top: 5px!important;  
+}
+
+.DateRangePicker {
+    border-radius: 0.25rem;
+    margin-left: 5px!important;
+    margin-top: 5px!important;  
+}
+
+.DateInput {
+    width: 100px;
+}
+.DateInput_input {
+    padding: 5px;
+    font-size: 16px;
+    text-align: center;
+}

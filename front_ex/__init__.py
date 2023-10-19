@@ -118,9 +118,10 @@ from .dashapp7_repairs import dash_app as dashapp7_repairs
 from .dashapp8_empty_transportations import dash_app as dashapp8_empty_transportations
 from .dashapp9_resellers_commerce import dash_app as dashapp9_resellers_commerce
 from .dashapp10_nagon import dash_app as dashapp10_nagon
-from .dashapp11_risks import dash_app as dashapp11_risks
+# from .dashapp11_risks import dash_app as dashapp11_risks
 from .dashapp13_credit_risks import dash_app as dashapp13_credit_risks
 from .dashapp14_spark_api_count_request import dash_app as dashapp14_spark_api_count_request
+from .dashapp15_airflow import dash_app as dashapp15_airflow
 
 # Добавляем руты и таски
 import front_ex.routes
@@ -138,9 +139,10 @@ dispatch_app = DispatcherMiddleware(app.wsgi_app, {
     'dashapp8': dashapp8_empty_transportations.server,
     'dashapp9': dashapp9_resellers_commerce.server,
     'dashapp10': dashapp10_nagon.server,
-    'dashapp11': dashapp11_risks.server, 
+    # 'dashapp11': dashapp11_risks.server, 
     'dashapp13': dashapp13_credit_risks.server,
     'dashapp14': dashapp14_spark_api_count_request.server,
+    'dashapp15': dashapp15_airflow.server, 
     })
 
 

@@ -154,7 +154,7 @@ def render_content(tab, start_date, end_date):
                                 autosize=True,
                                 barmode = 'stack', 
                                 # barmode = 'group',
-                                title_text='Кол-во порожних вагонорейсов с просрочкой помесячно, ваг.',
+                                title_text='Подневная загрузка - общий объем исполнения задач в часах',
                                 # margin={"r": 0, "t": 50, "b": 20, "l": 70, },
                                 # legend=dict(orientation="h"), 
                                 hovermode = 'closest',

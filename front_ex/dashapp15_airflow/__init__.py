@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 from .. import app
 # , db, engine_cons
 
-external_scripts = {'src': '../static/styles/additional.css'}
+# external_scripts = {'src': '../static/styles/additional.css'}
 
 dash_app = Dash(__name__, server=app,
                 url_base_pathname='/dashboards/airflow_dash/',

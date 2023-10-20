@@ -74,7 +74,6 @@ def create_layout():
                 dcc.Tabs(id='dashboard15-tabs', value='tab-1', children=[
                     dcc.Tab(label='Airflow', value='tab-1', className="tab",),
                     dcc.Tab(label='База данных', value='tab-4', className="tab",),
-                    dcc.Tab(label='Закладка 3', value='tab-2', className="tab",),
                     dcc.Tab(label='Описание', value='tab-3', className="tab",),
                 ], className="row all-tabs"),
                 #html.Div(id='tabs-example-content')

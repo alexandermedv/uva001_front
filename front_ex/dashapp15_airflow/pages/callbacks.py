@@ -12,6 +12,8 @@ import plotly.express as px
 from dateutil import relativedelta
 from pprint import pprint
 import dash_table.FormatTemplate as FormatTemplate
+from pytz import timezone
+import dash_bootstrap_components as dbc
 
 # from dash import dash_table
 
@@ -22,24 +24,18 @@ from ..pages import dash_app
 # Первая закладка
 from ..utils import dag_load_daily
 
-from ..utils import get_trans_empty_by_type, get_trans_empty_by_money, get_trans_empty_by_type_month, get_trans_empty_by_money_month
-# Вторая закладка
-from ..utils import get_raiways, get_trans_empty_all, get_trans_empty_by_railway_delay, get_trans_empty_by_railway_mean_delay, get_trans_empty_by_railway_penalty
-from ..utils import get_tab4_trans_empty_delay_by_rps, get_tab4_trans_empty_penalty_by_rps, get_tab4_trans_empty_mean_delay_by_rps
-from ..utils import external_railway, get_tab1_trans_empty_by_delay_stat
-
-def dag_load_daily_bars():
+def dag_load_daily_bars(start_date):
     bars = []
     dags_load_hours_by_day = dag_load_daily()
                                                              
-    for dag_id in dags_load_hours_by_day[dags_load_hours_by_day['date'] >= dt.datetime.strptime('2023-10-01', '%Y-%m-%d').date()]['dag_id'].unique():
+    for dag_id in dags_load_hours_by_day[dags_load_hours_by_day['date'] >= start_date]['dag_id'].unique():
         # print(dag_id, flush=True)
 
-        bars.append(go.Bar(x=dags_load_hours_by_day[(dags_load_hours_by_day['date'] >= dt.datetime.strptime('2023-10-01', '%Y-%m-%d').date()) 
-                                              & (dags_load_hours_by_day['dag_id']==dag_id)]['date'],
-            y=dags_load_hours_by_day[(dags_load_hours_by_day['date'] >= dt.datetime.strptime('2023-10-01', '%Y-%m-%d').date()) 
+        bars.append(go.Bar(x=dags_load_hours_by_day[(dags_load_hours_by_day['date'] >= start_date) 
+                                              & (dags_load_hours_by_day['dag_id']==dag_id)]['date'].apply(lambda x: x.date()),
+            y=dags_load_hours_by_day[(dags_load_hours_by_day['date'] >= start_date) 
                                               & (dags_load_hours_by_day['dag_id']==dag_id)]['duration_hours'],
-            text = dag_id,
+            # text = dag_id,
             # hovertemplate=
             #     """Кол-во вагонорейсов с просрочкой в прошлом году: %{text}""",
             # name = dt.date.today().year - 1 ,
@@ -100,16 +96,20 @@ pie_colors_failed = [
 def render_content(tab, start_date, end_date):
     """Построение содержимого выбранной закладки"""
 
-    # start_date = pd.to_datetime(start_date)
-    # end_date = pd.to_datetime(end_date)
+    start_date = pd.to_datetime(start_date, utc=True)
+    end_date = pd.to_datetime(end_date, utc=True)
+    # start_date = dt.datetime.strptime(start_date[:15], '%Y-%m-%dT%H:%M')
+    # end_date = dt.datetime.strptime(end_date[:15], '%Y-%m-%dT%H:%M')
     
     if tab == 'tab-1':
         """Общие"""
         # Закладка общие
         dags_load_hours_by_day = dag_load_daily()
         dash4_cols=['dag_id','owners','duration_hours']
-        # print(dags_load_hours_by_day[(dags_load_hours_by_day['date'] == dt.datetime.strptime('2023-10-11', '%Y-%m-%d').date())
-        #                         & (dags_load_hours_by_day['state']=='failed')][['dag_id', 'owners', 'duration_hours']])
+        
+        dags_load_hours_by_cur_day = dags_load_hours_by_day[(dags_load_hours_by_day['date'] >= end_date - dt.timedelta(days=1)) & 
+                                                            (dags_load_hours_by_day['date'] <= end_date)]
+
 
         content = html.Div([
             # Первая линия
@@ -120,42 +120,38 @@ def render_content(tab, start_date, end_date):
                         figure={
                             "data": [
                                 go.Pie(
-                                    values=dags_load_hours_by_day[(dags_load_hours_by_day['date'] == dt.datetime.strptime('2023-10-11', '%Y-%m-%d').date())]
-                                       .groupby('state').agg(state_cnt=('dag_id', lambda x: x.nunique()))['state_cnt'],        
+                                    values=dags_load_hours_by_cur_day.groupby('state').agg(state_cnt=('dag_id', lambda x: x.nunique()))['state_cnt'],        
                                     textinfo='label+value+percent', 
                                     hole=.6,
-                                    labels=dags_load_hours_by_day[(dags_load_hours_by_day['date'] == dt.datetime.strptime('2023-10-11', '%Y-%m-%d').date())]
-                                       .groupby('state').agg(state_cnt=('dag_id', lambda x: x.nunique())).reset_index()['state'],
+                                    labels=dags_load_hours_by_cur_day.groupby('state').agg(state_cnt=('dag_id', lambda x: x.nunique())).reset_index()['state'],
                                     marker=dict(colors=pie_colors_failed),
                             ),],
                             "layout": go.Layout(
                                 autosize=True,
                                 annotations=[dict(text='<b>Всего: {}</b>'
-                                                    .format(len(dags_load_hours_by_day[(dags_load_hours_by_day['date'] == dt.datetime.strptime('2023-10-11', '%Y-%m-%d').date())]['dag_id'].unique())), 
+                                                    .format(len(dags_load_hours_by_cur_day['dag_id'].unique())), 
                                                     x=0.5, y=0.5, font_size=18, showarrow=False)],
                                 font = dict(size=11),
-                                title_text='Статистика исполнения задач на вчера',
+                                title_text='<b style="color: rgb(101,102,105); font-size: 15px;">Статистика исполнения задач на вчера</b>',
                                 hovermode=False,
-                                # margin={"r": 0, "t": 100, "b": 20, "l": 70, },
-                                # legend=dict(orientation="h", yanchor="top", y=1.02, xanchor="right", x=0)
                             ),
                         },
                         # config={"displayModeBar": False},
                     ),
+                    # html.A('* сноска ', id='tbl_out', style={'margin-left':'5px'}),
                 ]),
                 html.Div(className="col-8", children=[
                     dcc.Graph(
                         id="dash15-tab-1-graph1",
                         figure={
                             "data": 
-                                dag_load_daily_bars(),
+                                dag_load_daily_bars(start_date=start_date),
                             # dag_load_daily_bars(),
                             "layout": go.Layout(
                                 autosize=True,
                                 barmode = 'stack', 
                                 # barmode = 'group',
-                                title_text='Подневная загрузка - общий объем исполнения задач в часах',
-                                # margin={"r": 0, "t": 50, "b": 20, "l": 70, },
+                                title_text='<b style="color: rgb(101,102,105); font-size: 15px;">Подневная загрузка - общий объем исполнения задач в часах</b>',
                                 # legend=dict(orientation="h"), 
                                 hovermode = 'closest',
                             ),
@@ -169,15 +165,16 @@ def render_content(tab, start_date, end_date):
             # Невыполненные на вчера задачи
             html.Div(className="row", children=[
                 html.Div(className="col-4", children=[
+                    html.B("Невыполненные задачи за 24 часа", id='data_failed_name', style={'margin-left':'5px','color':'rgb(101 102 105)'}),
                     dash_table.DataTable(
                         id = "dash_15_data_failed",
                         columns =  [
-                            {"name": 'dag_id', "id": 'dag_id'},
-                            {"name": 'owners', "id": 'owners'},
-                            {"name": 'duration_hours', "id": 'duration_hours', 'type': 'numeric', 'format': dict(specifier='.2f')},                                                  
+                            {"name": 'Задача', "id": 'dag_id'},
+                            {"name": 'Отвественный', "id": 'owners'},
+                            {"name": 'Время, ч', "id": 'duration_hours', 'type': 'numeric', 'format': dict(specifier='.2f')},                                                  
                         ],
-                        data=dags_load_hours_by_day[(dags_load_hours_by_day['date'] == dt.datetime.strptime('2023-10-11', '%Y-%m-%d').date())
-                                & (dags_load_hours_by_day['state']=='failed')][['dag_id', 'owners', 'duration_hours']].to_dict('records'),
+                        data = dags_load_hours_by_cur_day[(dags_load_hours_by_day['state']=='failed')]
+                            [['dag_id', 'owners', 'duration_hours']].to_dict('records'),
                         editable=False,
                         sort_action='native',
                         filter_action='native',
@@ -188,50 +185,46 @@ def render_content(tab, start_date, end_date):
                     )
                 ]),
                 html.Div(className="col-4", children=[
+                    html.B('Рейтинг длительности задач за 24 часа', id='data_failed_name', style={'margin-left':'5px','color':'rgb(101 102 105)'}),
                     dash_table.DataTable(
                         id = "dash_15_datatable",
                         columns =  [
-                            {"name": 'dag_id', "id": 'dag_id'},
-                            {"name": 'owners', "id": 'owners'},
-                            {"name": 'duration_hours', "id": 'duration_hours', 'type': 'numeric', 'format': dict(specifier='.2f')},                                                  
+                            {"name": 'Задача', "id": 'dag_id'},
+                            {"name": 'Отвественный', "id": 'owners'},
+                            {"name": 'Кол-во запусков', "id": 'count'},
+                            {"name": 'Время, ч', "id": 'duration_hours', 'type': 'numeric', 'format': dict(specifier='.2f')},                                                  
                                     ],
-                        data=dags_load_hours_by_day[(dags_load_hours_by_day['date'] == dt.datetime.strptime('2023-10-11', '%Y-%m-%d').date())
-                                                    & (dags_load_hours_by_day['duration_hours']>0)][dash4_cols].sort_values(by='duration_hours', ascending=False).to_dict('records'),
+                         data =  dags_load_hours_by_cur_day[(dags_load_hours_by_day['duration_hours']>0)]
+                                    [dash4_cols].groupby(['dag_id','owners']).agg(count=('dag_id', 'count'), duration_hours=('duration_hours','sum')).reset_index()
+                                        .sort_values(by='duration_hours', ascending=False).to_dict('records'),
                         editable=False,
                         sort_action='native',
                         style_data_conditional=(
-                            data_bars(dags_load_hours_by_day[(dags_load_hours_by_day['date'] == dt.datetime.strptime('2023-10-11', '%Y-%m-%d').date())
-                                                    & (dags_load_hours_by_day['duration_hours']>0)][dash4_cols].sort_values(by='duration_hours', ascending=False), 'duration_hours')
+                            data_bars(dags_load_hours_by_cur_day[(dags_load_hours_by_day['duration_hours']>0)]
+                                      [dash4_cols].sort_values(by='duration_hours', ascending=False), 'duration_hours')
                         ),
                         filter_action='native',
                         style_cell={'textAlign': 'left', 'fontSize':12, 'font-family':'verdana'},
                         style_as_list_view=True,
-                        # style_cell_conditional=[
-                        #     {
-                        #         'if': {'column_id': 'duration_hours'},
-                        #         'color': 'rgb(94,144,134)'
-                        #     }
-                        # ]
                     )
                 ]),
                 html.Div(className="col-4", children=[
+                    html.B('Загрузка ресурсов по ответственным', id='data_failed_name', style={'margin-left':'5px','color':'rgb(101 102 105)'}),
                     dash_table.DataTable(
                         id = "dash_15_datatable2",
                         columns =  [
-                            {"name": 'owners', "id": 'owners'},
-                            {"name": 'dag_id', "id": 'dag_id'},
-                            {"name": 'duration_hours', "id": 'duration_hours', 'type': 'numeric', 'format': dict(specifier='.2f')},                                                  
+                            {"name": 'Отвественный', "id": 'owners'},
+                            {"name": 'Кол-во запусков', "id": 'count'},
+                            {"name": 'Время, ч', "id": 'duration_hours', 'type': 'numeric', 'format': dict(specifier='.2f')},                                                  
                                     ],
-                        data=dags_load_hours_by_day[(dags_load_hours_by_day['date'] == dt.datetime.strptime('2023-10-11', '%Y-%m-%d').date())
-                                                    & (dags_load_hours_by_day['duration_hours']>0)].groupby('owners')
-                                                    .agg(dag_id=('dag_id', 'count'), duration_hours=('duration_hours', 'sum')).reset_index()
+                        data=dags_load_hours_by_cur_day[(dags_load_hours_by_day['duration_hours']>0)].groupby('owners')
+                                                    .agg(count=('dag_id', 'count'), duration_hours=('duration_hours', 'sum')).reset_index()
                                                     .sort_values(by='duration_hours', ascending=False).to_dict('records'),
                         editable=False,
                         sort_action='native',
                         style_data_conditional=(
-                            data_bars(dags_load_hours_by_day[(dags_load_hours_by_day['date'] == dt.datetime.strptime('2023-10-11', '%Y-%m-%d').date())
-                                                    & (dags_load_hours_by_day['duration_hours']>0)].groupby('owners')
-                                                    .agg(dag_id=('dag_id', 'count'), duration_hours=('duration_hours', 'sum')).reset_index()
+                            data_bars(dags_load_hours_by_cur_day[(dags_load_hours_by_day['duration_hours']>0)].groupby('owners')
+                                                    .agg(duration_hours=('duration_hours', 'sum')).reset_index()
                                                     .sort_values(by='duration_hours', ascending=False), 'duration_hours')
                         ),
                         filter_action='native',

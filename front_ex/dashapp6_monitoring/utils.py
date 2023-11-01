@@ -9,23 +9,23 @@ def get_get_open_ap_by_groups_182():
     """Открытые планы мероприятий по группам 0-182 дня"""
 
     sql = '''
-        SELECT z.issue_group AS issue_group,
+        SELECT z."ActName" AS actname,
             z.issue_risk_level AS issue_risk_level,
             count(*)
         FROM (
 
             SELECT a.*,
-                        c."Language3" AS issue_group, 
+                        h."ActName", 
                         e."Language3" AS issue_type,
                         g."Language3" AS issue_risk_level,
                         h."IDFld",
                         i.open_actplans,
-                        TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY') AS "Sent_to_Itrack",
+                        to_date(k."ActlDate6", 'MM/DD/YYYY') + 3 AS "GD_Approve",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2022-11-01') AS "Reporting_date",
-                        CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2022-11-01') - DATE(j."AP_date")
-						ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+                        DATE('2023-08-04') AS "Reporting_date",
+                        CASE WHEN k."ActlDate6" IS NULL
+						THEN DATE('2023-08-04') - DATE(j."AP_date")
+						ELSE DATE('2023-08-04') - (to_date(k."ActlDate6", 'MM/DD/YYYY') + 3)
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -50,11 +50,12 @@ def get_get_open_ap_by_groups_182():
                         ON a."AuditID" = h."GuiIDFld"
 
                     LEFT JOIN (
-                        SELECT "OrigID", count(*) AS open_actplans, min("Sent_to_Itrack") AS "Sent_to_Itrack"
+                        SELECT "OrigID", count(*) AS open_actplans
                         FROM dashboard.actplans
                         WHERE "APADate" IS NULL
                             AND "APStatus" <> '61'
                             AND "Deleted" = '-1'
+                            --AND "Sent_to_Itrack" IS NOT NULL
                         GROUP BY "OrigID"
                         ) i
                         ON a."IDFld" = i."OrigID"
@@ -65,19 +66,23 @@ def get_get_open_ap_by_groups_182():
                             GROUP BY "Iss"
                     ) j
                         ON a."Subject" = j."Iss"
+            
+                    LEFT JOIN dashboard.overview k
+				        ON a."AuditID" = k."IDFld"
                         
                     WHERE i.open_actplans IS NOT NULL
                         AND h."IDFld" <> '2022 Test'
                         AND "Subject" IS NOT NULL
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
-                        AND CASE WHEN i."Sent_to_Itrack" IS NULL
-                            THEN DATE('2022-11-01') - DATE(j."AP_date")
-                            ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-                            END < 182
+                        AND CASE WHEN k."ActlDate6" IS NULL
+                            THEN DATE('2023-08-04') - DATE(j."AP_date")
+                            ELSE DATE('2023-08-04') - to_date(k."ActlDate6", 'MM/DD/YYYY') + 3
+                            END < 183
+                        --AND k."Sent_to_Itrack" IS NOT NULL
                 
             ) z
-                    GROUP BY z.issue_group,
+                    GROUP BY z."ActName",
                         z.issue_risk_level
     '''
 
@@ -91,23 +96,23 @@ def get_get_open_ap_by_groups_365():
     """Открытые планы мероприятий по группам 183-365 дней"""
 
     sql = '''
-        SELECT z.issue_group AS issue_group,
+        SELECT z."ActName" AS actname,
             z.issue_risk_level AS issue_risk_level,
             count(*)
         FROM (
 
             SELECT a.*,
-                        c."Language3" AS issue_group, 
+                        h."ActName",
                         e."Language3" AS issue_type,
                         g."Language3" AS issue_risk_level,
                         h."IDFld",
                         i.open_actplans,
-                        TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY') AS "Sent_to_Itrack",
+                        to_date(k."ActlDate6", 'MM/DD/YYYY') + 3 AS "GD_Approve",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2022-11-01') AS "Reporting_date",
-                        CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2022-11-01') - DATE(j."AP_date")
-						ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+                        DATE('2023-08-04') AS "Reporting_date",
+                        CASE WHEN k."ActlDate6" IS NULL
+						THEN DATE('2023-08-04') - DATE(j."AP_date")
+						ELSE DATE('2023-08-04') - (to_date(k."ActlDate6", 'MM/DD/YYYY') + 3)
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -132,7 +137,7 @@ def get_get_open_ap_by_groups_365():
                         ON a."AuditID" = h."GuiIDFld"
 
                     LEFT JOIN (
-                        SELECT "OrigID", count(*) AS open_actplans, min("Sent_to_Itrack") AS "Sent_to_Itrack"
+                        SELECT "OrigID", count(*) AS open_actplans
                         FROM dashboard.actplans
                         WHERE "APADate" IS NULL
                             AND "APStatus" <> '61'
@@ -147,19 +152,22 @@ def get_get_open_ap_by_groups_365():
                             GROUP BY "Iss"
                     ) j
                         ON a."Subject" = j."Iss"
+            
+                    LEFT JOIN dashboard.overview k
+				        ON a."AuditID" = k."IDFld"
                         
                     WHERE i.open_actplans IS NOT NULL
                         AND h."IDFld" <> '2022 Test'
                         AND "Subject" IS NOT NULL
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
-                        AND CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2022-11-01') - DATE(j."AP_date")
-						ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-						END BETWEEN 183 AND 365
+                        AND CASE WHEN k."ActlDate6" IS NULL
+						    THEN DATE('2023-08-04') - DATE(j."AP_date")
+						    ELSE DATE('2023-08-04') - to_date(k."ActlDate6", 'MM/DD/YYYY') + 3
+						    END BETWEEN 183 AND 365
                 
             ) z
-                    GROUP BY z.issue_group,
+                    GROUP BY z."ActName",
                         z.issue_risk_level
     '''
 
@@ -173,24 +181,24 @@ def get_get_open_ap_by_groups_366():
     """Открытые планы мероприятий по группам более года"""
 
     sql = '''
-        SELECT z.issue_group AS issue_group,
+        SELECT z."ActName" AS actname,
             z.issue_risk_level AS issue_risk_level,
             count(*)
         FROM (
 
             SELECT a.*,
-                        c."Language3" AS issue_group, 
+                        h."ActName", 
                         e."Language3" AS issue_type,
                         g."Language3" AS issue_risk_level,
                         h."IDFld",
                         i.open_actplans,
-                        TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY') AS "Sent_to_Itrack",
+                        to_date(k."ActlDate6", 'MM/DD/YYYY') + 3 AS "GD_Approve",
                         i."Close_date",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2022-11-01') AS "Reporting_date",
-                        CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2022-11-01') - DATE(j."AP_date")
-						ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
+                        DATE('2023-08-04') AS "Reporting_date",
+                        CASE WHEN k."ActlDate6" IS NULL
+						THEN DATE('2023-08-04') - DATE(j."AP_date")
+						ELSE DATE('2023-08-04') - (to_date(k."ActlDate6", 'MM/DD/YYYY') + 3)
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -223,6 +231,7 @@ def get_get_open_ap_by_groups_366():
                         WHERE "APADate" IS NULL
                             AND "APStatus" <> '61'
                             AND "Deleted" = '-1'
+                            AND "Sent_to_Itrack" IS NOT NULL
                         GROUP BY "OrigID"
                         ) i
                         ON a."IDFld" = i."OrigID"
@@ -233,19 +242,23 @@ def get_get_open_ap_by_groups_366():
                             GROUP BY "Iss"
                     ) j
                         ON a."Subject" = j."Iss"
+            
+                    LEFT JOIN dashboard.overview k
+				        ON a."AuditID" = k."IDFld"
                         
                     WHERE i.open_actplans IS NOT NULL
                         AND h."IDFld" <> '2022 Test'
                         AND "Subject" IS NOT NULL
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
-                        AND (CASE WHEN i."Sent_to_Itrack" IS NULL
-						THEN DATE('2022-11-01') - DATE(j."AP_date")
-						ELSE DATE('2022-11-01') - TO_DATE(left(i."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-						END) > 365
+                        AND i."Sent_to_Itrack" IS NOT NULL
+                        AND (CASE WHEN k."ActlDate6" IS NULL
+						    THEN DATE('2023-08-04') - DATE(j."AP_date")
+						    ELSE DATE('2023-08-04') - to_date(k."ActlDate6", 'MM/DD/YYYY') + 3
+						    END) > 365
                 
             ) z
-                    GROUP BY z.issue_group,
+                    GROUP BY z."ActName",
                         z.issue_risk_level
     '''
 
@@ -332,12 +345,13 @@ def get_incoming_ap():
             AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
 							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) < TO_DATE('20220401', 'YYYYMMDD')
+							END) < TO_DATE('20230101', 'YYYYMMDD')
             AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
 							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) IS NOT NULL
-            AND NOT (k."Close_date" < TO_DATE('20220401', 'YYYYMMDD') AND i.open_actplans IS NULL)
+            AND k."Sent_to_Itrack" IS NOT NULL
+            AND NOT (k."Close_date" < TO_DATE('20230101', 'YYYYMMDD') AND i.open_actplans IS NULL)
         ) z
         GROUP BY z.issue_risk_level
     '''
@@ -426,7 +440,7 @@ def get_increase_ap():
 			AND (CASE WHEN j."AP_date" IS NOT NULL
 							THEN j."AP_date"
 							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) >= TO_DATE('20220401', 'YYYYMMDD')
+							END) >= TO_DATE('20230101', 'YYYYMMDD')
         ) z
         GROUP BY z.issue_risk_level
     '''
@@ -483,6 +497,7 @@ def get_decrease_ap():
             WHERE "APADate" IS NULL
                 AND "APStatus" <> '61'
                 AND "Deleted" = '-1'
+                AND "Sent_to_Itrack" IS NOT NULL
             GROUP BY "OrigID"
             ) i
             ON a."IDFld" = i."OrigID"
@@ -513,7 +528,8 @@ def get_decrease_ap():
 							THEN j."AP_date"
 							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) IS NOT NULL
-			AND k."Close_date" >= TO_DATE('20220401', 'YYYYMMDD')
+			AND k."Close_date" >= TO_DATE('20230101', 'YYYYMMDD')
+            AND k."Sent_to_Itrack" IS NOT NULL
         ) z
         GROUP BY z.issue_risk_level
     '''
@@ -573,6 +589,7 @@ def get_outcoming_ap():
             WHERE "APADate" IS NULL
                 AND "APStatus" <> '61'
                 AND "Deleted" = '-1'
+                AND "Sent_to_Itrack" IS NOT NULL
             GROUP BY "OrigID"
             ) i
             ON a."IDFld" = i."OrigID"
@@ -603,6 +620,7 @@ def get_outcoming_ap():
 							THEN j."AP_date"
 							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
 							END) IS NOT NULL
+            AND k."Sent_to_Itrack" IS NOT NULL
         ) z
         GROUP BY z.issue_risk_level
     '''
@@ -709,6 +727,7 @@ def get_delayed_actplans():
         WHERE g."Language3" = 'Высокий'
             AND i.open_actplans IS NOT NULL
             AND j."APREDate" IS NOT NULL
+            AND j."APADate" IS NULL
             AND j."APCmt" IS NOT NULL -- Убрать эту строчку
             '''
 

@@ -3,12 +3,11 @@
 {% block css %}
   <link rel="stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/slidebar_dash.css')}}">
 
-  <link rel="stylesheet" type= "text/css" href= "https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css" /> 
+  <link rel="stylesheet" type= "text/css" href= "https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css"/> 
   <!-- Для работы DataTable -->
   <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
   <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-  <!-- <link rel="stylesheet" type= "text/css" href= "https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css" /> -->
-  
+
   <!-- Для кнопок экспорта в DataTable -->
   <link rel="stylesheet" type= "text/css" href= "https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css" />
   <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
@@ -42,7 +41,7 @@
           <div class="row" style="margin-left: 0; margin-right: 0">
             <a class="navbar-left" href="https://pgk1/mainpage/" style="padding: 5px 5px;">
               <img src="{{ url_for('static', filename='images/logo_pgk.png') }}" height="40px" position="center"></a>
-            <a class="navbar-right" href = "/index" style="padding: 5px 5px; margin-right: 10px; margin-top: 10px; font-size: 13px; color: black" height="40px"> СЕРВИС УВА</a>
+            <a class="navbar-right" href = "/index" style="font-size: 13px; color: black; padding-top: 12px; font-weight: 600; color: rgb(115,0,49);" height="40px"> СЕРВИС УВА</a>
           </div>
         </div>
 
@@ -104,7 +103,7 @@
               <li><a href="/resellers_dash"><i class="fa fa-dashboard"></i>Посредники (дашборд)</a></li>
               {% endif %}
               {% if current_user.check_dash_roles('resellers_commerce') %}  
-              <li><a href="/resellers_dash_commerce"><i class="fa fa-dashboard"></i>Посредники (дашборд) вариант2</a></li>
+              <li><a href="/resellers_dash_commerce"><i class="fa fa-dashboard"></i>Посредники (дашборд)</a></li>
               {% endif %}
               {% if current_user.check_dash_roles('monitoring') %}  
               <li><a href="/monitoring_dash"><i class="fa fa-dashboard"></i>Мониторинг</a></li>
@@ -121,14 +120,17 @@
               {% if current_user.check_dash_roles('nagon') %}
               <li><a href="dashboards/nagon_dash"><i class="fa fa-dashboard"></i>Дашборд по нагону</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('spark_api_count_request') %}
+              <!-- {% if current_user.check_dash_roles('spark_api_count_request') %}
               <li><a href="/spark_api_count_request_dash"><i class="fa fa-dashboard"></i>Кол-во запросов СПАРК</a></li>
+              {% endif %} -->
+              {% if current_user.check_dash_roles('airflow') %}
+              <li><a href="/airflow_dash"><i class="fa fa-dashboard"></i>Мониторинг ресурсов</a></li>
               {% endif %}
               {% if current_user.check_dash_roles('credibility_rating') %}
               <li><a href="/credibility_rating_dash"><i class="fa fa-dashboard"></i>Рейтинг добросовестности клиентов</a></li>
               {% endif %}
               {% if current_user.check_report_roles('admin') %}
-                <li><a href="https://uvapgk.atlassian.net/jira/projects"><i class="fa fa-dashboard"></i>Jira</a></li>
+                <li><a href="https://jira.pgk.ru/projects/CITA/issues"><i class="fa fa-dashboard"></i>Jira</a></li>
               {% endif %}
               {% if current_user.check_report_roles('admin') %}
                 <li><a href="https://gitlab.pgkweb.ru/"><i class="fa fa-dashboard"></i>Gitlab</a></li>

@@ -1,10 +1,32 @@
+/* http://frontendfreecode.com/simple-bootstrap-sidebar-menu */
 body {
-  /* margin-top: 50px; */
+  /* AT Налезало на верхнюю панель */
+  margin-top: 50px;
+
   background-color: #fff;
   font-family: Arial, sans-serif;
   font-size: 14px;
   letter-spacing: 0.01em;
   color: #39464e;
+  
+  /* AT Появляется второй scroll*/
+  height: 100%; 
+  overflow: hidden;
+  /* font-family: Verdana, sans-serif!important; */
+}
+
+/* Позиционирование лейбла УВА на навигационной панели */
+.navbar-right {
+  margin: 5px!important;
+}
+
+.navbar-nav {
+  margin: 0px!important;
+}
+
+.navbar-header {
+  margin-right: 0px!important;
+  margin-left: 0px!important;
 }
 
 .navbar-default {
@@ -34,11 +56,13 @@ body {
   border: none;
   margin-left: 0;
   background-color: inherit;
+  /* AT */
+  margin-bottom: 0px!important;
 }
 .msb .navbar-header {
   width: 100%;
   border-bottom: 1px solid #e7e7e7;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   background: #fff;
 }
 .msb .navbar-nav .panel {

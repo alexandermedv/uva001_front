@@ -12,7 +12,7 @@ import dash
 from ..pages import dash_app
 from ..utils import get_get_open_ap_by_groups_182, get_get_open_ap_by_groups_365, get_get_open_ap_by_groups_366
 from ..utils import get_incoming_ap, get_increase_ap, get_decrease_ap, get_outcoming_ap, get_high_ap_issues
-from ..utils import get_manual_table1, get_manual_table2, get_manual_table3, get_delayed_actplans
+from ..utils import get_manual_table1, get_manual_table2, get_manual_table3, get_actplans
 
 
 # Построение содержимого выбранной закладки
@@ -27,6 +27,7 @@ def render_content():
     x1_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
     x1_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
     y1_data = df1['actname'][df1['issue_risk_level']=='Низкий'].tolist()
+    
     x1_text_bold = []
     for item in x1_text:
         x1_text_bold.append('<b>' + item + '</b>')
@@ -156,7 +157,8 @@ def render_content():
 
     high_ap = get_high_ap_issues()
 
-    delayed_actplans = get_delayed_actplans()
+    df_actplans = get_actplans()
+    print(df_actplans.columns)
     manual_table2 = get_manual_table2()
     manual_table3 = get_manual_table3()
 
@@ -419,7 +421,7 @@ def render_content():
                                                     "r": 50,
                                                     "t": 50,
                                                     "b": 20,
-                                                    "l": 150,
+                                                    "l": 250,
                                 },
                                 showlegend=False,
                             ),
@@ -650,7 +652,7 @@ def render_content():
                 # Ручные таблицы
                 html.Br(),
                 dbc.Row(),
-                html.H6('''Недостатки с высоким риском и перенесенным сроком выполнения мероприятий''',
+                html.H6('''Список недостатков''',
                     style={'text-align':'center',
                             'font-size': '16pt',
                             'font-weight': 'bold'}),
@@ -658,28 +660,46 @@ def render_content():
                 dash_table.DataTable(
                     # https://dash.plotly.com/datatable/width
                     id='manual_table1',
-                    columns=[{"name": i, "id": i} for i in delayed_actplans.columns],
-                    data=delayed_actplans.to_dict('records'),
+                    columns=[{"name": i, "id": i} for i in df_actplans.columns],
+                    data=df_actplans.to_dict('records'),
                     page_size=20,
                     style_table={'overflowX': 'auto'},
                     style_cell={
                         # all three widths are needed
-                        'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+                        'minWidth': '180px', 
+                        # 'width': '180px', 
+                        'maxWidth': '18000px',
                         'overflow': 'hidden',
                         'textOverflow': 'ellipsis',
                         'textAlign': 'left',
                     },
                     style_cell_conditional=[
-                        {'if': {'column_id': "Описание недостатка"},
-                        'width': '20%'},
-                        {'if': {'column_id': "Мероприятие"},
-                        'width': '20%'},
-                        {'if': {'column_id': "Первоначальная дата окончания"},
+                        {'if': {'column_id': 'Название аудита'},
+                        'width': '35%'},
+                        {'if': {'column_id': 'Мероприятие'},
+                        'width': '85%'},
+                        {'if': {'column_id': 'Описание недостатка (кратк)'},
                         'width': '5%'},
-                        {'if': {'column_id': "Пересмотренная дата окончания"},
+                        {'if': {'column_id': 'Описание недостатка (детальн)'},
+                        'width': '1580'},
+                        {'if': {'column_id': "Уровень критичности недостатка"},
                         'width': '5%'},
-                        {'if': {'column_id': "Комментарий"},
-                        'width': '50%'},
+                        {'if': {'column_id': "Рекомендации"},
+                        'width': '40%'},
+                        {'if': {'column_id': "Комментарии"},
+                        'width': '10%'},
+                        {'if': {'column_id': "Отв аудитор"},
+                        'width': '5%'},
+                        {'if': {'column_id': "Координатор от бизнес-подразделения"},
+                        'width': '5%'},
+                        {'if': {'column_id': "Ожидаемая дата выполнения"},
+                        'width': '10%'},
+                        {'if': {'column_id': "Пересмотренная дата выполнения"},
+                        'width': '10%'},
+                        {'if': {'column_id': "ЗГД"},
+                        'width': '10%'},
+                        {'if': {'column_id': "История комментариев"},
+                        'width': '10%'},
                     ],
                     export_format='xlsx',
                     export_headers='display',

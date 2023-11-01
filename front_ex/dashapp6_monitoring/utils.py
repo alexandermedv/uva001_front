@@ -251,7 +251,7 @@ def get_get_open_ap_by_groups_366():
                         AND "Subject" IS NOT NULL
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
-                        AND i."Sent_to_Itrack" IS NOT NULL
+                        --AND i."Sent_to_Itrack" IS NOT NULL
                         AND (CASE WHEN k."ActlDate6" IS NULL
 						    THEN DATE('2023-08-04') - DATE(j."AP_date")
 						    ELSE DATE('2023-08-04') - to_date(k."ActlDate6", 'MM/DD/YYYY') + 3
@@ -275,84 +275,88 @@ def get_incoming_ap():
         SELECT z.issue_risk_level,
             count(*)
         FROM (
-       SELECT a.*,
-            c."Language3" AS issue_group, 
-            e."Language3" AS issue_type,
-            g."Language3" AS issue_risk_level,
-            h."IDFld",
-            i.open_actplans,
-            (CASE WHEN j."AP_date" IS NOT NULL
-							THEN j."AP_date"
-							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) AS "Sent_to_Itrack",
-            k."Close_date"
-        FROM dashboard.issues a
-        LEFT JOIN dashboard.udfvalue b
-            ON a."FindGroup" = b."UDFValueID"
-        LEFT JOIN dashboard.languageaa c
-            ON b."LanguageID"::text = c."IDFld"::text
-                AND c."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.udfvalue d
-            ON a."FindType" = d."UDFValueID"
-        LEFT JOIN dashboard.languageaa e
-            ON d."LanguageID"::text = e."IDFld"::text
-                AND e."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.udfvalue f
-            ON a."FindRisk" = f."UDFValueID"
-        LEFT JOIN dashboard.languageaa g
-            ON f."LanguageID"::text = g."IDFld"::text
-                AND g."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.activities h
-            ON a."AuditID" = h."GuiIDFld"
+        SELECT a.*,
+                c."Language3" AS issue_group, 
+                e."Language3" AS issue_type,
+                g."Language3" AS issue_risk_level,
+                h."IDFld",
+                i.open_actplans,
+                (CASE WHEN j."AP_date" IS NOT NULL
+                                THEN j."AP_date"
+                                ELSE TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY')
+                                END) AS "ActlDate6",
+                k."Close_date"
+            FROM dashboard.issues a
+            LEFT JOIN dashboard.udfvalue b
+                ON a."FindGroup" = b."UDFValueID"
+            LEFT JOIN dashboard.languageaa c
+                ON b."LanguageID"::text = c."IDFld"::text
+                    AND c."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.udfvalue d
+                ON a."FindType" = d."UDFValueID"
+            LEFT JOIN dashboard.languageaa e
+                ON d."LanguageID"::text = e."IDFld"::text
+                    AND e."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.udfvalue f
+                ON a."FindRisk" = f."UDFValueID"
+            LEFT JOIN dashboard.languageaa g
+                ON f."LanguageID"::text = g."IDFld"::text
+                    AND g."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.activities h
+                ON a."AuditID" = h."GuiIDFld"
 
-        LEFT JOIN (
-            SELECT "OrigID", 
-                count(*) AS open_actplans, 
-                min("Sent_to_Itrack") AS "Sent_to_Itrack",
-                max(TO_DATE(LEFT("APADate", 10), 'DD/MM/YYYY')) AS "Close_date"
-            FROM dashboard.actplans
-            WHERE "APADate" IS NULL
-                AND "APStatus" <> '61'
-                AND "Deleted" = '-1'
-            GROUP BY "OrigID"
-            ) i
-            ON a."IDFld" = i."OrigID"
+            LEFT JOIN (
+                SELECT "OrigID", 
+                    count(*) AS open_actplans, 
+                    min(bb."ActlDate6") AS "ActlDate6",
+                    max(TO_DATE(LEFT("APADate", 10), 'DD/MM/YYYY')) AS "Close_date"
+                FROM dashboard.actplans aa
+                LEFT JOIN dashboard.overview bb
+                            ON aa."AuditID" = bb."IDFld"
+                WHERE "APADate" IS NULL
+                    AND "APStatus" <> '61'
+                    AND aa."Deleted" = '-1'
+                GROUP BY "OrigID"
+                ) i
+                ON a."IDFld" = i."OrigID"
 
-        LEFT JOIN (
-							SELECT "Iss", min("AP_date") AS "AP_date"
-								FROM dashboard.ap_dates
-								GROUP BY "Iss"
-						) j
-							ON a."Subject" = j."Iss"
+            LEFT JOIN (
+                                SELECT "Iss", min("AP_date") AS "AP_date"
+                                    FROM dashboard.ap_dates
+                                    GROUP BY "Iss"
+                            ) j
+                                ON a."Subject" = j."Iss"
 
-        LEFT JOIN (
-			SELECT "OrigID",
-            min("Sent_to_Itrack") AS "Sent_to_Itrack",
-			max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
-			FROM dashboard.actplans
-            WHERE "Deleted" = '-1'
-            GROUP BY "OrigID"
-            ) k
-			ON a."IDFld" = k."OrigID"
-            
-        WHERE h."IDFld" <> '2022 Test'
-			AND "Subject" IS NOT NULL
-            AND a."Deleted" = '-1'
-			AND a."Dispos" = '52'
-            AND (CASE WHEN j."AP_date" IS NOT NULL
-							THEN j."AP_date"
-							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) < TO_DATE('20230101', 'YYYYMMDD')
-            AND (CASE WHEN j."AP_date" IS NOT NULL
-							THEN j."AP_date"
-							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) IS NOT NULL
-            AND k."Sent_to_Itrack" IS NOT NULL
-            AND NOT (k."Close_date" < TO_DATE('20230101', 'YYYYMMDD') AND i.open_actplans IS NULL)
-        ) z
+            LEFT JOIN (
+                SELECT "OrigID",
+                min(bb."ActlDate6") AS "ActlDate6",
+                max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
+                FROM dashboard.actplans aa
+                LEFT JOIN dashboard.overview bb
+                            ON aa."AuditID" = bb."IDFld"
+                WHERE aa."Deleted" = '-1'
+                GROUP BY "OrigID"
+                ) k
+                ON a."IDFld" = k."OrigID"
+                
+            WHERE h."IDFld" <> '2022 Test'
+                AND "Subject" IS NOT NULL
+                AND a."Deleted" = '-1'
+                AND a."Dispos" = '52'
+                AND (CASE WHEN j."AP_date" IS NOT NULL
+                                THEN j."AP_date"
+                                ELSE TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY')
+                                END) < TO_DATE('20230101', 'YYYYMMDD')
+                AND (CASE WHEN j."AP_date" IS NOT NULL
+                                THEN j."AP_date"
+                                ELSE TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY')
+                                END) IS NOT NULL
+                AND k."ActlDate6" IS NOT NULL
+                AND NOT (k."Close_date" < TO_DATE('20230101', 'YYYYMMDD') AND i.open_actplans IS NULL)
+            ) z
         GROUP BY z.issue_risk_level
     '''
 
@@ -369,79 +373,84 @@ def get_increase_ap():
         SELECT z.issue_risk_level,
             count(*)
         FROM (
-        SELECT a.*,
-            c."Language3" AS issue_group, 
-            e."Language3" AS issue_type,
-            g."Language3" AS issue_risk_level,
-            h."IDFld",
-            i.open_actplans,
-			(CASE WHEN j."AP_date" IS NOT NULL
-							THEN j."AP_date"
-							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) AS "Sent_to_Itrack",
-            k."Close_date"
-        FROM dashboard.issues a
-        LEFT JOIN dashboard.udfvalue b
-            ON a."FindGroup" = b."UDFValueID"
-        LEFT JOIN dashboard.languageaa c
-            ON b."LanguageID"::text = c."IDFld"::text
-                AND c."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.udfvalue d
-            ON a."FindType" = d."UDFValueID"
-        LEFT JOIN dashboard.languageaa e
-            ON d."LanguageID"::text = e."IDFld"::text
-                AND e."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.udfvalue f
-            ON a."FindRisk" = f."UDFValueID"
-        LEFT JOIN dashboard.languageaa g
-            ON f."LanguageID"::text = g."IDFld"::text
-                AND g."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.activities h
-            ON a."AuditID" = h."GuiIDFld"
+            SELECT a.*,
+                c."Language3" AS issue_group, 
+                e."Language3" AS issue_type,
+                g."Language3" AS issue_risk_level,
+                h."IDFld",
+                i.open_actplans,
+                (CASE WHEN j."AP_date" IS NOT NULL
+                                THEN j."AP_date"
+                                ELSE TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY')
+                                END) AS "ActlDate6",
+                k."Close_date"
+            FROM dashboard.issues a
+            LEFT JOIN dashboard.udfvalue b
+                ON a."FindGroup" = b."UDFValueID"
+            LEFT JOIN dashboard.languageaa c
+                ON b."LanguageID"::text = c."IDFld"::text
+                    AND c."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.udfvalue d
+                ON a."FindType" = d."UDFValueID"
+            LEFT JOIN dashboard.languageaa e
+                ON d."LanguageID"::text = e."IDFld"::text
+                    AND e."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.udfvalue f
+                ON a."FindRisk" = f."UDFValueID"
+            LEFT JOIN dashboard.languageaa g
+                ON f."LanguageID"::text = g."IDFld"::text
+                    AND g."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.activities h
+                ON a."AuditID" = h."GuiIDFld"
 
-        LEFT JOIN (
-            SELECT "OrigID", count(*) AS open_actplans, min("Sent_to_Itrack") AS "Sent_to_Itrack"
-            FROM dashboard.actplans
-            WHERE "APADate" IS NULL
-                AND "APStatus" <> '61'
-                AND "Deleted" = '-1'
-            GROUP BY "OrigID"
-            ) i
-            ON a."IDFld" = i."OrigID"
-        
-        LEFT JOIN (
-							SELECT "Iss", min("AP_date") AS "AP_date"
-								FROM dashboard.ap_dates
-								GROUP BY "Iss"
-						) j
-							ON a."Subject" = j."Iss"
-							
-		LEFT JOIN (
-			SELECT "OrigID",
-            min("Sent_to_Itrack") AS "Sent_to_Itrack",
-			max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
-			FROM dashboard.actplans
-            WHERE "Deleted" = '-1'
-            GROUP BY "OrigID"
-            ) k
-			ON a."IDFld" = k."OrigID"
+            LEFT JOIN (
+                SELECT "OrigID", count(*) AS open_actplans, 
+                    min(bb."ActlDate6") AS "ActlDate6"
+                FROM dashboard.actplans aa
+                LEFT JOIN dashboard.overview bb
+                    ON aa."AuditID" = bb."IDFld"
+                WHERE "APADate" IS NULL
+                    AND "APStatus" <> '61'
+                    AND aa."Deleted" = '-1'
+                GROUP BY "OrigID"
+                ) i
+                ON a."IDFld" = i."OrigID"
             
-        WHERE h."IDFld" <> '2022 Test'
-			AND "Subject" IS NOT NULL
-            AND a."Deleted" = '-1'
-			AND a."Dispos" = '52'
-            AND (CASE WHEN j."AP_date" IS NOT NULL
-							THEN j."AP_date"
-							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) IS NOT NULL
-			AND (CASE WHEN j."AP_date" IS NOT NULL
-							THEN j."AP_date"
-							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) >= TO_DATE('20230101', 'YYYYMMDD')
-        ) z
+            LEFT JOIN (
+                                SELECT "Iss", min("AP_date") AS "AP_date"
+                                    FROM dashboard.ap_dates
+                                    GROUP BY "Iss"
+                            ) j
+                                ON a."Subject" = j."Iss"
+                                
+            LEFT JOIN (
+                SELECT "OrigID",
+                min(bb."ActlDate6") AS "ActlDate6",
+                max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
+                FROM dashboard.actplans aa
+                LEFT JOIN dashboard.overview bb
+                    ON aa."AuditID" = bb."IDFld"
+                WHERE aa."Deleted" = '-1'
+                GROUP BY "OrigID"
+                ) k
+                ON a."IDFld" = k."OrigID"
+                
+            WHERE h."IDFld" <> '2022 Test'
+                AND "Subject" IS NOT NULL
+                AND a."Deleted" = '-1'
+                AND a."Dispos" = '52'
+                AND (CASE WHEN j."AP_date" IS NOT NULL
+                                THEN j."AP_date"
+                                ELSE TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY')
+                                END) IS NOT NULL
+                AND (CASE WHEN j."AP_date" IS NOT NULL
+                                THEN j."AP_date"
+                                ELSE TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY')
+                                END) >= TO_DATE('20230101', 'YYYYMMDD')
+            ) z
         GROUP BY z.issue_risk_level
     '''
 
@@ -458,79 +467,84 @@ def get_decrease_ap():
         SELECT z.issue_risk_level,
             count(*)
         FROM (
-        SELECT a.*,
-            c."Language3" AS issue_group, 
-            e."Language3" AS issue_type,
-            g."Language3" AS issue_risk_level,
-            h."IDFld",
-            i.open_actplans,
-			(CASE WHEN j."AP_date" IS NOT NULL
-							THEN j."AP_date"
-							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) AS "Sent_to_Itrack",
-            k."Close_date"
-        FROM dashboard.issues a
-        LEFT JOIN dashboard.udfvalue b
-            ON a."FindGroup" = b."UDFValueID"
-        LEFT JOIN dashboard.languageaa c
-            ON b."LanguageID"::text = c."IDFld"::text
-                AND c."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.udfvalue d
-            ON a."FindType" = d."UDFValueID"
-        LEFT JOIN dashboard.languageaa e
-            ON d."LanguageID"::text = e."IDFld"::text
-                AND e."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.udfvalue f
-            ON a."FindRisk" = f."UDFValueID"
-        LEFT JOIN dashboard.languageaa g
-            ON f."LanguageID"::text = g."IDFld"::text
-                AND g."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.activities h
-            ON a."AuditID" = h."GuiIDFld"
+            SELECT a.*,
+                c."Language3" AS issue_group, 
+                e."Language3" AS issue_type,
+                g."Language3" AS issue_risk_level,
+                h."IDFld",
+                i.open_actplans,
+                (CASE WHEN j."AP_date" IS NOT NULL
+                                THEN j."AP_date"
+                                ELSE TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY')
+                                END) AS "ActlDate6",
+                k."Close_date"
+            FROM dashboard.issues a
+            LEFT JOIN dashboard.udfvalue b
+                ON a."FindGroup" = b."UDFValueID"
+            LEFT JOIN dashboard.languageaa c
+                ON b."LanguageID"::text = c."IDFld"::text
+                    AND c."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.udfvalue d
+                ON a."FindType" = d."UDFValueID"
+            LEFT JOIN dashboard.languageaa e
+                ON d."LanguageID"::text = e."IDFld"::text
+                    AND e."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.udfvalue f
+                ON a."FindRisk" = f."UDFValueID"
+            LEFT JOIN dashboard.languageaa g
+                ON f."LanguageID"::text = g."IDFld"::text
+                    AND g."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.activities h
+                ON a."AuditID" = h."GuiIDFld"
 
-        LEFT JOIN (
-            SELECT "OrigID", count(*) AS open_actplans, min("Sent_to_Itrack") AS "Sent_to_Itrack"
-            FROM dashboard.actplans
-            WHERE "APADate" IS NULL
-                AND "APStatus" <> '61'
-                AND "Deleted" = '-1'
-                AND "Sent_to_Itrack" IS NOT NULL
-            GROUP BY "OrigID"
-            ) i
-            ON a."IDFld" = i."OrigID"
-        
-        LEFT JOIN (
-							SELECT "Iss", min("AP_date") AS "AP_date"
-								FROM dashboard.ap_dates
-								GROUP BY "Iss"
-						) j
-							ON a."Subject" = j."Iss"
-							
-		LEFT JOIN (
-			SELECT "OrigID",
-            min("Sent_to_Itrack") AS "Sent_to_Itrack",
-			max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
-			FROM dashboard.actplans
-            WHERE "Deleted" = '-1'
-            GROUP BY "OrigID"
-            ) k
-			ON a."IDFld" = k."OrigID"
+            LEFT JOIN (
+                SELECT "OrigID", count(*) AS open_actplans, 
+                    min(bb."ActlDate6") AS "ActlDate6"
+                FROM dashboard.actplans aa
+                LEFT JOIN dashboard.overview bb
+                    ON aa."AuditID" = bb."IDFld"
+                WHERE "APADate" IS NULL
+                    AND "APStatus" <> '61'
+                    AND aa."Deleted" = '-1'
+                    AND "ActlDate6" IS NOT NULL
+                GROUP BY "OrigID"
+                ) i
+                ON a."IDFld" = i."OrigID"
             
-        WHERE h."IDFld" <> '2022 Test'
-			AND "Subject" IS NOT NULL
-            AND i.open_actplans IS NULL
-            AND a."Deleted" = '-1'
-			AND a."Dispos" = '52'
-            AND (CASE WHEN j."AP_date" IS NOT NULL
-							THEN j."AP_date"
-							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) IS NOT NULL
-			AND k."Close_date" >= TO_DATE('20230101', 'YYYYMMDD')
-            AND k."Sent_to_Itrack" IS NOT NULL
-        ) z
+            LEFT JOIN (
+                                SELECT "Iss", min("AP_date") AS "AP_date"
+                                    FROM dashboard.ap_dates
+                                    GROUP BY "Iss"
+                            ) j
+                                ON a."Subject" = j."Iss"
+                                
+            LEFT JOIN (
+                SELECT "OrigID",
+                min(bb."ActlDate6") AS "ActlDate6",
+                max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
+                FROM dashboard.actplans aa
+                LEFT JOIN dashboard.overview bb
+                    ON aa."AuditID" = bb."IDFld"
+                WHERE aa."Deleted" = '-1'
+                GROUP BY "OrigID"
+                ) k
+                ON a."IDFld" = k."OrigID"
+                
+            WHERE h."IDFld" <> '2022 Test'
+                AND "Subject" IS NOT NULL
+                AND i.open_actplans IS NULL
+                AND a."Deleted" = '-1'
+                AND a."Dispos" = '52'
+                AND (CASE WHEN j."AP_date" IS NOT NULL
+                                THEN j."AP_date"
+                                ELSE TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY')
+                                END) IS NOT NULL
+                AND k."Close_date" >= TO_DATE('20230101', 'YYYYMMDD')
+                AND k."ActlDate6" IS NOT NULL
+            ) z
         GROUP BY z.issue_risk_level
     '''
 
@@ -547,81 +561,85 @@ def get_outcoming_ap():
         SELECT z.issue_risk_level,
             count(*)
         FROM (
-        SELECT a.*,
-            c."Language3" AS issue_group, 
-            e."Language3" AS issue_type,
-            g."Language3" AS issue_risk_level,
-            h."IDFld",
-            i.open_actplans,
-            (CASE WHEN j."AP_date" IS NOT NULL
-							THEN j."AP_date"
-							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) AS "Sent_to_Itrack",
-            k."Close_date"
-        FROM dashboard.issues a
-        LEFT JOIN dashboard.udfvalue b
-            ON a."FindGroup" = b."UDFValueID"
-        LEFT JOIN dashboard.languageaa c
-            ON b."LanguageID"::text = c."IDFld"::text
-                AND c."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.udfvalue d
-            ON a."FindType" = d."UDFValueID"
-        LEFT JOIN dashboard.languageaa e
-            ON d."LanguageID"::text = e."IDFld"::text
-                AND e."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.udfvalue f
-            ON a."FindRisk" = f."UDFValueID"
-        LEFT JOIN dashboard.languageaa g
-            ON f."LanguageID"::text = g."IDFld"::text
-                AND g."Description" = 'UDF'
-                
-        LEFT JOIN dashboard.activities h
-            ON a."AuditID" = h."GuiIDFld"
+            SELECT a.*,
+                c."Language3" AS issue_group, 
+                e."Language3" AS issue_type,
+                g."Language3" AS issue_risk_level,
+                h."IDFld",
+                i.open_actplans,
+                (CASE WHEN j."AP_date" IS NOT NULL
+                                THEN j."AP_date"
+                                ELSE TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY')
+                                END) AS "ActlDate6",
+                k."Close_date"
+            FROM dashboard.issues a
+            LEFT JOIN dashboard.udfvalue b
+                ON a."FindGroup" = b."UDFValueID"
+            LEFT JOIN dashboard.languageaa c
+                ON b."LanguageID"::text = c."IDFld"::text
+                    AND c."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.udfvalue d
+                ON a."FindType" = d."UDFValueID"
+            LEFT JOIN dashboard.languageaa e
+                ON d."LanguageID"::text = e."IDFld"::text
+                    AND e."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.udfvalue f
+                ON a."FindRisk" = f."UDFValueID"
+            LEFT JOIN dashboard.languageaa g
+                ON f."LanguageID"::text = g."IDFld"::text
+                    AND g."Description" = 'UDF'
+                    
+            LEFT JOIN dashboard.activities h
+                ON a."AuditID" = h."GuiIDFld"
 
-        LEFT JOIN (
-            SELECT "OrigID", 
-                count(*) AS open_actplans, 
-                min("Sent_to_Itrack") AS "Sent_to_Itrack",
-                max(TO_DATE(LEFT("APADate", 10), 'DD/MM/YYYY')) AS "Close_date"
-            FROM dashboard.actplans
-            WHERE "APADate" IS NULL
-                AND "APStatus" <> '61'
-                AND "Deleted" = '-1'
-                AND "Sent_to_Itrack" IS NOT NULL
-            GROUP BY "OrigID"
-            ) i
-            ON a."IDFld" = i."OrigID"
+            LEFT JOIN (
+                SELECT "OrigID", 
+                    count(*) AS open_actplans, 
+                    min(bb."ActlDate6") AS "ActlDate6",
+                    max(TO_DATE(LEFT("APADate", 10), 'DD/MM/YYYY')) AS "Close_date"
+                FROM dashboard.actplans aa
+                LEFT JOIN dashboard.overview bb
+                    ON aa."AuditID" = bb."IDFld"
+                WHERE "APADate" IS NULL
+                    AND "APStatus" <> '61'
+                    AND aa."Deleted" = '-1'
+                    AND bb."ActlDate6" IS NOT NULL
+                GROUP BY "OrigID"
+                ) i
+                ON a."IDFld" = i."OrigID"
 
-        LEFT JOIN (
-							SELECT "Iss", min("AP_date") AS "AP_date"
-								FROM dashboard.ap_dates
-								GROUP BY "Iss"
-						) j
-							ON a."Subject" = j."Iss"
+            LEFT JOIN (
+                                SELECT "Iss", min("AP_date") AS "AP_date"
+                                    FROM dashboard.ap_dates
+                                    GROUP BY "Iss"
+                            ) j
+                                ON a."Subject" = j."Iss"
 
-        LEFT JOIN (
-			SELECT "OrigID",
-            min("Sent_to_Itrack") AS "Sent_to_Itrack",
-			max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
-			FROM dashboard.actplans
-            WHERE "Deleted" = '-1'
-            GROUP BY "OrigID"
-            ) k
-			ON a."IDFld" = k."OrigID"
-            
-        WHERE h."IDFld" <> '2022 Test'
-			AND "Subject" IS NOT NULL
-            AND a."Deleted" = '-1'
-			AND a."Dispos" = '52'
-            AND i.open_actplans IS NOT NULL
-            AND (CASE WHEN j."AP_date" IS NOT NULL
-							THEN j."AP_date"
-							ELSE TO_DATE(left(k."Sent_to_Itrack", 10), 'MM/DD/YYYY')
-							END) IS NOT NULL
-            AND k."Sent_to_Itrack" IS NOT NULL
-        ) z
+            LEFT JOIN (
+                SELECT "OrigID",
+                min(bb."ActlDate6") AS "ActlDate6",
+                max(TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY')) AS "Close_date"
+                FROM dashboard.actplans aa
+                LEFT JOIN dashboard.overview bb
+                    ON aa."AuditID" = bb."IDFld"
+                WHERE aa."Deleted" = '-1'
+                GROUP BY "OrigID"
+                ) k
+                ON a."IDFld" = k."OrigID"
+                
+            WHERE h."IDFld" <> '2022 Test'
+                AND "Subject" IS NOT NULL
+                AND a."Deleted" = '-1'
+                AND a."Dispos" = '52'
+                AND i.open_actplans IS NOT NULL
+                AND (CASE WHEN j."AP_date" IS NOT NULL
+                                THEN j."AP_date"
+                                ELSE TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY')
+                                END) IS NOT NULL
+                AND k."ActlDate6" IS NOT NULL
+            ) z
         GROUP BY z.issue_risk_level
     '''
 
@@ -675,6 +693,37 @@ def get_high_ap_issues():
                         AND i."Language3" = 'Высокий'
                         AND a."open_actplans" IS NOT NULL
     '''
+
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    df1 = pd.read_sql(sql, con)
+
+    return df1
+
+
+def get_actplans():
+    """Планы мероприятий для таблицы"""
+
+    sql = '''
+        SELECT 
+            "ActName" AS "Название аудита",
+            "Subject" AS "Мероприятие",
+            "Finding" AS "Описание недостатка (кратк)",
+            "Background" AS "Описание недостатка (детальн)",
+            "issue_risk_level" AS "Уровень критичности недостатка",
+            "Recom" AS "Рекомендации",
+            "Mresp" AS "Комментарии",
+            "Creator" AS "Отв аудитор",
+            "employee" AS "Координатор от бизнес-подразделения", 
+            "APEDate" AS "Ожидаемая дата выполнения",
+            "APREDate" AS "Пересмотренная дата выполнения",
+            "reviewer" AS "ЗГД",
+            "APCmtHst" AS "История комментариев"
+        FROM dashboard.issues_actplans
+        WHERE 
+            "APADate" IS NULL
+            AND "APStatus" <> '61'
+            AND "Deleted" = '-1'
+            '''
 
     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     df1 = pd.read_sql(sql, con)
@@ -789,6 +838,18 @@ def get_manual_table3():
     df1 = pd.read_sql(sql, con)
 
     return df1
+
+
+# Максимальная дата в выгрузке
+def get_max_date():
+    """Максимальная дата в выгрузке"""
+    sql = '''
+    SELECT MAX(TO_DATE("Дата ввода", 'YYYYMMDD'))
+    FROM dashboard.osv_94
+    '''
+    # return engine_cons.execute(sql).fetchone()[0]
+    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    return con.execute(sql).fetchone()[0]
 
 
 # def get_ap_issues():

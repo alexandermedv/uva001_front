@@ -43,7 +43,7 @@ def render_dashapp14():
 @app.route('/credibility_rating_dash/')
 @login_required
 @logger(os.environ['USER_ACTIONS_FILE'])
-def render_dashapp15():
+def render_dashapp_credibility_rating():
     """Рейтинг добросовестности клиентов"""
     return render_template('/dashapp15_credibility_rating/overview.html')
 

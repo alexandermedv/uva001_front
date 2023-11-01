@@ -126,6 +126,9 @@
               {% if current_user.check_dash_roles('airflow') %}
               <li><a href="/airflow_dash"><i class="fa fa-dashboard"></i>Мониторинг ресурсов</a></li>
               {% endif %}
+              {% if current_user.check_dash_roles('credibility_rating') %}
+              <li><a href="/credibility_rating_dash"><i class="fa fa-dashboard"></i>Рейтинг добросовестности клиентов</a></li>
+              {% endif %}
               {% if current_user.check_report_roles('admin') %}
                 <li><a href="https://jira.pgk.ru/projects/CITA/issues"><i class="fa fa-dashboard"></i>Jira</a></li>
               {% endif %}

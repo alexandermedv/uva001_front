@@ -9,4 +9,5 @@ from front_ex import dispatch_app, app
 
 if (__name__ == '__main__'):
     app.wsgi_app = dispatch_app
-    app.run('172.17.0.135', '7114')
+    app.run('0.0.0.0', debug=True)
+    #app.run('172.17.0.135', '7114')

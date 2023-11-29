@@ -199,47 +199,7 @@ def create_layout():
     # engine_cons = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
     layout = html.Div([
         html.Div([
-            # Row 1 - Фильтры отчета   
-            dbc.Row(
-                dbc.Navbar(
-                [
-                    html.Div('Начало периода:', 
-                        style={'width': '15%', 
-                        'display': 'inline-block', 'marginBottom': 15, 'margin-left': 30,'marginTop': 25,
-                        'color': '#7E0046'}
-                    ),
-                    dcc.DatePickerSingle(
-                        clearable=True,
-                        id='filtr_str_date',
-                        date=min_date,
-                        min_date_allowed=min_date,
-                        max_date_allowed=max_date,
-                        initial_visible_month=min_date,
-                        number_of_months_shown = 3,
-                        display_format='DD.MM.YYYY',
-                        style={'width': '20%', 'display': 'inline-block'}
-                    ),
-                    html.Div('Конец периода:', 
-                        style={'width': '15%', 'display': 'inline-block', 'color': '#7E0046'}
-                    ),
-                    dcc.DatePickerSingle(
-                        clearable=True,
-                        id='filtr_end_date',
-                        date=max_date,
-                        min_date_allowed=min_date,
-                        max_date_allowed=max_date,
-                        initial_visible_month=min_date,
-                        number_of_months_shown = 3,
-                        display_format='DD.MM.YYYY',
-                        style={'width': '20%', 'display': 'inline-block'}
-                    ),
-                    html.Button('Выбрать', id='submit-val', n_clicks=0,
-                        style={'width': '15%',  'background-color': 'white', 'display': 'inline-block', 'color':'#7E0046',})
-                ], style={'background-image': 'linear-gradient(to bottom right, #D3D3D3, #A9A9A9)'}
-                ), 
-            style={'margin-bottom': '16px'}
-            ),
-            # Row 3 - Табличка
+            # Row 1 - Табличка
             dbc.Row([
                 #html.Strong('''Рейтинг: '''),
                 html.Article('''В таблице собраны данные из разных источников.
@@ -255,14 +215,14 @@ def create_layout():
                     columns=[
                         {'name': 'Клиент', 'id': 'Клиент', 'type': 'text'},
                         {'name': 'Наименование клиента', 'id': 'Наименование клиента', 'type': 'text'},
-                        {'name': 'Холдинг клиента', 'id': 'Холдинг клиента', 'type': 'text'},
+                        #{'name': 'Холдинг клиента', 'id': 'Холдинг клиента', 'type': 'text'},
                         {'name': 'ДО: Доходность 2023', 'id': 'ДО: Доходность', 'type': 'numeric', 'format': Format(scheme=Scheme.decimal_integer, group=Group.yes, groups=3, precision=2, group_delimiter=' ')},
                         {'name': 'СХ: Доходность 2023', 'id': 'СХ: Доходность', 'type': 'numeric', 'format': Format(scheme=Scheme.decimal_integer, group=Group.yes, groups=3, precision=2, group_delimiter=' ')},
-                        {'name': 'Доля посредничества ⭐', 'id': 'Доля посредничества', 'type':'numeric', 'format': Format(scheme=Scheme.percentage, precision=0)},
+                        {'name': 'Доля посредничества', 'id': 'Доля посредничества', 'type':'numeric', 'format': Format(scheme=Scheme.percentage, precision=0)},
                         # {'name': 'Случаев просрочки ДЗ', 'id': 'Случаев просрочки ДЗ', 'type': 'numeric', 'format': Format(scheme=Scheme.decimal_integer, group=Group.yes, groups=3, precision=2, group_delimiter=' ')},
                         # {'name': 'Дней просрочки ДЗ', 'id': 'Дней просрочки ДЗ', 'type': 'numeric', 'format': Format(scheme=Scheme.decimal_integer, group=Group.yes, groups=3, precision=2, group_delimiter=' ')},
                         # {'name': 'Сумма просрочки', 'id': 'Сумма просрочки', 'type': 'numeric', 'format': Format(scheme=Scheme.decimal_integer, group=Group.yes, groups=3, precision=2, group_delimiter=' ')},
-                        {'name': 'Изменение доли основного груза 🚚', 'id': 'Изменение доли основного груза', 'type': 'numeric',  'format': Format(scheme=Scheme.percentage, precision=0)},
+                        # {'name': 'Изменение доли основного груза 🚚', 'id': 'Изменение доли основного груза', 'type': 'numeric',  'format': Format(scheme=Scheme.percentage, precision=0)},
                         {'name': 'Разных грузов у клиента', 'id': 'Разных грузов у клиента', 'type': 'numeric'},
                         {'name': 'Флаги', 'id': 'Флаги', 'type': 'text'},
                     ],
@@ -277,7 +237,7 @@ def create_layout():
                         {
                             'if': {'column_id': c},
                             'textAlign': 'left'
-                        } for c in ['Наименование клиента', 'Холдинг клиента'] #'Клиент', 
+                        } for c in ['Наименование клиента'] #'Клиент', , 'Холдинг клиента'
                     ],
                     style_header={
                         'backgroundColor': 'rgb(230, 230, 230)',
@@ -290,15 +250,6 @@ def create_layout():
                         'fontSize': 11, 'font-family': 'Arial'
                     },
                     style_table={'max-height': card_height},
-                    # Расшифровка строки в выпадающей подсказке
-                    # tooltip_data=[
-                    #     {
-                    #         column: {'value': str(value), 'type': 'markdown'}
-                    #         for column, value in row.items()
-                    #     } for row in df_clients[['Наименование клиента', 'ОКВЭД']].to_dict('records')
-                    # ],
-                    # tooltip_delay=0,
-                    # tooltip_duration=None,
                 ),]
                 ),
             html.Hr(style={'color':'#730031'}),

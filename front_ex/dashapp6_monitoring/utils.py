@@ -22,10 +22,10 @@ def get_get_open_ap_by_groups_182():
                         i.open_actplans,
                         to_date(k."ActlDate6", 'MM/DD/YYYY') + 3 AS "GD_Approve",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2023-08-04') AS "Reporting_date",
+                        DATE('2023-12-11') AS "Reporting_date",
                         CASE WHEN k."ActlDate6" IS NULL
-						THEN DATE('2023-08-04') - DATE(j."AP_date")
-						ELSE DATE('2023-08-04') - (to_date(k."ActlDate6", 'MM/DD/YYYY') + 3)
+						THEN DATE('2023-12-11') - DATE(j."AP_date")
+						ELSE DATE('2023-12-11') - (to_date(k."ActlDate6", 'MM/DD/YYYY') + 3)
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -50,7 +50,10 @@ def get_get_open_ap_by_groups_182():
                         ON a."AuditID" = h."GuiIDFld"
 
                     LEFT JOIN (
-                        SELECT "OrigID", count(*) AS open_actplans
+                        SELECT "OrigID", 
+                        min("Sent_to_Itrack") AS "Sent_to_Itrack",
+                        max(TO_DATE(LEFT("APADate", 10), 'DD/MM/YYYY')) AS "Close_date",
+                        count(*) AS open_actplans
                         FROM dashboard.actplans
                         WHERE "APADate" IS NULL
                             AND "APStatus" <> '61'
@@ -75,10 +78,14 @@ def get_get_open_ap_by_groups_182():
                         AND "Subject" IS NOT NULL
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
-                        AND CASE WHEN k."ActlDate6" IS NULL
-                            THEN DATE('2023-08-04') - DATE(j."AP_date")
-                            ELSE DATE('2023-08-04') - to_date(k."ActlDate6", 'MM/DD/YYYY') + 3
+                        AND i."Sent_to_Itrack" IS NOT NULL
+                        AND (CASE WHEN k."ActlDate6" IS NULL
+                            THEN DATE('2023-12-11') - DATE(j."AP_date")
+                            ELSE DATE('2023-12-11') - to_date(k."ActlDate6", 'MM/DD/YYYY') + 3
                             END < 183
+                            OR
+                            h."ActName" IN ('Разделка вагона после продажи', 'Наблюдение за проведением инвентаризации на складе ВРЦ Моршанск')
+                            )
                         --AND k."Sent_to_Itrack" IS NOT NULL
                 
             ) z
@@ -109,10 +116,10 @@ def get_get_open_ap_by_groups_365():
                         i.open_actplans,
                         to_date(k."ActlDate6", 'MM/DD/YYYY') + 3 AS "GD_Approve",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2023-08-04') AS "Reporting_date",
+                        DATE('2023-12-11') AS "Reporting_date",
                         CASE WHEN k."ActlDate6" IS NULL
-						THEN DATE('2023-08-04') - DATE(j."AP_date")
-						ELSE DATE('2023-08-04') - (to_date(k."ActlDate6", 'MM/DD/YYYY') + 3)
+						THEN DATE('2023-12-11') - DATE(j."AP_date")
+						ELSE DATE('2023-12-11') - (to_date(k."ActlDate6", 'MM/DD/YYYY') + 3)
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -137,7 +144,10 @@ def get_get_open_ap_by_groups_365():
                         ON a."AuditID" = h."GuiIDFld"
 
                     LEFT JOIN (
-                        SELECT "OrigID", count(*) AS open_actplans
+                        SELECT "OrigID", 
+                        min("Sent_to_Itrack") AS "Sent_to_Itrack",
+                        max(TO_DATE(LEFT("APADate", 10), 'DD/MM/YYYY')) AS "Close_date",
+                        count(*) AS open_actplans
                         FROM dashboard.actplans
                         WHERE "APADate" IS NULL
                             AND "APStatus" <> '61'
@@ -161,10 +171,11 @@ def get_get_open_ap_by_groups_365():
                         AND "Subject" IS NOT NULL
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
+                        AND i."Sent_to_Itrack" IS NOT NULL
                         AND CASE WHEN k."ActlDate6" IS NULL
-						    THEN DATE('2023-08-04') - DATE(j."AP_date")
-						    ELSE DATE('2023-08-04') - to_date(k."ActlDate6", 'MM/DD/YYYY') + 3
-						    END BETWEEN 183 AND 365
+						    THEN DATE('2023-12-11') - DATE(j."AP_date")
+						    ELSE DATE('2023-12-11') - to_date(k."ActlDate6", 'MM/DD/YYYY') + 3
+						    END BETWEEN 183 AND 365  
                 
             ) z
                     GROUP BY z."ActName",
@@ -195,10 +206,10 @@ def get_get_open_ap_by_groups_366():
                         to_date(k."ActlDate6", 'MM/DD/YYYY') + 3 AS "GD_Approve",
                         i."Close_date",
                         DATE(j."AP_date") AS "AP_date",
-                        DATE('2023-08-04') AS "Reporting_date",
+                        DATE('2023-12-11') AS "Reporting_date",
                         CASE WHEN k."ActlDate6" IS NULL
-						THEN DATE('2023-08-04') - DATE(j."AP_date")
-						ELSE DATE('2023-08-04') - (to_date(k."ActlDate6", 'MM/DD/YYYY') + 3)
+						THEN DATE('2023-12-11') - DATE(j."AP_date")
+						ELSE DATE('2023-12-11') - (to_date(k."ActlDate6", 'MM/DD/YYYY') + 3)
 						END AS "duration"
                     FROM dashboard.issues a
                     LEFT JOIN dashboard.udfvalue b
@@ -252,10 +263,10 @@ def get_get_open_ap_by_groups_366():
                         AND a."Deleted" = '-1'
                         AND a."Dispos" = '52'
                         AND i."Sent_to_Itrack" IS NOT NULL
-                        AND (CASE WHEN k."ActlDate6" IS NULL
-						    THEN DATE('2023-08-04') - DATE(j."AP_date")
-						    ELSE DATE('2023-08-04') - to_date(k."ActlDate6", 'MM/DD/YYYY') + 3
-						    END) > 365
+                        AND CASE WHEN k."ActlDate6" IS NULL
+						    THEN DATE('2023-12-11') - DATE(j."AP_date")
+						    ELSE DATE('2023-12-11') - to_date(k."ActlDate6", 'MM/DD/YYYY') + 3
+						    END > 365
                 
             ) z
                     GROUP BY z."ActName",

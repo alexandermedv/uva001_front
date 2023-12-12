@@ -215,6 +215,7 @@ def create_layout():
                     columns=[
                         {'name': 'Клиент', 'id': 'Клиент', 'type': 'text'},
                         {'name': 'Наименование клиента', 'id': 'Наименование клиента', 'type': 'text'},
+                        {'name': 'Кол-во рейсов ТМ', 'id': 'Кол-во рейсов ТМ', 'type': 'numeric', 'format': Format(scheme=Scheme.decimal_integer, group=Group.yes, groups=3, precision=2, group_delimiter=' ')},
                         #{'name': 'Холдинг клиента', 'id': 'Холдинг клиента', 'type': 'text'},
                         {'name': 'ДО: Доходность 2023', 'id': 'ДО: Доходность', 'type': 'numeric', 'format': Format(scheme=Scheme.decimal_integer, group=Group.yes, groups=3, precision=2, group_delimiter=' ')},
                         {'name': 'СХ: Доходность 2023', 'id': 'СХ: Доходность', 'type': 'numeric', 'format': Format(scheme=Scheme.decimal_integer, group=Group.yes, groups=3, precision=2, group_delimiter=' ')},

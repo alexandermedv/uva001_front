@@ -147,7 +147,14 @@ table.tiny-header tr:first-child {
 .columns {
   margin-left: 0 !important;
 }
-
+.row{
+  font-weight: bold;
+  margin-bottom: 30px; 
+  margin-left: 30px;
+  margin-top: 30px;
+  padding-top:20px;
+  position: relative;
+}
 .row > .columns:not(:first-child) {
   padding-left: 20px;
 }
@@ -381,36 +388,105 @@ a:active {
   }
 }
 
-/* Fix the font size and other stuff of datepicker*/
+/* Внутренее окно*/
 .DateInput_input, .DateInput_input_1 {
   /* my personal stuff */
   text-align: center;
   line-height: 100%;
   /* default flatly stuff */
-  height: 38px;
+  height: 37px;
   font-size: 1.3rem;
   font-weight: 400;
   color: #7b8a8b;
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  /* background-color: #fff; */
+  /* background-clip: padding-box; */
+  /* border: 1px solid #ced4da; */
+  /* border-radius: 0.25rem; */
+  /* transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; */
 }
 
-  /* Fix the font size and other stuff of datepicker*/
+  /* Внешнее окно*/
 .DateInput, .DateInput1 {
   /* my personal stuff */
   text-align: center;
   line-height: 100%;
   /* default flatly stuff */
   height: 38px;
+  /* 38px; */
   font-size: 1.3rem;
   font-weight: 400;
   color: #7b8a8b;
   background-color: #fff;
   background-clip: padding-box;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  /* border: 1px solid #ced4da; */
+  /* border-radius: 0.25rem; */
+  /* transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; */
+}
+.dash-dropdown{
+  min-width: 40ch;
+  min-height: 5ch;
+  height: auto;
+  width: auto;
+  /* white-space: nowrap;  */
+  /* width: 200px;        */
+  /* overflow: hidden; */
+  /* text-overflow: ellipsis */
+  white-space: pre-line  ;
+  /* text-overflow: ellipsis; */
+  /* overflow:auto; */
+  /* border: 1px solid #ddd; */
+  margin: 0;
+}
+.Select-control{
+  min-height: 5ch;
+  height: auto;
+  /* white-space: pre-line  ; */
+  /* overflow:auto; */
+}
+
+.Select-value{
+  min-height: 5ch;
+  height: auto;
+  
+} 
+.Select-value-label{
+  min-height: 5ch;
+  height: auto; 
+  white-space: pre-line  ;
+  overflow:auto;
+  /* line-height: 0.5; */
+  position:relative
+} 
+.export,.Button_mine { 
+  color: #fff;
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: .25rem;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.scrollbar {
+  border: 1px solid transparent;
+  padding: .375rem .75rem;
+  color: rgba(255, 255, 255, 0.121);
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  stroke-width: 10;
+  min-width: 10;
+  }
+.gtitle{
+  font-weight: bold;
 }

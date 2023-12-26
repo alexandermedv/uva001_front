@@ -12,7 +12,7 @@ import dash
 from ..pages import dash_app
 from ..utils import get_get_open_ap_by_groups_182, get_get_open_ap_by_groups_365, get_get_open_ap_by_groups_366
 from ..utils import get_incoming_ap, get_increase_ap, get_decrease_ap, get_outcoming_ap, get_high_ap_issues
-from ..utils import get_manual_table1, get_manual_table2, get_manual_table3, get_delayed_actplans
+from ..utils import get_manual_table1, get_manual_table2, get_manual_table3, get_actplans
 
 
 # Построение содержимого выбранной закладки
@@ -20,68 +20,57 @@ from ..utils import get_manual_table1, get_manual_table2, get_manual_table3, get
 def render_content():
     """Построение содержимого дашборда"""
 
-    print('Запуск вкладки 1')
     df1 = get_get_open_ap_by_groups_182()
-    print('df1 =', df1)
     # df1 = get_monitoring().sort_values(by=s, ascending=True)
-
     kol = 0
 
     x1_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
     x1_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
-    y1_data = df1['issue_group'][df1['issue_risk_level']=='Низкий'].tolist()
+    y1_data = df1['actname'][df1['issue_risk_level']=='Низкий'].tolist()
+    
     x1_text_bold = []
     for item in x1_text:
         x1_text_bold.append('<b>' + item + '</b>')
-    print('x1_data =', x1_data)
-    print('y1_data =', y1_data)
 
     x2_data = df1['count'][df1['issue_risk_level']=='Средний'].astype(str).tolist()
     x2_text = df1['count'][df1['issue_risk_level']=='Средний'].astype(str)
-    y2_data = df1['issue_group'][df1['issue_risk_level']=='Средний'].tolist()
+    y2_data = df1['actname'][df1['issue_risk_level']=='Средний'].tolist()
     x2_text_bold = []
     for item in x2_text:
         x2_text_bold.append('<b>' + item + '</b>')
-    print('x2_data =', x2_data)
-    print('y2_data =', y2_data)
 
     x3_data = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str).tolist()
     x3_text = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str)
-    y3_data = df1['issue_group'][df1['issue_risk_level']=='Высокий'].tolist()
+    y3_data = df1['actname'][df1['issue_risk_level']=='Высокий'].tolist()
     x3_text_bold = []
     for item in x3_text:
         x3_text_bold.append('<b>' + item + '</b>')
-    print('x3_data =', x3_data)
-    print('y3_data =', y3_data)
 
-    print('x1_data =', x1_data)
-    print('sum(x1_data) =', sum(map(int, x1_data)))
     sum1 = sum(map(int, x1_data)) + sum(map(int, x2_data)) + sum(map(int, x3_data))
 
     df1 = get_get_open_ap_by_groups_365()
 
     x4_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
     x4_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
-    y4_data = df1['issue_group'][df1['issue_risk_level']=='Низкий'].tolist()
+    y4_data = df1['actname'][df1['issue_risk_level']=='Низкий'].tolist()
     x4_text_bold = []
     for item in x4_text:
         x4_text_bold.append('<b>' + item + '</b>')
 
     x5_data = df1['count'][df1['issue_risk_level']=='Средний'].astype(str).tolist()
     x5_text = df1['count'][df1['issue_risk_level']=='Средний'].astype(str)
-    y5_data = df1['issue_group'][df1['issue_risk_level']=='Средний'].tolist()
+    y5_data = df1['actname'][df1['issue_risk_level']=='Средний'].tolist()
     x5_text_bold = []
     for item in x5_text:
         x5_text_bold.append('<b>' + item + '</b>')
 
     x6_data = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str).tolist()
     x6_text = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str)
-    y6_data = df1['issue_group'][df1['issue_risk_level']=='Высокий'].tolist()
+    y6_data = df1['actname'][df1['issue_risk_level']=='Высокий'].tolist()
     x6_text_bold = []
     for item in x6_text:
         x6_text_bold.append('<b>' + item + '</b>')
 
-    print('df2 =', df1)
     sum2 = sum(map(int, x4_data)) + sum(map(int, x5_data)) + sum(map(int, x6_data))
 
 
@@ -89,26 +78,24 @@ def render_content():
 
     x7_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
     x7_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
-    y7_data = df1['issue_group'][df1['issue_risk_level']=='Низкий'].tolist()
+    y7_data = df1['actname'][df1['issue_risk_level']=='Низкий'].tolist()
     x7_text_bold = []
     for item in x7_text:
         x7_text_bold.append('<b>' + item + '</b>')
 
     x8_data = df1['count'][df1['issue_risk_level']=='Средний'].astype(str).tolist()
     x8_text = df1['count'][df1['issue_risk_level']=='Средний'].astype(str)
-    y8_data = df1['issue_group'][df1['issue_risk_level']=='Средний'].tolist()
+    y8_data = df1['actname'][df1['issue_risk_level']=='Средний'].tolist()
     x8_text_bold = []
     for item in x8_text:
         x8_text_bold.append('<b>' + item + '</b>')
 
     x9_data = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str).tolist()
     x9_text = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str)
-    y9_data = df1['issue_group'][df1['issue_risk_level']=='Высокий'].tolist()
+    y9_data = df1['actname'][df1['issue_risk_level']=='Высокий'].tolist()
     x9_text_bold = []
     for item in x9_text:
         x9_text_bold.append('<b>' + item + '</b>')
-
-    print('df3 =', df1)
 
     sum3 = sum(map(int, x7_data)) + sum(map(int, x8_data)) + sum(map(int, x9_data))
 
@@ -120,7 +107,6 @@ def render_content():
     y11 = incoming_ap[incoming_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]
     y11_bold = '<b>' + str(incoming_ap[incoming_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]) + '</b>'
     if not increase_ap[increase_ap['issue_risk_level'] == 'Высокий'].empty:
-        print('increase_ap =', increase_ap)
         y12 = increase_ap[increase_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]
         y12_bold = '<b>' + str(increase_ap[increase_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]) + '</b>'
     else:
@@ -171,7 +157,8 @@ def render_content():
 
     high_ap = get_high_ap_issues()
 
-    delayed_actplans = get_delayed_actplans()
+    df_actplans = get_actplans()
+    print(df_actplans.columns)
     manual_table2 = get_manual_table2()
     manual_table3 = get_manual_table3()
 
@@ -180,7 +167,7 @@ def render_content():
             html.Div([
                 html.Div([
                     html.Br([]),
-                    html.H6('''Количество недостатков по областям риска и длительностям устранения, шт.''',
+                    html.H6('''Количество недостатков по аудитам и длительностям устранения, шт.''',
                             style={'text-align':'center',
                                 'font-size': '16pt',
                                 'font-weight': 'bold'}),
@@ -434,7 +421,7 @@ def render_content():
                                                     "r": 50,
                                                     "t": 50,
                                                     "b": 20,
-                                                    "l": 150,
+                                                    "l": 250,
                                 },
                                 showlegend=False,
                             ),
@@ -453,12 +440,13 @@ def render_content():
                             "data": [
                                 go.Waterfall(
                                     measure = ['relative', 'relative', 'relative', 'relative'],
-                                    x=["Мониторинг <br>на 01.04.2022", "Выявлено по <br>проверкам 2022", "Сняты с контроля <br>на 01.05.2022", "Мониторинг <br>на 01.05.2022"],
+                                    x=["Мониторинг <br>на 01.01.2023", "Выявлено по <br>проверкам 2023", "Сняты с контроля <br>на 04.08.2023", "Мониторинг <br>на 04.08.2023"],
                                     y=[y11, y12, y13, y14],
                                     # y=[49, 43, -23, -69],
                                     increasing = {"marker":{"color":"rgb(138,36,50)"}},
                                     decreasing = {"marker":{"color":"rgb(197, 116, 137)"}},
-                                    textposition = "inside",
+                                    # textposition = "inside",
+                                    textposition = "auto",
                                     cliponaxis = False,
                                     connector={'visible': False},
                                     text=[y11_bold, y12_bold, y13_bold, y14_bold],
@@ -496,12 +484,13 @@ def render_content():
                             "data": [
                                 go.Waterfall(
                                     measure = ['relative', 'relative', 'relative', 'relative'],
-                                    x=["Мониторинг <br>на 01.04.2022", "Выявлено по <br>проверкам 2022", "Сняты с контроля <br>на 01.05.2022", "Мониторинг <br>на 01.05.2022"],
+                                    x=["Мониторинг <br>на 01.01.2023", "Выявлено по <br>проверкам 2023", "Сняты с контроля <br>на 04.08.2023", "Мониторинг <br>на 04.08.2023"],
                                     y=[y21, y22, y23, y24],
                                     # y=[49, 43, -23, -69],
                                     increasing = {"marker":{"color":"rgb(250,216,89)"}},
                                     decreasing = {"marker":{"color":"rgb(251, 231, 152)"}},
-                                    textposition = "inside",
+                                    # textposition = "inside",
+                                    textposition = "auto",
                                     connector={'visible': False},
                                     text=[y21_bold, y22_bold, y23_bold, y24_bold],
                                     hoverinfo='skip',
@@ -537,12 +526,13 @@ def render_content():
                             "data": [
                                 go.Waterfall(
                                     measure = ['relative', 'relative', 'relative', 'relative'],
-                                    x=["Мониторинг <br>на 01.04.2022", "Выявлено по <br>проверкам 2022", "Сняты с контроля <br>на 01.05.2022", "Мониторинг <br>на 01.05.2022"],
+                                    x=["Мониторинг <br>на 01.01.2023", "Выявлено по <br>проверкам 2023", "Сняты с контроля <br>на 04.08.2023", "Мониторинг <br>на 04.08.2023"],
                                     y=[y31, y32, y33, y34],
                                     # y=[49, 43, -23, -69],
                                     increasing = {"marker":{"color":"rgb(112,149,51)"}},
                                     decreasing = {"marker":{"color":"rgb(169, 191, 133)"}},
-                                    textposition = "inside",
+                                    # textposition = "inside",
+                                    textposition = "auto",
                                     connector={'visible': False},
                                     text=[y31_bold, y32_bold, y33_bold, y34_bold],
                                     hoverinfo='skip',
@@ -662,7 +652,7 @@ def render_content():
                 # Ручные таблицы
                 html.Br(),
                 dbc.Row(),
-                html.H6('''Недостатки с высоким риском и перенесенным сроком выполнения мероприятий''',
+                html.H6('''Список недостатков''',
                     style={'text-align':'center',
                             'font-size': '16pt',
                             'font-weight': 'bold'}),
@@ -670,28 +660,46 @@ def render_content():
                 dash_table.DataTable(
                     # https://dash.plotly.com/datatable/width
                     id='manual_table1',
-                    columns=[{"name": i, "id": i} for i in delayed_actplans.columns],
-                    data=delayed_actplans.to_dict('records'),
+                    columns=[{"name": i, "id": i} for i in df_actplans.columns],
+                    data=df_actplans.to_dict('records'),
                     page_size=20,
                     style_table={'overflowX': 'auto'},
                     style_cell={
                         # all three widths are needed
-                        'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+                        'minWidth': '180px', 
+                        # 'width': '180px', 
+                        'maxWidth': '18000px',
                         'overflow': 'hidden',
                         'textOverflow': 'ellipsis',
                         'textAlign': 'left',
                     },
                     style_cell_conditional=[
-                        {'if': {'column_id': "Описание недостатка"},
-                        'width': '20%'},
-                        {'if': {'column_id': "Мероприятие"},
-                        'width': '20%'},
-                        {'if': {'column_id': "Первоначальная дата окончания"},
+                        {'if': {'column_id': 'Название аудита'},
+                        'width': '35%'},
+                        {'if': {'column_id': 'Мероприятие'},
+                        'width': '85%'},
+                        {'if': {'column_id': 'Описание недостатка (кратк)'},
                         'width': '5%'},
-                        {'if': {'column_id': "Пересмотренная дата окончания"},
+                        {'if': {'column_id': 'Описание недостатка (детальн)'},
+                        'width': '1580'},
+                        {'if': {'column_id': "Уровень критичности недостатка"},
                         'width': '5%'},
-                        {'if': {'column_id': "Комментарий"},
-                        'width': '50%'},
+                        {'if': {'column_id': "Рекомендации"},
+                        'width': '40%'},
+                        {'if': {'column_id': "Комментарии"},
+                        'width': '10%'},
+                        {'if': {'column_id': "Отв аудитор"},
+                        'width': '5%'},
+                        {'if': {'column_id': "Координатор от бизнес-подразделения"},
+                        'width': '5%'},
+                        {'if': {'column_id': "Ожидаемая дата выполнения"},
+                        'width': '10%'},
+                        {'if': {'column_id': "Пересмотренная дата выполнения"},
+                        'width': '10%'},
+                        {'if': {'column_id': "ЗГД"},
+                        'width': '10%'},
+                        {'if': {'column_id': "История комментариев"},
+                        'width': '10%'},
                     ],
                     export_format='xlsx',
                     export_headers='display',

@@ -145,6 +145,19 @@ class Role(db.Model):
         return self.name
 
 
+# Логи
+class Log(db.Model):
+    __bind_key__ = 'log'
+    __tablename__ = 'log'
+    id = db.Column(db.Integer, primary_key=True)
+    login = db.Column(db.String(80))
+    timestamp = db.Column(db.String(80))
+    message = db.Column(db.String(255))
+
+    def __str__(self):
+        return self.name
+
+
 #### Встраивание Flask Admin
 class UserModelView(ModelView):
     '''

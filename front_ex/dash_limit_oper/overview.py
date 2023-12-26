@@ -1,5 +1,7 @@
-import dash_core_components as dcc
+# from dash import dcc
+# from dash import html
 import dash_html_components as html
+import dash_core_components as dcc
 import plotly.graph_objs as go
 from dash.dependencies import Output, Input, State
 # from dash.dash_table.Format import Format, Group

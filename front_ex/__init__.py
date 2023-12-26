@@ -2,6 +2,7 @@
 import os
 from os import path as op
 from flask import Flask, redirect, url_for, request
+from healthcheck import HealthCheck
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 
@@ -9,7 +10,8 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
-from flask_migrate import Migrate, MigrateCommand
+from flask_migrate import Migrate
+# from flask_migrate import MigrateCommand
 from flask_login import UserMixin, LoginManager
 from flask_admin import Admin
 
@@ -29,6 +31,7 @@ from flask_login import LoginManager
 from flask_cors import CORS
 
 app = Flask(__name__)
+
 # app.config.update(
 #     USE_TZ = os.environ['USE_TZ'],
 #     TIMEZONE = os.environ['TIMEZONE'],   
@@ -45,15 +48,17 @@ babel = Babel(app)
 
 # Добавляем базы данных и логин-менеджер
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
+app.config['SQLALCHEMY_BINDS'] = {'log': os.environ['SQLALCHEMY_DATABASE_LOG']}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.urandom(24)
 db = SQLAlchemy(app)
-db.create_all()
+db.create_all(bind=None)
+db.create_all(bind=['log'])
 
 # Миграция - создание и обновление структуры баз данных
 migrate = Migrate(app, db, compare_type=True)
 manager = Manager(app)
-manager.add_command('db', MigrateCommand)
+# manager.add_command('db', MigrateCommand)
 
 # Логирование
 # login = LoginManager()
@@ -71,7 +76,8 @@ security.init_app(app=app, datastore = user_datastore)
 # декоратор под первого пользователя
 @app.before_first_request
 def create_user():
-    db.create_all()
+    db.create_all(bind=None)
+    db.create_all(bind=['log'])
     user = User.query.first()
     if not user:
         user_datastore.create_user(ldap_account='svc_fs-uva', email='svc_fs-uva@pgkweb.ru', active=True)
@@ -100,7 +106,7 @@ api = Api(app)
 migrate = Migrate(app, db, compare_type=True)
 
 manager = Manager(app)
-manager.add_command('db', MigrateCommand)
+# manager.add_command('db', MigrateCommand)
 
 # Сборка Dashboards
 from .dash_limit_oper import dash_app as dash_limit_oper
@@ -115,6 +121,9 @@ from .dashapp10_nagon import dash_app as dashapp10_nagon
 from .dashapp11_risks import dash_app as dashapp11_risks
 from .dashapp12_tor_neis import dash_app as dashapp12_tor_neis
 from .dashapp13_credit_risks import dash_app as dashapp13_credit_risks
+# from .dashapp14_spark_api_count_request import dash_app as dashapp14_spark_api_count_request
+from .dashapp15_airflow import dash_app as dashapp15_airflow
+from .dashapp_credibility_rating import dash_app as dashapp_credibility_rating
 
 # Добавляем руты и таски
 import front_ex.routes
@@ -135,4 +144,43 @@ dispatch_app = DispatcherMiddleware(app.wsgi_app, {
     'dashapp11': dashapp11_risks.server,
     'dashapp12': dashapp12_tor_neis.server,  
     'dashapp13': dashapp13_credit_risks.server,
+    # 'dashapp14': dashapp14_spark_api_count_request.server,
+    'dashapp15': dashapp15_airflow.server, 
+    'credibility_rating': dashapp_credibility_rating.server, 
     })
+
+
+# Healthcheck
+health = HealthCheck()
+from .utils import get_postgre_con_str, get_log_con_str
+
+# Проверка доступности баз данных
+def front_db_available():
+    front_db_engine = get_postgre_con_str()
+    if front_db_engine:
+        result = True
+    else:
+        result = False
+    return result, "front_db_checked"
+
+def log_db_available():
+    sap_s4p_engine = get_log_con_str()
+    if sap_s4p_engine:
+        result = True
+    else:
+        result = False
+    return result, "log_db_checked"
+
+# def get_sap_s4_con_str():
+#     """Строка подключения к S4 прод"""
+#     return os.environ['SAP_HOST_S4']
+
+# def get_udv_con_str():
+#     """Строка подключения к УДВ прод"""
+#     return os.environ['UDV']
+
+
+health.add_check(front_db_available)
+health.add_check(log_db_available)
+
+app.add_url_rule('/healthcheck', 'healthcheck', view_func=lambda: health.run())

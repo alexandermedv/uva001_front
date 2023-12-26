@@ -1,5 +1,7 @@
 # Инициализируем Dashboards
 from dash import Dash
+# from dash import html
+# from dash import dcc
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output
@@ -11,7 +13,7 @@ import dash_bootstrap_components as dbc
 from .. import app
 
 # Базовые URL определяет куст все страниц на сайте
-dash_app = Dash(__name__, server = app, url_base_pathname='/limit_oper_dash/', suppress_callback_exceptions = True,
+dash_app = Dash(__name__, server=app, url_base_pathname='/limit_oper_dash/', suppress_callback_exceptions = True,
     external_stylesheets=[dbc.themes.BOOTSTRAP])
 dash_app.config.update(app.config)
 

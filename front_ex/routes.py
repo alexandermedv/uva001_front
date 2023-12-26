@@ -17,6 +17,13 @@ from .glossary import utils as glossary
 from .ldap import ldap_authentication
 from .utils import logger
 
+# Руты к дэшбордам
+@app.route('/airflow_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp15():
+    """Дашборд по статистике airflow"""
+    return render_template('/dashapp15_airflow/overview.html')
 
 # Руты к дэшбордам
 @app.route('/risks_dash/')
@@ -26,7 +33,20 @@ def render_dashapp11():
     """Дашборд по размеру и динамике недостачи"""
     return render_template('/dashapp11_risks/overview.html')
 
-# Руты к дэшбордам
+@app.route('/spark_api_count_request_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp14():
+    """Кол-во запросов СПАРК"""
+    return render_template('/dashapp14_spark_api_count_request/overview.html')
+
+@app.route('/credibility_rating_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp_credibility_rating():
+    """Рейтинг добросовестности клиентов"""
+    return render_template('/dashapp_credibility_rating/overview.html')
+
 @app.route('/credit_risks_dash/')
 @login_required
 @logger(os.environ['USER_ACTIONS_FILE'])

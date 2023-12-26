@@ -5,7 +5,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from sqlalchemy import create_engine
-# s
+
+from ..utils import get_max_date
 from .callbacks import render_content
 
 
@@ -27,6 +28,35 @@ def create_layout():
                         ),
                     ], className="product",
                 )
+            ], className="row",
+            ),
+
+            # Row 2 - 1-й ряд фильтров
+            html.Div([
+                dbc.Navbar([
+                    html.Div(
+                        html.Output('Дата:'),
+                        className='one column',
+                        style={"display": "flex",
+                        "align-items": "center",
+                        "height": "38px"
+                            }
+                            ),
+                    dcc.DatePickerRange(
+                        id='dashboard2-date-picker-range',
+                        min_date_allowed=date(2000, 1, 1),
+                        max_date_allowed=date(2050, 1, 1),
+                        initial_visible_month=date(2020, 1, 1),
+                        start_date=date(2020, 1, 1),
+                        end_date=get_max_date().strftime("%m.%d.%Y"),
+                        number_of_months_shown = 3,
+                        updatemode = 'singledate',
+                        display_format='DD.MM.YYYY',
+                        start_date_placeholder_text='Начало периода',
+                        end_date_placeholder_text='Конец периода',
+                    className='four columns'),
+
+                ],)
             ], className="row",
             ),
 

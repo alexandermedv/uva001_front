@@ -53,8 +53,8 @@ def create_layout():
                         min_date_allowed=date(2000, 1, 1),
                         max_date_allowed=date(2050, 1, 1),
                         initial_visible_month=date(2022, 4, 1),
-                        start_date=date(2021, 1, 1),
-                        end_date=date(2022, 9, 1),
+                        start_date=date(2019, 1, 1),
+                        end_date=date(2023, 12, 31),
                         number_of_months_shown = 3,
                         updatemode = 'singledate',
                         display_format='DD.MM.YYYY',
@@ -64,27 +64,60 @@ def create_layout():
 
                     html.Div(
                         html.Output('Количество ремонтов:'),
-                    className='two columns',
-                    style={"display": "flex",
+                        className='two columns',
+                        style={"display": "flex",
                         "align-items": "center",
                         "height": "38px"
-                            }),
+                            },
+                            ),
                     html.Div(
                         html.B(
                             html.Output(id='tors_amount'),
                             ),
-                    className='two columns',
-                                style={"border-style": "groove",
+                            className='two columns',
+                            style={"border-style": "groove",
                                     "border-radius": "5px",
                                     "height": "38px",
                                     "display": "flex",
                                     "align-items": "center",
                                     "justify-content": "center"
                                     }
-                    ),                    
-                ],)
-            ], className="row",
-            ),
+                            ),
+                    ],)
+                ], className="row",
+                ),
+
+            # Row 3 - 2-й ряд фильтров
+                    html.Div(
+                        html.Br(),
+                        style={"height":"5px"}),
+                    html.Div([
+                        dbc.Navbar([
+                    html.Div(
+                        html.Output('Количество некач. ремонтов:'),
+                        className='two columns',
+                        style={"display": "flex",
+                        "align-items": "center",
+                        "height": "38px"
+                            },
+                            ),
+                    html.Div(
+                        html.B(
+                            html.Output(id='tors_amount_nk'),
+                            ),
+                            className='two columns',
+                            style={"border-style": "groove",
+                                    "border-radius": "5px",
+                                    "height": "38px",
+                                    "display": "flex",
+                                    "align-items": "center",
+                                    "justify-content": "center"
+                                    }
+                            ),                    
+                                ],)
+                            ], className="row",
+                            ),
+            
  
            html.Div([
                 dcc.Tabs(id='dashboard12-tabs', value='tab-1', children=[

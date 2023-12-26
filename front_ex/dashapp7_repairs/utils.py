@@ -252,7 +252,7 @@ def get_bad_tors_912(start_date, end_date):
                     where t.datnrp between '%s' AND '%s' and t.ilatx in ('ТР-1','ТР-2') and (t.neis1_kod in ('912','913') or t.neis2_kod in ('912','913') or t.neis3_kod in ('912','913'))
                     ) a 
                     left join dashboard.tor_ik b on b.eqktx = a.eqktx and b.ilatx in ('ТР-1','ТР-2') and (a.pnrp < b.datnrp and  b.datnrp < a.onrp)
-                    ) a where a.bilatx is null group by a.eqktx, a.rod_id_text,a.kod_neis) q where q.kod_neis = '912' group by q.kod_neis, q.rod_id_text order by q.kod_neis desc
+                    ) a where a.bilatx is null group by a.eqktx, a.rod_id_text,a.kod_neis) q where q.kod_neis = '912' and q.ROD_ID_TEXT <> 'ЗРВ' and q.ROD_ID_TEXT <> 'None' group by q.kod_neis, q.rod_id_text order by q.kod_neis desc
 
     ''' % (start_date, end_date)
 
@@ -305,7 +305,7 @@ def get_bad_tors_913(start_date, end_date):
                     where t.datnrp between '%s' AND '%s' and t.ilatx in ('ТР-1','ТР-2') and (t.neis1_kod in ('912','913') or t.neis2_kod in ('912','913') or t.neis3_kod in ('912','913'))
                     ) a 
                     left join dashboard.tor_ik b on b.eqktx = a.eqktx and b.ilatx in ('ТР-1','ТР-2') and (a.pnrp < b.datnrp and  b.datnrp < a.onrp)
-                    ) a where a.bilatx is null group by a.eqktx, a.rod_id_text,a.kod_neis) q where q.kod_neis = '913' group by q.kod_neis, q.rod_id_text order by q.kod_neis desc
+                    ) a where a.bilatx is null group by a.eqktx, a.rod_id_text,a.kod_neis) q where q.kod_neis = '913' and q.ROD_ID_TEXT <> 'None' group by q.kod_neis, q.rod_id_text order by q.kod_neis desc
 
     ''' % (start_date, end_date)
 

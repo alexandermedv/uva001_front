@@ -53,7 +53,7 @@ def create_layout():
                         max_date_allowed=date(2050, 1, 1),
                         initial_visible_month=date(2021, 4, 1),
                         start_date=date(2021, 1, 1),
-                        end_date=date(2021, 9, 30),
+                        end_date=date(2023, 12, 31),
                         # end_date=get_max_date().strftime("%m.%d.%Y"),
                         # end_date=datetime.datetime.now().strftime("%m.%d.%Y"),
                         number_of_months_shown = 3,

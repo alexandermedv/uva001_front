@@ -16,7 +16,7 @@ def get_postgre_con_str():
 
 def get_log_con_str():
     """Строка подключения к log прод"""
-    return os.environ['LOG_DB']
+    return os.environ['SQLALCHEMY_DATABASE_LOG']
 
 def get_sap_s4_con_str():
     """Строка подключения к S4 прод"""

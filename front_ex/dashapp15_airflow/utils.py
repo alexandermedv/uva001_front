@@ -34,6 +34,6 @@ def dag_load_daily():
             ) t group by date, dag_id, owners, state 
                 order by date
     '''
-    con=create_engine(os.environ['POSTGRE_URL_DASH_LOG'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH_LOG'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df

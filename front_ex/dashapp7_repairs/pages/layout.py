@@ -1,8 +1,10 @@
 """ Шаблоны для отчета по ремонтам."""
 from datetime import date
 import datetime
-import dash_core_components as dcc
-import dash_html_components as html
+# import dash_core_components as dcc
+from dash import dcc
+# import dash_html_components as html
+from dash import html
 import dash_bootstrap_components as dbc
 # from . import engine_cons
 from ..utils import get_max_date, get_tors_count
@@ -16,7 +18,7 @@ from sqlalchemy import create_engine
 
 def create_layout():
     """Создание шаблона"""
-    # engine_cons = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    # engine_cons = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     layout = html.Div([
         html.Div([
             # Row 1 - Описание отчета

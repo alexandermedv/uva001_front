@@ -19,7 +19,7 @@ def get_branch_names(start_date, end_date, gruz, rod):
     ''' % (start_date, end_date, gruz, rod)
 
     # return pd.read_sql(sql, con=engine_cons)
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 # Значения полного списка филиалов
@@ -33,7 +33,7 @@ def get_all_branch_names(start_date, end_date):
     ''' % (start_date, end_date)
 
     # return pd.read_sql(sql, con=engine_cons)
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 # Значения списка групп грузов
@@ -49,7 +49,7 @@ def get_cargo_names(start_date, end_date, branches, rod):
         ORDER BY "Название груза ЕТСНГ" ASC
     ''' % (start_date, end_date, branches, rod)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 # Значения полного списка групп грузов
@@ -62,7 +62,7 @@ def get_all_cargo_names(start_date, end_date):
         ORDER BY "Название груза ЕТСНГ" ASC
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 # Значения списка РПС
@@ -78,7 +78,7 @@ def get_rps(start_date, end_date, branches, gruz):
         ORDER BY "Род подвижного состава" ASC
     ''' % (start_date, end_date, branches, gruz)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 # Значения полного списка РПС
@@ -91,7 +91,7 @@ def get_all_rps(start_date, end_date):
         ORDER BY "Род подвижного состава" ASC
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 # Максимальная дата в выгрузке
@@ -102,7 +102,7 @@ def get_max_date():
     FROM dashboard.resellers_cube
     '''
     # return engine_cons.execute(sql).fetchone()[0]
-    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     return con.execute(sql).fetchone()[0]
 
 
@@ -155,7 +155,7 @@ def get_top_resellers(start_date, end_date, branches, gruz, rod, sorting):
         LIMIT 10
     """ % (start_date, end_date, branches, gruz, rod, start_date, end_date, branches, gruz, rod, sorting)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 # Количество посреднических рейсов в разрезе филиалов
@@ -244,7 +244,7 @@ def get_resellers_by_branches(start_date, end_date, branches, gruz, rod, sorting
                 END) ASC
     """ % (start_date, end_date, branches, gruz, rod, start_date, end_date, branches, gruz, rod, sorting)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 def get_resellers_by_rps(start_date, end_date, branches, gruz, rod, sorting):
@@ -291,7 +291,7 @@ def get_resellers_by_rps(start_date, end_date, branches, gruz, rod, sorting):
                 END) ASC
     ''' % (start_date, end_date, branches, gruz, rod, start_date, end_date, branches, gruz, rod, sorting)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 def get_resellers_cargo(start_date, end_date, branches, gruz, rod, sorting):
@@ -343,7 +343,7 @@ def get_resellers_cargo(start_date, end_date, branches, gruz, rod, sorting):
         LIMIT 10
     """ % (start_date, end_date, branches, gruz, rod, start_date, end_date, branches, gruz, rod, sorting)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 def get_resellers_count(start_date, end_date, branches, gruz, rod):
@@ -382,8 +382,8 @@ def get_resellers_share(start_date, end_date, branches, gruz, rod):
         AND "Название груза ЕТСНГ" IN %s
         AND "Род подвижного состава" IN %s
     ''' % (start_date, end_date, branches, gruz, rod)
-    df1 = pd.read_sql(sql1, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
-    df2 = pd.read_sql(sql2, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    df1 = pd.read_sql(sql1, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
+    df2 = pd.read_sql(sql2, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
     if df1['Количество посреднических рейсов'][0] and df2['Количество рейсов'][0]:
         return str(round(float(df1['Количество посреднических рейсов'][0])/float(df2['Количество рейсов'][0])*100, 2)) + '%'
@@ -405,7 +405,7 @@ def get_resellers_table(start_date, end_date, branches, gruz, rod):
             AND "Род подвижного состава" IN %s
     ''' % (start_date, end_date, branches, gruz, rod)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 def get_resellers_dynamics(start_date, end_date, branches, gruz, rod):
@@ -485,4 +485,4 @@ def get_resellers_dynamics(start_date, end_date, branches, gruz, rod):
         # )
     # '''
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))

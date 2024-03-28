@@ -3,11 +3,14 @@ import datetime as dt
 import os
 import numpy as np
 from dash.dependencies import Input, Output, State
-import dash_core_components as dcc
-import dash_html_components as html
+# import dash_core_components as dcc
+from dash import dcc
+# import dash_html_components as html
+from dash import html
 import plotly.graph_objects as go
 import pandas as pd
-import dash_table
+# import dash_table
+from dash import dash_table
 import dash
 import plotly.express as px
 from dateutil import relativedelta
@@ -727,7 +730,7 @@ def btn_download_report_button(n_clicks, start_date, end_date, railway):
         end_date = dt.datetime.strftime(dt.datetime.strptime(end_date, '%Y-%m-%d'), '%d-%m-%Y')
 
         url = 'http://{api_host}:{api_port}/api/reports/transport_empty_delay'.format(api_host=os.environ['API_HOST'], api_port=os.environ['API_PORT'])
-        print(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), ' ', 'АPI request: ', url, flush = True)    
+        # print(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), ' ', 'АPI request: ', url, flush = True)    
         
         res_task = requests.get(url, 
             params={'start_date':start_date, 'end_date':end_date},
@@ -744,7 +747,7 @@ def btn_download_report_button(n_clicks, start_date, end_date, railway):
             if res.json().get('kwargs'):
                 file_name = res.json().get('kwargs').get('file_name')
 
-            print("res.json()", res.json(), flush = True)
+            # print("res.json()", res.json(), flush = True)
           
             if res.json().get('state') == 'SUCCESS':
                 break
@@ -752,10 +755,10 @@ def btn_download_report_button(n_clicks, start_date, end_date, railway):
             i += i
             # Ожидание 10 мин
             if i > 60:
-                print('no file', flush=True)
+                # print('no file', flush=True)
                 return 'no file'
         url_upload = 'http://{api_host}:{api_port}/api/uploads/{file_name}'.format(file_name=file_name, api_host=os.environ['API_HOST'], api_port=os.environ['API_PORT'])
-        print(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), ' ', 'URL_upload: ', url_upload, flush=True)
+        # print(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), ' ', 'URL_upload: ', url_upload, flush=True)
 
 
         return url_upload

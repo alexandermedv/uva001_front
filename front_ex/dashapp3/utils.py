@@ -21,7 +21,7 @@ def get_conflict1_data():
     sql = '''
         SELECT * FROM analysis.conflict1
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -30,7 +30,7 @@ def get_conflict2_data():
     sql = '''
         SELECT * FROM analysis.conflict2
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -39,7 +39,7 @@ def get_conflict3_data():
     sql = '''
         SELECT * FROM analysis.conflict3
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -48,7 +48,7 @@ def get_conflict4_data():
     sql = '''
         SELECT * FROM analysis.conflict4
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -57,7 +57,7 @@ def get_conflict5_data():
     sql = '''
         SELECT * FROM analysis.conflict5
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -66,7 +66,7 @@ def get_conflict6_data():
     sql = '''
         SELECT * FROM analysis.conflict6
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -75,7 +75,7 @@ def get_conflict7_data():
     sql = '''
         SELECT * FROM analysis.conflict7
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -84,7 +84,7 @@ def get_conflict8_data():
     sql = '''
         SELECT * FROM analysis.conflict8
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -93,7 +93,7 @@ def get_conflict9_data():
     sql = '''
         SELECT * FROM analysis.conflict9
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -102,7 +102,7 @@ def get_conflict10_data():
     sql = '''
         SELECT * FROM analysis.conflict10
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -111,7 +111,7 @@ def get_conflict11_data():
     sql = '''
         SELECT * FROM analysis.conflict11
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -120,7 +120,7 @@ def get_conflict12_data():
     sql = '''
         SELECT * FROM analysis.conflict12
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -129,7 +129,7 @@ def get_conflict13_data():
     sql = '''
         SELECT * FROM analysis.conflict13
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -138,7 +138,7 @@ def get_conflict14_data():
     sql = '''
         SELECT * FROM analysis.conflict14
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -147,7 +147,7 @@ def get_conflict15_data():
     sql = '''
         SELECT * FROM analysis.conflict15
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -156,7 +156,7 @@ def get_conflict16_data():
     sql = '''
         SELECT * FROM analysis.conflict16
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -165,7 +165,7 @@ def get_conflict17_data():
     sql = '''
         SELECT * FROM analysis.conflict17
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -174,7 +174,7 @@ def get_conflict18_data():
     sql = '''
         SELECT * FROM analysis.conflict18
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)
 
@@ -183,6 +183,6 @@ def get_summary_data():
     sql = '''
         SELECT * FROM analysis.sap_sod_conflicts
             '''
-    con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+    con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 
     return pd.read_sql(sql, con=con)

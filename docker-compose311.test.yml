@@ -1,0 +1,49 @@
+version: '3.7'
+services: 
+   test_app:
+      container_name: test_front_3_11
+      build:  
+         context: .
+         dockerfile: dockerfile311.test
+      command: python wsgi_test.py
+      # command: gunicorn -w 1 -b 0.0.0.0:7007 wsgi:app  
+      volumes: 
+         - .:/usr/src/app/
+      ports: 
+         # - "127.0.0.1:7008:7007"
+         # - "7101:7102"
+         - "7104:7103"
+      environment: 
+         - TZ=Europe/Moscow
+         - HTTP_PROXY=msc01-cfw01.pgk.rzd:9090
+         - HTTPS_PROXY=msc01-cfw01.pgk.rzd:9090 
+      # networks:
+      #    - test_net_nginx
+      network_mode: bridge   
+   
+   # test_nginx:
+   #    build:
+   #       context: ./nginx
+   #       dockerfile: dockerfile.test
+   #    ports:
+   #          - 7100:7100
+   #    depends_on:
+   #          - test_app   
+   #    networks:
+   #       - test_net_nginx
+          
+
+# networks: 
+#    test_net_nginx: 
+#       driver: bridge
+#       ipam:
+#          config:
+#            - subnet: 172.17.8.0/24
+
+networks: 
+    net_nginx_prod: 
+        driver: bridge
+        ipam:
+            config:
+            - subnet: 172.17.48.0/24
+            

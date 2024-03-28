@@ -12,7 +12,7 @@ def get_raiways():
         select railway_id, railway_name from dashboard.tm_railways
     '''
     con=create_engine(os.environ['POSTGRE_URL_DASH'])
-    df = pd.read_sql(sql, con=con, max_identifier_length=128, encoding='utf-8')
+    df = pd.read_sql(sql, con=con, max_identifier_length=128)
     con.close()
     
     return df
@@ -22,7 +22,7 @@ def get_trans_empty_all():
         select * from dashboard.dash_transport_empty
     '''
     con=create_engine(os.environ['POSTGRE_URL_DASH'])
-    df = pd.read_sql(sql, con=con, max_identifier_length=128, encoding='utf-8')
+    df = pd.read_sql(sql, con=con, max_identifier_length=128)
     con.close()
 
     return df
@@ -56,7 +56,7 @@ def get_trans_empty_by_railway_delay(railway='', start_date=None, end_date=None)
                 order by sum(case when t."Превышение даты истечение срока д" = 'С просрочкой' then "Кол-во вагонорейсов" else 0 end) desc
         ) t
     ''' 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df
 
@@ -83,7 +83,7 @@ def get_trans_empty_by_railway_penalty(railway='', start_date=None, end_date=Non
                         group by t."Дорога назначения"	
                             order by sum("Оценка пени")	desc			
     '''
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df
 
@@ -113,7 +113,7 @@ def get_trans_empty_by_railway_mean_delay(railway='', start_date=None, end_date=
                                 order by sum("Дней просрочки, суток")/sum("Кол-во вагонорейсов")
                                 --order by avg("Дней просрочки, суток")
     '''
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df
 # #  <- Под дорогам 
@@ -151,7 +151,7 @@ def get_trans_empty_by_type(railway='', start_date=None, end_date=None):
             order by "Превышение даты истечение срока д" desc
     '''
     # print(sql)
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df
 
@@ -211,7 +211,7 @@ def get_trans_empty_by_money(railway, start_date=None, end_date=None):
                 ) t where "Тип" != 'Без просрочки'
     '''
     # print(sql)
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df
 
@@ -245,7 +245,7 @@ def get_trans_empty_by_type_month(railway, start_date=None, end_date=None):
             group by "Месяц", "Превышение даты истечение срока д"   
                 -- order by "Месяц", "Превышение даты истечение срока д" desc       
     '''
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df
 
@@ -275,7 +275,7 @@ def get_trans_empty_by_money_month(railway, start_date=None, end_date=None):
                     group by "Месяц", "Превышение даты истечение срока д"
     '''
     # print(sql)
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df
 
@@ -313,7 +313,7 @@ def get_tab1_trans_empty_by_delay_stat(railway, start_date=None, end_date=None):
                                         order by "Дней просрочки, суток" desc
 	            ) t
     '''
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df
 
@@ -366,7 +366,7 @@ def get_tab4_trans_empty_delay_by_rps(railway='', start_date=None, end_date=None
             and not t."РПС" in ('ТВЗ', 'РЛВ')
     ''' 
     # print(sql)
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df
 
@@ -396,7 +396,7 @@ def get_tab4_trans_empty_penalty_by_rps(railway='', start_date=None, end_date=No
                         group by t."РПС"	
                             order by sum("Оценка пени")	desc			
     '''
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df
 
@@ -428,7 +428,7 @@ def get_tab4_trans_empty_mean_delay_by_rps(railway='', start_date=None, end_date
                                 order by sum("Дней просрочки, суток")/sum("Кол-во вагонорейсов") 
                                 --order by avg("Дней просрочки, суток")
     '''
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df = pd.read_sql(sql, con)
     return df
 # По РПС 

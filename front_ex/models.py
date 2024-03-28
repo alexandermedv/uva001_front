@@ -1,22 +1,26 @@
 from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin, current_user
+from flask_security import RoleMixin
 from flask import url_for, redirect, render_template, flash, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms import SubmitField, TextAreaField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Length, InputRequired, Email, NumberRange, EqualTo
-from wtforms.fields.html5 import DateField, EmailField
+# from wtforms.fields.html5 import DateField, EmailField
+# from wtforms.fields import DateField, EmailField
 from functools import wraps
 from flask_admin import BaseView, AdminIndexView, expose
+from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey
 
 from . import db
 
 # Связь роли с пользователем
-roles_users = db.Table(
-    'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
-)
+# roles_users = db.Table(
+#     'roles_users',
+#     db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+#     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+# )
+
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
     # __table_args = {'schema':'ver1'}
@@ -30,10 +34,16 @@ class User(db.Model, UserMixin):
     dept_id = db.Column(db.Unicode(1000))
     position = db.Column(db.Unicode(1000))
     email = db.Column('email', db.Unicode(250), nullable=False)
+    # password = db.Column(db.String(255), nullable=True)
     active = db.Column(db.Boolean())
-    # Пароль не требуется, поскольку он проверяется по LDAP
-    roles = db.relationship('Role', secondary=roles_users,
+    
+    # AT new seq
+    fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
+    # Пароль не требуется, поскольку он проверяется 
+    # по LDAP
+    roles = db.relationship('Role', secondary='roles_users',
                             backref=db.backref('users', lazy='dynamic'))
+
 
     def __repr__(self):
         return '<User {}>'.format(self.last_name)
@@ -136,14 +146,32 @@ def requires_roles(*roles):
     return wrapper
 
 # Роли
-class Role(db.Model):
+class Role(db.Model, RoleMixin):
+    __tablename__ = 'role'
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
     description = db.Column(db.String(255))
+    # permissions = db.Column(db.String(1000))
 
     def __str__(self):
         return self.name
+    
+    # def get_permissions(self):
+    #     return ''
 
+class UserRoles(db.Model):
+    # Because peewee does not come with built-in many-to-many
+    # relationships, we need this intermediary class to link
+    # user to roles.
+    __tablename__ = 'roles_users'
+    id = Column(Integer(), primary_key=True)
+    user_id = db.Column('user', Integer(), ForeignKey('user.id'))
+    role_id = db.Column('role_id', Integer(), ForeignKey('role.id'))
+    name = property(lambda self: self.role.name)
+    description = property(lambda self: self.role.description)
+
+    def get_permissions(self):
+        return self.role.get_permissions()
 
 # Логи
 class Log(db.Model):

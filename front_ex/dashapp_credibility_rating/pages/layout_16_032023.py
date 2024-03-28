@@ -156,7 +156,7 @@ cards_2 = html.Div(
 
 def create_layout():
     """Создание шаблона"""
-    # engine_cons = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    # engine_cons = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     layout = html.Div([
         html.Div([
             # Row 1 - Описание отчета

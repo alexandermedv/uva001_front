@@ -8,10 +8,6 @@ body {
   background-color: #fafafa;
   font-size: 1.1rem;
   line-height: 1.3;
-
-  /* display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly; */
 }
 * {
   box-sizing: border-box;
@@ -137,7 +133,9 @@ table.tiny-header tr:first-child {
 
 /* .columns{ margin-left: 0 !important; } */
 
-
+/* .row > .columns:not(:first-child){
+padding-left: 20px;
+} */
 
 td,
 th {

@@ -49,90 +49,109 @@
         <div class="side-menu-container">
           <ul class="nav navbar-nav">
               <!-- Cписок дэшей -->
-              {% if current_user.check_report_roles('glossary') %}
+              {% if 'glossary' in current_user.roles %}
               <li><a href="/glossary"><i class="fa fa-dashboard"></i>Словарь терминов</a></li>
               {% endif %}
               
               <li><a href="/IssueTrack_instruction"><i class="fa fa-dashboard"></i>Инструкция по работе с мероприятиями</a></li>
               
-              {% if current_user.check_dash_roles('risks') %}
+              {% if 'risks' in current_user.roles %}
               <li><a href="/risks_dash"><i class="fa fa-dashboard"></i>Дашборд по рискам</a></li>
               {% endif %}
               
-              {% if current_user.check_dash_roles('dashapp13') %}
+              {% if 'dashapp13' in current_user.roles %}
               <li><a href="/credit_risks_dash"><i class="fa fa-dashboard"></i>Кредитные риски</a></li>
               {% endif %}
               
-              <!-- {% if current_user.check_report_roles('reports') %}
-              <li><a href="/reports/"><i class="fa fa-dashboard"></i>Отчеты</a></li>
-              {% endif %} -->
-              {% if current_user.check_dash_roles('limit_oper') %}
+              {% if 'limit_oper' in current_user.roles %}
                 <li><a href="/limit_oper"><i class="fa fa-dashboard"></i>Дебиторская задолженность</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('dashapp1') %}
+
+              {% if 'dashapp1' in current_user.roles %}
               <li><a href="/dashapp1"><i class="fa fa-dashboard"></i>Недостача запчастей</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('dashboard3') %}
+
+              {% if 'dashboard3' in current_user.roles %}
               <li><a href="/dashboard3"><i class="fa fa-dashboard"></i>Полномочия в SAP</a></li>
               {% endif %}
-              {% if current_user.check_report_roles('repair0') %}
+
+              {% if 'repair0' in current_user.roles %}
               <li><a href="/repairs/repair0"><i class="fa fa-dashboard"></i>Реестр ремонтов</a></li>
               {% endif %}
-              {% if current_user.check_report_roles('repair1') %}
+
+              {% if 'repair1' in current_user.roles %}
               <li><a href="/repairs/repair1"><i class="fa fa-dashboard"></i>Некачественные ТОР</a></li>
               {% endif %}
-              {% if current_user.check_report_roles('repair2') %}
+              
+              {% if 'repair2' in current_user.roles %}
               <li><a href="/repairs/repair2"><i class="fa fa-dashboard"></i>Некачественные ДР и КР</a></li>
               {% endif %}
-              {% if current_user.check_report_roles('repair7') %}             
+
+              {% if 'repair7' in current_user.roles %}             
               <li><a href="/repairs/repair7"><i class="fa fa-dashboard"></i>Двойное создание заказов ТОРО</a></li>
               {% endif %}
-              {% if current_user.check_report_roles('repair11') %}    
+
+              {% if 'repair11' in current_user.roles %}    
               <li><a href="/repairs/repair11"><i class="fa fa-dashboard"></i>Не выполненные вовремя плановые ремонты</a></li>
               {% endif %}
-              {% if current_user.check_report_roles('report1') %}                  
+
+              {% if 'report1' in current_user.roles %}                  
               <li><a href="/report1"><i class="fa fa-dashboard"></i>Детали в статусе ДОСТ</a></li>
               {% endif %}
-              {% if current_user.check_report_roles('report_equipment') %}  
+
+              {% if 'report_equipment' in current_user.roles %}  
               <li><a href="/report_equipment"><i class="fa fa-dashboard"></i>Запчасти</a></li>
               {% endif %}
-              {% if current_user.check_report_roles('report_resellers') %}  
+
+              {% if 'report_resellers' in current_user.roles %}  
               <li><a href="/resellers"><i class="fa fa-dashboard"></i>Посредники (отчет)</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('resellers') %}  
+
+              {% if 'resellers' in current_user.roles %}  
               <li><a href="/resellers_dash"><i class="fa fa-dashboard"></i>Посредники (дашборд)</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('resellers_commerce') %}  
+
+              {% if 'resellers_commerce' in current_user.roles %}  
               <li><a href="/resellers_dash_commerce"><i class="fa fa-dashboard"></i>Посредники (дашборд)</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('monitoring') %}  
+
+              {% if 'monitoring' in current_user.roles %}  
               <li><a href="/monitoring_dash"><i class="fa fa-dashboard"></i>Мониторинг</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('repairs') %}  
+
+              {% if 'repairs' in current_user.roles %}  
               <li><a href="/repairs_dash"><i class="fa fa-dashboard"></i>Ремонты (дашборд)</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('repairs_neis') %}  
+
+              {% if 'repairs_neis' in current_user.roles %}  
               <li><a href="/tor_ik_dash"><i class="fa fa-dashboard"></i>Некачественные ремонты (дашборд)</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('empty_transportations') %}  
+
+              {% if 'empty_transportations' in current_user.roles %}  
               <li><a href="/empty_transportations_dash"><i class="fa fa-dashboard"></i>Порожние рейсы (дашборд)</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('nagon') %}
+
+              {% if 'nagon' in current_user.roles %}
               <li><a href="dashboards/nagon_dash"><i class="fa fa-dashboard"></i>Дашборд по нагону</a></li>
               {% endif %}
-              <!-- {% if current_user.check_dash_roles('spark_api_count_request') %}
-              <li><a href="/spark_api_count_request_dash"><i class="fa fa-dashboard"></i>Кол-во запросов СПАРК</a></li>
-              {% endif %} -->
-              {% if current_user.check_dash_roles('airflow') %}
+
+              {% if 'airflow' in current_user.roles %}
               <li><a href="/airflow_dash"><i class="fa fa-dashboard"></i>Мониторинг ресурсов</a></li>
               {% endif %}
-              {% if current_user.check_dash_roles('credibility_rating') %}
+
+              {% if 'credibility_rating' in current_user.roles %}
               <li><a href="/credibility_rating_dash"><i class="fa fa-dashboard"></i>Рейтинг добросовестности клиентов</a></li>
               {% endif %}
-              {% if current_user.check_report_roles('admin') %}
+
+              {% if 'resellers_uru' in current_user.roles %}
+              <li><a href="/resellers_uru_dash"><i class="fa fa-dashboard"></i>Автоматизированный мониторинг: выявление потенциальных посредников</a></li>
+              {% endif %}
+
+              {% if 'admin' in current_user.roles %}
                 <li><a href="https://jira.pgk.ru/projects/CITA/issues"><i class="fa fa-dashboard"></i>Jira</a></li>
               {% endif %}
-              {% if current_user.check_report_roles('admin') %}
+              
+              {% if 'admin' in current_user.roles %}
                 <li><a href="https://gitlab.pgkweb.ru/"><i class="fa fa-dashboard"></i>Gitlab</a></li>
               {% endif %}
           </ul>

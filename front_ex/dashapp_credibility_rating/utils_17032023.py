@@ -46,7 +46,7 @@ def get_clients_df(start_date, end_date, client=None):
                     "ОКВЭД",
                     "Доля посредничества"
         ''' % (start_date, end_date)
-        df_clients = pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+        df_clients = pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
         df_clients = df_clients.sort_values(by=['Доля посредничества', 'Холдинг клиента'], ascending=False).reset_index(drop=True)
         return df_clients
     else:
@@ -76,7 +76,7 @@ def get_clients_df(start_date, end_date, client=None):
                     "ОКВЭД",
                     "Доля посредничества"
         ''' % (start_date, end_date, client)
-        df_client = pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+        df_client = pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
         return df_client
 
 # Дропдаун для грузоотправителей
@@ -88,7 +88,7 @@ def get_list_go(start_date, end_date, client_holding):
             AND "Клиент (холдинг)" = '%s'
         ORDER BY "Метрика посредничества", "Сумма продаж ГО(холдинг) у Клиента" DESC
     ''' % (start_date, end_date, client_holding)
-    df_list_go = pd.read_sql(sql2, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    df_list_go = pd.read_sql(sql2, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
     return [{"label": i, "value": i} for i in df_list_go['ГО (холдинг)']]
 
 # Таблица по грузам
@@ -119,7 +119,7 @@ def get_gruzes_df(client=None):
             FROM dashboard.credibility_gruz_changes_uru
             WHERE "Клиент" = '%s'
         ''' % (client)
-        return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+        return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
     
 # Фильтры
 date_filter = dbc.FormGroup([

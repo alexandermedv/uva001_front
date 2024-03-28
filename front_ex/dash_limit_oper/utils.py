@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 # from . import engine_cons
 
 # engine_cons = create_engine("""postgresql://locadm:Temp001@msc199-
-# sdb04.domain.local:8031/uva_cons""", max_identifier_length=128, encoding='utf-8')
+# sdb04.domain.local:8031/uva_cons""", max_identifier_length=128)
 
 # Выгрузка таблицы по рискам
 def get_credit_data():
@@ -22,7 +22,7 @@ def get_credit_data():
 		SELECT *
 		FROM '''+schema+'''.'''+Name_table #+''' where
 	# date='2022-08-31' limit 100'''
-	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
+	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128)
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()
 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
@@ -39,7 +39,7 @@ def get_credit_data_clients():
 		SELECT *
 		FROM '''+schema+'''.'''+Name_table#+''' where
 	# date='2022-08-31' limit 100'''
-	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
+	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128)
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()
 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
@@ -56,7 +56,7 @@ def get_credit_data_all():
 	sql = '''
 		SELECT *
 		FROM '''+schema+'''.'''+Name_table
-	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
+	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128)
 	df2=con.execute(sql).fetchall()
 	df2=pd.DataFrame()
 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
@@ -81,7 +81,7 @@ def get_credit_data_all():
 # 		SELECT *
 # 		FROM '''+schema+'''.'''+Name_table +''' where
 # 	date='2022-08-31' limit 100'''
-# 	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
+# 	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128)
 # 	df2=con.execute(sql).fetchall()
 # 	df2=pd.DataFrame()
 # 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
@@ -98,7 +98,7 @@ def get_credit_data_all():
 # 		SELECT *
 # 		FROM '''+schema+'''.'''+Name_table+''' where
 # 	date='2022-08-31' limit 100'''
-# 	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
+# 	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128)
 # 	df2=con.execute(sql).fetchall()
 # 	df2=pd.DataFrame()
 # 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
@@ -114,7 +114,7 @@ def get_credit_data_all():
 # 	sql = '''
 # 		SELECT *
 # 		FROM '''+schema+'''.'''+Name_table
-# 	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
+# 	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128)
 # 	df2=con.execute(sql).fetchall()
 # 	df2=pd.DataFrame()
 # 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
@@ -130,7 +130,7 @@ def get_credit_data_all():
 # 	sql = '''
 # 		SELECT *
 # 		FROM '''+schema+'''.'''+Name_table
-# 	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128, encoding='utf-8')
+# 	con = create_engine('postgresql://'+login+':'+passwors+'@'+ip_server+'/uva_cons' , max_identifier_length=128)
 # 	df2=con.execute(sql).fetchall()
 # 	df2=pd.DataFrame()
 # 	for chunk in pd.read_sql_query(sql , con, chunksize=chunksize):
@@ -160,7 +160,7 @@ def get_credit_data_all():
 
 # def get_limit1():
 #         sql = "select * from analytics.limit1"
-#         con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+#         con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 #         data = pd.read_sql(sql, con=con)
 #         return data
 
@@ -170,14 +170,14 @@ def get_credit_data_all():
 #             left join sap_s4.kna1 b
 #             on a.lim_partner = b.kunnr
 #             """
-#         con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+#         con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 #         data = pd.read_sql(sql, con=con)
 #         return data
 
 # def get_limit_oper_data(debug=False):
 #         """Получение первичных данных"""
 #         sql = "select * from sap_s4.limit_oper"
-#         con = create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8')
+#         con = create_engine(get_connection_postgre_string(), max_identifier_length=128)
 #         data = pd.read_sql(sql, con=con)
 #         if debug: print(data.head(3))
 #         return data   
@@ -185,14 +185,14 @@ def get_credit_data_all():
 # def get_limit_oper_client_data():
 #         """Выгрузка данных по клиенту"""
 #         sql = "SELECT distinct(kunnr) as kunnr, name1 from sap_s4.limit_oper_kna"
-#         data = pd.read_sql(sql, con=create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8'))
+#         data = pd.read_sql(sql, con=create_engine(get_connection_postgre_string(), max_identifier_length=128))
 #         # print(data.head(3))
 #         return data
            
 # def get_limit_oper_zuonr_data(client):
 #         """Выгрузка данных по контрактам"""
 #         sql = "SELECT kunnr, zuonr from sap_s4.limit_oper_kna where kunnr = '%s'" % client
-#         data = pd.read_sql(sql, con=create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8'))
+#         data = pd.read_sql(sql, con=create_engine(get_connection_postgre_string(), max_identifier_length=128))
 #         # print(data.head(3))
 #         return data
 # def get_limit_oper_ttl_data(debug=False):
@@ -229,7 +229,7 @@ def get_credit_data_all():
 #                                         from sap_s4.limit_oper a group by BUDAT, KUNNR, ZUONR) a
 # 	) a  GROUP BY BUDAT, KUNNR, ZUONR ORDER BY BUDAT 
 #         """
-#         data = pd.read_sql(sql, con=create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8'))
+#         data = pd.read_sql(sql, con=create_engine(get_connection_postgre_string(), max_identifier_length=128))
 #         if debug: print(data.head(3))
 #         return data      
 
@@ -239,6 +239,6 @@ def get_credit_data_all():
 #                 SELECT kunnr, zuonr, ind, shkzg, hkont, h_blart, dmbtr, cpudt, cputm, budat, belnr, bldat, dmbtr_sign, timestamp, stblg 
 #                         from sap_s4.limit_oper where kunnr = '%s' and zuonr = '%s'
 #         """ % (client, zuonr)
-#         data = pd.read_sql(sql, con=create_engine(get_connection_postgre_string(), max_identifier_length=128, encoding='utf-8'))
+#         data = pd.read_sql(sql, con=create_engine(get_connection_postgre_string(), max_identifier_length=128))
 #         if debug: print(data.head(3))
 #         return data 

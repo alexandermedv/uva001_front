@@ -1,18 +1,11 @@
 """ Интерактивные элементы для отчета"""
-import datetime as dt
-import numpy as np
 from dash.dependencies import Input, Output, State
-import dash_core_components as dcc
+from dash.exceptions import PreventUpdate
+from dash import dcc, html, dash_table, no_update
 import dash_bootstrap_components as dbc
-from plotly.subplots import make_subplots
-import dash_html_components as html
 import plotly.graph_objects as go
 import plotly.express as px
-import pandas as pd
-import dash_table
-import dash
-from dash.exceptions import PreventUpdate
-from dash import no_update
+#import pandas as pd
 from ..pages import dash_app
 from ..utils import get_gruzes_df, get_go_rating, min_date, max_date  #get_clients_df, date_filter, get_go_posrednics_graph
 from ..pages.layout import df_clients
@@ -37,27 +30,25 @@ def update_table_data(active_cell): #, selected_cells, active_cell
         gruzes_df = get_gruzes_df(client)
         go_rating = get_go_rating(client)
         # Карточка клиента
-        client_card = dbc.Card(
-            dbc.CardBody(
-                [
-                    html.Label(
-                        dff['Наименование клиента'],
-                        style={'font-size': 14,
-                               'font-family': 'Arial',
-                                'text-align': 'left',
-                                'color': '#808080'},
-                    ),
-                    html.P('Состоит в холдинге: {}'.format(dff['Холдинг клиента'][0])),
-                    html.P('ИНН: {}, ОКПО: {}'.format(dff['ИНН клиента'][0], dff['ОГРН клиента'][0])),
-                    html.P(dff['ОКВЭД']),
-                    html.P('Дата регистрации: {}'.format(dff['Дата регистрации клиента'][0])),
-                    html.P('Последний фин период (СПАРК): {}'.format(dff['Последний фин период'][0])),
-                    html.P('Выручка посл фин период(СПАРК): {}'.format(dff['Выручка посл фин период'][0])),
-                ]
-            )
-        )
+        client_card_body = dbc.CardBody(
+                    [
+                        html.Label(
+                            dff['Наименование клиента'],
+                            style={'font-size': 14,
+                                    'font-family': 'Arial',
+                                    'text-align': 'left',
+                                    'color': '#808080'},
+                        ),
+                        html.P('Состоит в холдинге: {}'.format(dff['Холдинг клиента'][0])),
+                        html.P('ИНН: {}, ОКПО: {}'.format(dff['ИНН клиента'][0], dff['ОГРН клиента'][0])),
+                        html.P(dff['ОКВЭД']),
+                        html.P('Дата регистрации: {}'.format(dff['Дата регистрации клиента'][0])),
+                        html.P('Последний фин период (СПАРК): {}'.format(dff['Последний фин период'][0])),
+                        html.P('Выручка посл фин период(СПАРК): {:,.0f}'.format(dff['Выручка посл фин период'][0])),
+                    ]
+                )
         # Карточка доходности ДО
-        profit_do = px.pie(names=['Критичн','Миним', 'Норматив', 'Целевые'],
+        profit_do = px.pie(names=['Критичные','Минимальные', 'Нормативные', 'Целевые'],
                     values=[dff['ДО критичн'][0], 
                             dff['ДО миним'][0], 
                             dff['ДО норматив'][0], 
@@ -65,7 +56,7 @@ def update_table_data(active_cell): #, selected_cells, active_cell
                     color_discrete_sequence=['#D2042D', '#C0C0C0', '#FCD975', '#287233'],
                     title=dff['Наименование клиента'][0],
                     hole=0.85, 
-                    category_orders={"names":['Критичн','Миним', 'Норматив', 'Целевые']})
+                    category_orders={"names":['Критичные','Минимальные', 'Нормативные', 'Целевые']})
         profit_do.update_traces(textinfo='value+label', 
                         textposition="outside")
         profit_do.update_layout(showlegend=False,
@@ -93,9 +84,9 @@ def update_table_data(active_cell): #, selected_cells, active_cell
                     "border": "1px solid darkgray", #"1px solid rgb(0, 116, 217)",
                 }
             ], 
-            client_card,
-            gruzes_df.to_dict('rows'),
-            go_rating.to_dict('rows'),
+            client_card_body,
+            gruzes_df.to_dict('records'),
+            go_rating.to_dict('records'),
             profit_do,
         )
     else:

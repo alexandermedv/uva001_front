@@ -8,7 +8,7 @@ import pandas as pd
 from . import engine_cons
 
 # engine_cons = create_engine("""postgresql://locadm:Temp001@msc199-
-# sdb04.domain.local:8031/uva_cons""", max_identifier_length=128, encoding='utf-8')
+# sdb04.domain.local:8031/uva_cons""", max_identifier_length=128)
 
 # Выгрузка оборота и количества операций по счету 94* за выбранный период
 def get_osv_detail_by_dates(start_date, end_date, debug = False):

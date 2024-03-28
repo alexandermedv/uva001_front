@@ -2,11 +2,13 @@
 import datetime as dt
 import numpy as np
 from dash.dependencies import Input, Output
-import dash_core_components as dcc
+# import dash_core_components as dcc
+from dash import dcc
 import dash_bootstrap_components as dbc
-import dash_table
-import dash_html_components as html
-#import dash_table
+# import dash_table
+from dash import dash_table
+# import dash_html_components as html
+from dash import html
 #from dash_table.Format import Format, Scheme, Group
 #from app.dashes import dashapp1
 #from app.raw_sql import dashapp1_non_used_details_udv_filial
@@ -49,7 +51,7 @@ def update_markdown1(start_date,  end_date):
     """Количество неотраженных операций"""
 
     df1 = get_nagon_results(start_date,  end_date)
-    print('Количество непроведенных операций:', df1['oper_accepted_count'].sum())
+    # print('Количество непроведенных операций:', df1['oper_accepted_count'].sum())
 
     return int(df1['oper_accepted_count'].sum())
 
@@ -557,7 +559,7 @@ def render_content(start_date, end_date, tab, filial, detail_type,
         """Сводные результаты"""
         
         df1 = get_nagon_results(start_date,  end_date)
-        print('df1 =', df1)
+        # print('df1 =', df1)
 
         df_v1 = pd.pivot_table(df1, values='oper_accepted_count', index=['year', 'operation'], columns=['filial_name']).reset_index()
         df_v1.rename(columns = {'Владивостокский филиал' : 'Влд', 'Воронежский филиал' : 'Врж', 'Екатеринбургский филиал' : 'Екб',
@@ -565,7 +567,7 @@ def render_content(start_date, end_date, tab, filial, detail_type,
                                 'Новосибирский филиал' : 'Нвб', 'Самарский филиал' : 'Смр', 'Головное отделение' : 'ГО',
                                 'Ростовский филиал' : 'Рст', 'Санкт-Петербургский филиал' : 'СПб', 'Саратовский филиал': 'Срт',
                                 'Челябинский филиал' : 'Члб', 'Ярославский филиал': 'Ярв'}, inplace = True) 
-        print('df_v1 =\n', df_v1)
+        # print('df_v1 =\n', df_v1)
 
         df_v2 = pd.pivot_table(df1, values='percentage', index=['year', 'operation'], columns=['filial_name']).reset_index()
         df_v2.rename(columns = {'Владивостокский филиал' : 'Влд', 'Воронежский филиал' : 'Врж', 'Екатеринбургский филиал' : 'Екб',
@@ -573,7 +575,7 @@ def render_content(start_date, end_date, tab, filial, detail_type,
                                 'Новосибирский филиал' : 'Нвб', 'Самарский филиал' : 'Смр', 'Головное отделение' : 'ГО',
                                 'Ростовский филиал' : 'Рст', 'Санкт-Петербургский филиал' : 'СПб', 'Саратовский филиал': 'Срт',
                                 'Челябинский филиал' : 'Члб', 'Ярославский филиал': 'Ярв'}, inplace = True) 
-        print('df_v2 =\n', df_v2)
+        # print('df_v2 =\n', df_v2)
 
         df_v3 = pd.pivot_table(df1, values='oper_count', index=['year', 'operation'], columns=['filial_name']).reset_index()
         df_v3.rename(columns = {'Владивостокский филиал' : 'Влд', 'Воронежский филиал' : 'Врж', 'Екатеринбургский филиал' : 'Екб',
@@ -581,7 +583,7 @@ def render_content(start_date, end_date, tab, filial, detail_type,
                                 'Новосибирский филиал' : 'Нвб', 'Самарский филиал' : 'Смр', 'Головное отделение' : 'ГО',
                                 'Ростовский филиал' : 'Рст', 'Санкт-Петербургский филиал' : 'СПб', 'Саратовский филиал': 'Срт',
                                 'Челябинский филиал' : 'Члб', 'Ярославский филиал': 'Ярв'}, inplace = True) 
-        print('df_v3 =\n', df_v3)
+        # print('df_v3 =\n', df_v3)
         # sale_count = get_sale_count(start_date,  end_date)
 
         content = html.Div([
@@ -743,9 +745,9 @@ def render_content(start_date, end_date, tab, filial, detail_type,
         """Динамика нагона по данным УДВ"""
         
         df1 = get_nagon_dynamics(start_date, end_date)
-        print('df1 =', df1)
+        # print('df1 =', df1)
         df1_aggr = df1.groupby(['start_date', 'end_date']).sum().reindex()
-        print('df1_aggr =', df1_aggr)
+        # print('df1_aggr =', df1_aggr)
 
         df0['Дата'] = df0['Дата проводки'].apply(lambda x: dt.datetime.strptime(x, '%Y%m%d'))
         df0['Неделя'] = df0['Дата проводки'].apply(lambda x: dt.datetime.strptime(x, '%Y%m%d')).apply(lambda x: x - dt.timedelta(x.weekday()))

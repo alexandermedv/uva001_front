@@ -1,12 +1,15 @@
 # from dash import dcc
 # from dash import html
-import dash_html_components as html
-import dash_core_components as dcc
+# import dash_html_components as html
+from dash import html
+# import dash_core_components as dcc
+from dash import dcc
 import plotly.graph_objs as go
 from dash.dependencies import Output, Input, State
 # from dash.dash_table.Format import Format, Group
 import dash_bootstrap_components as dbc
-import dash_table
+# import dash_table
+from dash import dash_table
 from datetime import date
 import pandas as pd
 import os
@@ -87,10 +90,10 @@ def get_matrix_stat_2(df3_1,  e_d=None):
     return df3_1.sort_values(['dinamic_saldo', ],  ascending=False)
 
 def get_dates_for_table():
-    print('1. Загрузка данных')
+    # print('1. Загрузка данных')
     df = get_credit_data()
     
-    print('2. Все контракты')
+    # print('2. Все контракты')
     df_dog_2=df.loc[(df['3_group']==2) , ['id_rcm','client_name', 'dog_number', 
        'date',  'dinamic_saldo', 'lim_sum', 'rating', 'garanty',
        'dept_over_lim']]
@@ -124,7 +127,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
 
     # df_filial=df_filial0[df_filial0['date']=='2022-08-31']
     # filials = df_filial['filial'].drop_duplicates()
-    print('5. Все и безлимитные')
+    # print('5. Все и безлимитные')
     df_all0=get_credit_data_all()
     max_date=df_all0['date'].max()
     min_date=df_all0['date'].min()
@@ -199,7 +202,7 @@ def create_layout(app, start_date = None, end_date=None, debug=False):
     points_1_0=[0 for i in dates1_1]
     points_2_0=[0 for i in dates1_2]
     points_3_0=[0 for i in dates1_3]
-    print("5. Старт загрузки layout")
+    # print("5. Старт загрузки layout")
 
     layout = html.Div(
         [

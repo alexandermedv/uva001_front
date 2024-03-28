@@ -1,8 +1,10 @@
 """ Шаблоны для отчета по мониторингу."""
 from datetime import date
 import datetime
-import dash_core_components as dcc
-import dash_html_components as html
+# import dash_core_components as dcc
+from dash import dcc
+# import dash_html_components as html
+from dash import html
 import dash_bootstrap_components as dbc
 from sqlalchemy import create_engine
 

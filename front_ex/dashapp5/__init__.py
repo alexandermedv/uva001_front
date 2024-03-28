@@ -1,8 +1,10 @@
 """Инициализируем Dashboards"""
 from dash import Dash
 from dash.dependencies import Input, Output
-import dash_html_components as html
-import dash_core_components as dcc
+# import dash_html_components as html
+from dash import html
+# import dash_core_components as dcc
+from dash import dcc
 
 from .. import app
 # , db, engine_cons
@@ -10,7 +12,7 @@ from .. import app
 dash_app = Dash(__name__, server=app,
                 url_base_pathname='/dashboards/resellers_dash/',
                 suppress_callback_exceptions=True)
-dash_app.config.update(app.config)
+# dash_app.config.update(app.config)
 dash_app.layout = html.Div()
 
 # Тест

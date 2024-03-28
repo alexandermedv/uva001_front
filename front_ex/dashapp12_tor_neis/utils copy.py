@@ -23,7 +23,7 @@ def get_tors(start_date, end_date):
             group by a.yeardata, c.nekach
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 #Выгрузка ремонтов по Контрагентам
 def get_tors_by_contr(start_date, end_date):
@@ -59,7 +59,7 @@ def get_tors_by_contr(start_date, end_date):
         group by a.yeardata,m.lifnr_gr, c.nekach) k
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 #Выгрузка ремонтов по Клиентам
 def get_tors_by_client(start_date, end_date):
@@ -91,7 +91,7 @@ def get_tors_by_client(start_date, end_date):
         group by a.yeardata, c.nekach, a.naim_depo) k
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 #Выгрузка количество ремонтов
 def get_tors_count(start_date, end_date):
@@ -103,7 +103,7 @@ def get_tors_count(start_date, end_date):
          WHERE a.data1353 BETWEEN '%s' AND '%s'
      ''' % (start_date, end_date)
 
-     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 #Выгрузка количество ремонтов для спидометра
@@ -119,7 +119,7 @@ def get_tors_count_speed(start_date, end_date):
 		WHERE a.data1353 BETWEEN '%s' AND '%s'
      ''' % (start_date, end_date)
 
-     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 #Выгрузка количество некачественных ремонтов
@@ -132,7 +132,7 @@ def get_tors_count_nk(start_date, end_date):
          WHERE a.data1353dk BETWEEN '%s' AND '%s'
      ''' % (start_date, end_date)
 
-     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 #Выгрузка TOP-10 ремонтов по Контрагентам
 def get_top_tors_by_contr(start_date, end_date):
@@ -184,7 +184,7 @@ select
 				
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 #Выгрузка TOP-10 ремонтов по Клиентам
@@ -243,4 +243,4 @@ select
             order by sum(kach) desc
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))

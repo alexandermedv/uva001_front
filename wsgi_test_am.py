@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 
 # Переменные окружения
-load_dotenv(os.path.abspath(os.path.dirname(__file__))+'/.prod.env')
+load_dotenv(os.path.abspath(os.path.dirname(__file__))+'/.test.env')
 
 # Обязательно добавить app иначе flask db его не видит
 from front_ex import dispatch_app, app

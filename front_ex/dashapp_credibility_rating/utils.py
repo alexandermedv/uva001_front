@@ -1,21 +1,16 @@
 """Выгрузка данных и вспомогательные функции"""
 import os
-from contextlib import contextmanager
-from typing import Optional
 from sqlalchemy import create_engine
 import pandas as pd
-import numpy as np
-import json
-from datetime import datetime
-import xmlschema  # type: ignore
-import dash_bootstrap_components as dbc
-import dash_core_components as dcc
-import dash_html_components as html
 from datetime import date
+from dash import html, dcc
 
 # Переменные
 min_date = date(2020,1,1)
 max_date = date.today()
+flag_posr = 0.8
+flag_gruz = 0.8
+flag_profit = 0.8
 
 # Таблица по клиентам
 def get_clients_df(client=None):
@@ -34,7 +29,8 @@ def get_clients_df(client=None):
                     "Изменение доли основного груза",
                     "Разных грузов у клиента",
                     "Последний фин период", 
-			        "Выручка посл фин период",
+                    CASE WHEN "Выручка посл фин период" = 'Нет данных' THEN null
+			            ELSE "Выручка посл фин период"::bigint END AS "Выручка посл фин период",
                     "ДО: Доходность",
                     "СХ: Доходность",
                     "Кол-во рейсов" AS "ДО: Кол-во рейсов",
@@ -47,8 +43,17 @@ def get_clients_df(client=None):
                     "Доля критичнодоходности"
             FROM dashboard.credibility_uru
         '''
-        df_clients = pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
-        df_clients = df_clients.sort_values(by=['Доля посредничества', 'Холдинг клиента'], ascending=False).reset_index(drop=True)
+        # print(os.environ['POSTGRE_URL_DASH'], flush = True)
+        df_clients = pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH']))
+        
+        df_clients['Флаги'] = ''
+        df_clients.loc[df_clients['Доля посредничества']>=flag_posr, 'Флаги'] += '⭐'
+        df_clients.loc[df_clients['Изменение доли основного груза']>=flag_gruz, 'Флаги'] += '🚚'
+        df_clients.loc[df_clients['Доля критичнодоходности']>=flag_profit, 'Флаги'] += '💰'
+        df_clients = df_clients.sort_values(by=['Флаги', 'Кол-во рейсов ТМ'], ascending=False).reset_index(drop=True)
+        #df_clients = df_clients.sort_values(by=['Доля посредничества', 'Холдинг клиента'], ascending=False).reset_index(drop=True)
+        # Это индексирование нужно для того чтобы в dash можно было выбирать строку
+        df_clients['id'] = df_clients.index
         return df_clients
     else:
         sql = '''
@@ -78,7 +83,7 @@ def get_clients_df(client=None):
             FROM dashboard.credibility_uru
             WHERE "Клиент" = '%s'
         ''' % (client)
-        df_client = pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+        df_client = pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
         return df_client
 
 # Таблица по грузам
@@ -92,7 +97,8 @@ def get_gruzes_df(client=None):
                     "Рейсов 2020",
                     "Рейсов 2021",
                     "Рейсов 2022",
-                    "Рейсов 2023"
+                    "Рейсов 2023",
+                    "Рейсов 2024"
             FROM dashboard.credibility_gruz_changes_uru
         '''
         return "Выберите клиента"
@@ -105,11 +111,12 @@ def get_gruzes_df(client=None):
                     "Рейсов 2020",
                     "Рейсов 2021",
                     "Рейсов 2022",
-                    "Рейсов 2023"
+                    "Рейсов 2023",
+                    "Рейсов 2024"
             FROM dashboard.credibility_gruz_changes_uru
             WHERE "Клиент" = '%s'
         ''' % (client)
-        return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+        return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 def get_go_rating(client):
     sql2 = '''
@@ -122,16 +129,17 @@ def get_go_rating(client):
                 "Метрика посредничества"
         FROM dashboard.credibility_posrednics_go_rating_uru е
         WHERE "Клиент" = '%s'
+        ORDER BY "Доля ГО у клиента" DESC
     ''' % (client)
-    return pd.read_sql(sql2, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql2, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
-# Фильтры
-date_filter = dbc.FormGroup([
-    dbc.Label("Период", html_for="date_filter"),
-    dcc.DatePickerRange(
-        id="date_filter",
-        start_date=date(2020,1,1),
-        end_date=date.today(),
-        display_format='D MMM YYYY'
-    )
-])
+# # Фильтры
+# date_filter = dbc.FormGroup([
+#     dbc.Label("Период", html_for="date_filter"),
+#     dcc.DatePickerRange(
+#         id="date_filter",
+#         start_date=date(2020,1,1),
+#         end_date=date.today(),
+#         display_format='D MMM YYYY'
+#     )
+# ])

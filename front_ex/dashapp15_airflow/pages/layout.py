@@ -3,15 +3,17 @@ from datetime import date
 import datetime as dt
 import datetime
 from weakref import ref
-import dash_core_components as dcc
-import dash_html_components as html
+# import dash_core_components as dcc
+from dash import dcc
+# import dash_html_components as html
+from dash import html
 import dash_bootstrap_components as dbc
 
 from sqlalchemy import create_engine
 
 def create_layout():
     """Создание шаблона"""
-    # engine_cons = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    # engine_cons = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     print(dt.datetime.now().replace(minute=0) - dt.timedelta(days=15))
     layout = html.Div([
         html.Div([

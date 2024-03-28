@@ -15,7 +15,7 @@ def get_rps(start_date, end_date):
         ORDER BY rod_id_text ASC
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 # Значения полного списка РПС
@@ -28,7 +28,7 @@ def get_all_rps(start_date, end_date):
         ORDER BY rod_id_text ASC
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 # Максимальная дата в выгрузке
@@ -39,7 +39,7 @@ def get_max_date():
     FROM dashboard.tor_ik t
     '''
     # return engine_cons.execute(sql).fetchone()[0]
-    con = create_engine(config.POSTGRE_DB, max_identifier_length=128, encoding='utf-8')
+    con = create_engine(config.POSTGRE_DB, max_identifier_length=128)
     return con.execute(sql).fetchone()[0]
 
     
@@ -52,7 +52,7 @@ def get_tors_count(start_date, end_date):
         WHERE a.DATNRP BETWEEN '%s' AND '%s'
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 def get_tors_by_rps(start_date, end_date):
     """Выгрузка ремонтов в разрезе РПС"""
@@ -66,7 +66,7 @@ def get_tors_by_rps(start_date, end_date):
         GROUP BY a.ROD_ID_GROUP, a.ILATX
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 def get_tors_by_rps_pr(start_date, end_date):
@@ -81,7 +81,7 @@ def get_tors_by_rps_pr(start_date, end_date):
         GROUP BY a.ROD_ID_TEXT, a.ILATX
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 
@@ -97,7 +97,7 @@ def get_tors_by_type(start_date, end_date):
         GROUP BY a.ILATX
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 def get_top_tors_by_rps(start_date, end_date):
     """Выгрузка топ3 кодов неисправности в разрезе РПС"""
@@ -120,7 +120,7 @@ def get_top_tors_by_rps(start_date, end_date):
           ORDER BY a.ROD_ID_GROUP,a.KOLVO asc;
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 def get_top_tors_by_rps_pr(start_date, end_date):
@@ -144,7 +144,7 @@ def get_top_tors_by_rps_pr(start_date, end_date):
           ORDER BY a.ROD_ID_TEXT,a.KOLVO desc;
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 def get_top_tors_by_type(start_date, end_date):
     """Выгрузка топ кодов неисправности в разрезе видов ТОР"""
@@ -171,7 +171,7 @@ def get_top_tors_by_type(start_date, end_date):
           ORDER BY "Сортировка",a.KOLVO asc;
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 def get_avg_tors(start_date, end_date):
@@ -201,7 +201,7 @@ def get_avg_tors(start_date, end_date):
               GROUP BY a.ILATX) a left join dashboard.avgttor t on t.ILATX = a.ILATX order by "Сортировка" desc
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 
@@ -256,7 +256,7 @@ def get_bad_tors_912(start_date, end_date):
 
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 def get_bad_tors_913(start_date, end_date):
     """Выгрузка некачественных 913 ремонтов"""
@@ -309,7 +309,7 @@ def get_bad_tors_913(start_date, end_date):
 
     ''' % (start_date, end_date)
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 def get_kodneis_info():
@@ -320,4 +320,4 @@ def get_kodneis_info():
 			  from dashboard.kn_info_ik a
     ''' 
 
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))

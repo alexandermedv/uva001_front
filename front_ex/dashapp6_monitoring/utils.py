@@ -93,7 +93,7 @@ def get_get_open_ap_by_groups_182():
                         z.issue_risk_level
     '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -182,7 +182,7 @@ def get_get_open_ap_by_groups_365():
                         z.issue_risk_level
     '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -273,7 +273,7 @@ def get_get_open_ap_by_groups_366():
                         z.issue_risk_level
     '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -371,7 +371,7 @@ def get_incoming_ap():
         GROUP BY z.issue_risk_level
     '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -465,7 +465,7 @@ def get_increase_ap():
         GROUP BY z.issue_risk_level
     '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -559,7 +559,7 @@ def get_decrease_ap():
         GROUP BY z.issue_risk_level
     '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -654,7 +654,7 @@ def get_outcoming_ap():
         GROUP BY z.issue_risk_level
     '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -705,7 +705,7 @@ def get_high_ap_issues():
                         AND a."open_actplans" IS NOT NULL
     '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -736,7 +736,7 @@ def get_actplans():
             AND "Deleted" = '-1'
             '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -791,7 +791,7 @@ def get_delayed_actplans():
             AND j."APCmt" IS NOT NULL -- Убрать эту строчку
             '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -810,7 +810,7 @@ def get_manual_table1():
         FROM dashboard.aa_manual_table1
     '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -827,7 +827,7 @@ def get_manual_table2():
         FROM dashboard.aa_manual_table2
     '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -845,7 +845,7 @@ def get_manual_table3():
         FROM dashboard.aa_manual_table3
     '''
 
-    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     df1 = pd.read_sql(sql, con)
 
     return df1
@@ -859,7 +859,7 @@ def get_max_date():
     FROM dashboard.osv_94
     '''
     # return engine_cons.execute(sql).fetchone()[0]
-    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     return con.execute(sql).fetchone()[0]
 
 
@@ -895,7 +895,7 @@ def get_max_date():
 # 			AND b."Dispos" = '52'
 #     '''
 
-#     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+#     con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
 #     df1 = pd.read_sql(sql, con)
 
 #     return df1

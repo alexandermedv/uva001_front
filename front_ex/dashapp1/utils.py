@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 # from . import engine_cons
 
 # engine_cons = create_engine("""postgresql://locadm:Temp001@msc199-
-# sdb04.domain.local:8031/uva_cons""", max_identifier_length=128, encoding='utf-8')
+# sdb04.domain.local:8031/uva_cons""", max_identifier_length=128)
 
 # Выгрузка оборота и количества операций по счету 94* за выбранный период
 def get_osv_detail_by_dates(start_date, end_date, debug = False):
@@ -44,11 +44,11 @@ def get_osv_detail_by_dates(start_date, end_date, debug = False):
                      dashboard.material."Группа материалов",
                      "Наименование склада"
     ''' % (start_date, end_date)
-    print('1')
+    # print('1')
     if debug:
         print(sql)
     # return pd.read_sql(sql, con=engine_cons, params={"dstart":start_date,"dfinish":end_date})
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 # Выгрузка куба данных операций по счету 94* за выбранный период
@@ -255,7 +255,7 @@ def get_osv_data(start_date, end_date, debug = False):
     if debug:
         print(sql)
     # return pd.read_sql(sql, con=engine_cons, params={"dstart":start_date,"dfinish":end_date})
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 # Выгрузка оборота и количества операций по счету 94* за выбранный период для вкладки 4
 def get_osv_detail_by_dates2(start_date, end_date, debug = False):
@@ -279,7 +279,7 @@ def get_osv_detail_by_dates2(start_date, end_date, debug = False):
         print(sql)
 
     # return pd.read_sql(sql, con=engine_cons)
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 
 # Значения списка филиалов
@@ -294,7 +294,7 @@ def get_branch_names(debug = False):
         print(sql)
 
     # return pd.read_sql(sql, con=engine_cons)
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 # Значения списка типов запчастей
 def get_detail_type_names(debug = False):
@@ -308,7 +308,7 @@ def get_detail_type_names(debug = False):
         print(sql)
 
     # return pd.read_sql(sql, con=engine_cons)
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 # Значения списка складов
 def get_warehouse_names(debug = False):
@@ -321,7 +321,7 @@ def get_warehouse_names(debug = False):
     if debug: print(sql)
 
     # return pd.read_sql(sql, con=engine_cons)
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8'))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
 
 # Максимальная дата в выгрузке
 def get_max_date():
@@ -331,5 +331,5 @@ def get_max_date():
     FROM dashboard.osv_94
     '''
     # return engine_cons.execute(sql).fetchone()[0]
-    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128, encoding='utf-8')
+    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     return con.execute(sql).fetchone()[0]

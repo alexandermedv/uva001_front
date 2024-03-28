@@ -1,14 +1,13 @@
 import json
-from pprint import pprint
 import flask
 import psycopg2
 from flask import url_for, redirect, render_template, flash, request, jsonify, send_from_directory
-from flask_security import login_required, current_user, login_user, logout_user
+from flask_security import login_required, current_user, login_user, logout_user, auth_required, roles_required
 import pandas as pd
 from sqlalchemy import func
 import os
 
-from . import app, db
+from . import app, db, security, login
 from .forms import LoginForm, ProfileForm
 from .models import User, requires_roles, Report
 from sqlalchemy import create_engine
@@ -46,6 +45,13 @@ def render_dashapp14():
 def render_dashapp_credibility_rating():
     """Рейтинг добросовестности клиентов"""
     return render_template('/dashapp_credibility_rating/overview.html')
+
+@app.route('/resellers_uru_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp_resellers_uru():
+    """Автоматизированный мониторинг: выявление потенциальных посредников"""
+    return render_template('/dashapp_resellers_uru/overview.html')
 
 @app.route('/credit_risks_dash/')
 @login_required
@@ -143,7 +149,7 @@ def render_glossary():
 @logger(os.environ['USER_ACTIONS_FILE'])
 def render_IssueTrack_instruction():
 
-    print(os.getcwd())
+    # wtforms.fieldsos.getcwd())
 
     return send_from_directory(os.getcwd() + '/front_ex/files/' ,'Инструкция по работе с мероприятиями.docx', as_attachment=True)
 
@@ -153,7 +159,7 @@ def render_IssueTrack_instruction():
 @logger(os.environ['USER_ACTIONS_FILE'])
 def render_report1():
     df1 = report1.get_details_dost()
-    print(df1)
+    # wtforms.fieldsdf1)
     return render_template('/report1/report1.html', title='report1', items=df1[[
         'equnr', 'eartx', 'status', 'erdat', 'hequi', 'typtx', 
         'last_oper_date']].to_dict(orient='records'))
@@ -171,20 +177,20 @@ def render_report_equipment():
 @logger(os.environ['USER_ACTIONS_FILE'])
 def serverside_table():
     req = flask.request.form
-    # print("Request data", flask.request.data)
-    # print("Request form", flask.request.form)
+    # wtforms.fields"Request data", flask.request.data)
+    # wtforms.fields"Request form", flask.request.form)
     table_name = str(req['table_name'])
     key = str(req['key'])
     schema_name = str(req['schema_name'])
-    # print("table_name", table_name)
-    # print("key", key)
-    # print("schema_name", schema_name)
+    # wtforms.fields"table_name", table_name)
+    # wtforms.fields"key", key)
+    # wtforms.fields"schema_name", schema_name)
 
     column_names = []
     for item in req:
         if 'columns[' in item and '][data]' in item:
             column_names.append(req[item])
-    # print("column_names", column_names)
+    # wtforms.fields"column_names", column_names)
 
     try:
         # Убрать хардкод!
@@ -194,60 +200,60 @@ def serverside_table():
                                 port="8031",
                                 database="uva_cons") as pg_con:
             cursor = pg_con.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            # print('Соединение с базой данных установлено')
+            # wtforms.fields'Соединение с базой данных установлено')
 
             if request.method == 'POST':
                 draw = request.form['draw']
                 row = int(request.form['start'])
                 rowperpage = int(request.form['length'])
                 searchValue = request.form["search[value]"]
-                # print('draw =', draw)
-                # print('row =', row)
-                # print('rowperpage =', rowperpage)
-                # print('searchValue =', searchValue)
+                # wtforms.fields'draw =', draw)
+                # wtforms.fields'row =', row)
+                # wtforms.fields'rowperpage =', rowperpage)
+                # wtforms.fields'searchValue =', searchValue)
 
                 # Total number of records without filtering
                 sql = "SELECT count(*) from " + schema_name + '.' + table_name
                 cursor.execute(sql)
                 totalRecords = int(cursor.fetchone()[0])
-                # print('totalRecords =', totalRecords)
+                # wtforms.fields'totalRecords =', totalRecords)
 
                 # Total number of records with filtering
                 if len(searchValue) < 3:
                     totalRecordwithFilter = totalRecords
-                    # print('totalRecordwithFilter =', totalRecordwithFilter)
+                    # wtforms.fields'totalRecordwithFilter =', totalRecordwithFilter)
                 else:
                     likestrings = searchValue.split(' ')
                     likestrings = ['%' + i + '%' for i in likestrings]
-                    # print('likestrings', likestrings)
+                    # wtforms.fields'likestrings', likestrings)
                     s = ''
                     for column in column_names:
                         s += '"' + str(column) + '", '
                     s = s[:-2].replace("['index'], ", "")
-                    # print('s =', s)
+                    # wtforms.fields's =', s)
                     cols = s.replace("['", "")
                     cols = cols.replace("']", "")
 
-                    # print('cols =', cols)
+                    # wtforms.fields'cols =', cols)
 
                     sql = """SELECT count(*) from """ + schema_name + '.' + table_name + """ WHERE
                      concat(""" + cols + """) LIKE %s"""
                     for i in range(len(likestrings) - 1):
                         sql += """ AND concat(""" + cols + """) LIKE %s"""
-                    # print('sql =', sql)
-                    # print('likeString =', tuple(likestrings))
+                    # wtforms.fields'sql =', sql)
+                    # wtforms.fields'likeString =', tuple(likestrings))
                     cursor.execute(sql, (tuple(likestrings)))
                     totalRecordwithFilter = int(cursor.fetchone()[0])
-                    # print('totalRecordwithFilter =', totalRecordwithFilter)
+                    # wtforms.fields'totalRecordwithFilter =', totalRecordwithFilter)
 
                 # Fetch records
                 if len(searchValue) < 3:
                     sql = 'SELECT * FROM ' + schema_name + '.' + table_name + ' ORDER BY "' + key + '" asc limit %s offset %s;'
                     cursor.execute(sql, (rowperpage, row))
                     resultlist = cursor.fetchall()
-                    # print('resultlist получен (пустой поиск)')
+                    # wtforms.fields'resultlist получен (пустой поиск)')
                 else:
-                    # print('rowperpage =', rowperpage)
+                    # wtforms.fields'rowperpage =', rowperpage)
                     sql = """SELECT * from """ + schema_name + '.' + table_name + """ WHERE
                             concat(""" + cols + """) LIKE %s"""
                     for i in range(len(likestrings) - 1):
@@ -261,7 +267,7 @@ def serverside_table():
                         # sql = "SELECT * FROM " + schema_name + '.' + table_name + " WHERE eqktx LIKE %s OR maktx LIKE %s OR wgbez LIKE %s OR status LIKE %s;"
                         cursor.execute(sql, (likestrings))
                     resultlist = cursor.fetchall()
-                    # print('resultlist получен (не пустой поиск)')
+                    # wtforms.fields'resultlist получен (не пустой поиск)')
 
                 sql = """
                     SELECT column_name
@@ -270,7 +276,7 @@ def serverside_table():
                     AND table_name   = %s"""
                 cursor.execute(sql, (schema_name, table_name))
                 columns = cursor.fetchall()
-                # print('columns =', columns)
+                # wtforms.fields'columns =', columns)
 
                 data = []
 
@@ -278,10 +284,10 @@ def serverside_table():
                     d = {}
                     for col in column_names:
                         d[col] = row[col]
-                    # print('d =', d)
+                    # wtforms.fields'd =', d)
                     data.append(d)
 
-                # print('data =', data[:5])
+                # wtforms.fields'data =', data[:5])
 
                 response = {
                     'draw': draw,
@@ -291,7 +297,7 @@ def serverside_table():
                     'aaData': data,
                 }
 
-                # print('response =', response)
+                # wtforms.fields'response =', response)
 
                 return jsonify(response)
     except Exception as e:
@@ -304,17 +310,32 @@ def serverside_table():
 @logger(os.environ['USER_ACTIONS_FILE'])
 def signin():
     """Вход в систему"""
+    
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = LoginForm()
+    # print('user = ', User.ldap_account)
+    # print('user = ', form.ldap_account.data)
     if form.validate_on_submit():
         login = form.ldap_account.data.lower()  
+        print('login =', login)
         password = form.password.data
+        print('password =', password)
+        print('ldap_authentication(login, password) = ', ldap_authentication(login, password))
         user = User.query.filter(func.lower(User.ldap_account)==login).first()
-        if user and ldap_authentication(login, password): 
+        print('user =', user)
+        print('user =', security.datastore.find_user(email="svc_fs_uva@pgkweb.ru"))
+        if user and ldap_authentication(login, password):
+            print('Логиним юзера')
             login_user(user)
+            # security.datastore.commit()
+            print('Получилось залогиниться?', current_user.is_authenticated())
+            print('current_user =', current_user)
+            print('current_user.email =', current_user.email)
+            print('current_user.check_report_roles(glossary) =', current_user.check_report_roles('glossary'))
             if 'next' in request.args:
                 return redirect(request.args['next'])
+            print('редиректим на индекс')
             return redirect(url_for('index'))
         # Переписать
         else:
@@ -331,10 +352,14 @@ def redirect_login():
 
 
 @app.route('/index')
-@login_required
+# @login_required
+# @auth_required('session')
+# @roles_required('admin')
 @logger(os.environ['USER_ACTIONS_FILE'])
 def index():
     """Первичная страница"""
+    # print('login.current_user.is_authenticated() =', login.current_user.is_authenticated())
+    # print('authenticated?', current_user.is_authenticated())
     return render_template('index.html')
     
 

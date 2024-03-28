@@ -23,7 +23,9 @@
           <!-- Администрирование -->
           <ul class="nav navbar-nav navbar-right" style="font-size: 15px;">
             <li class="dropdown">
+                {% if 'admin' in current_user.roles %}
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Администрирование<span class="caret"></span></a>
+                {% endif %}
               <ul class="dropdown-menu">
                 <li><a href="/admin/user">Управление пользователями</a></li>
               </ul>

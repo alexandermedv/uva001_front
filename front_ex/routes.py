@@ -322,8 +322,9 @@ def signin():
         password = form.password.data
         print('password =', password)
         print('ldap_authentication(login, password) = ', ldap_authentication(login, password))
+        print(User.query.first().id)
         user = User.query.filter(func.lower(User.ldap_account)==login).first()
-        print('user =', user)
+        print('user =', user.ldap_account)
         print('user =', security.datastore.find_user(email="svc_fs_uva@pgkweb.ru"))
         if user and ldap_authentication(login, password):
             print('Логиним юзера')

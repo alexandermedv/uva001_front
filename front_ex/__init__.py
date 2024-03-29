@@ -72,6 +72,9 @@ from .models import User,Role,Dash,HomeIndexView,UserModelView,RoleModelView,Rep
 # Добавляем админку
 # Добавление ролевой модели из Flask_Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+
+print(user_datastore)
+
 security = Security()
 app.config['SECURITY_MSG_LOGIN'] = ('Для просмотра сайта требуется авторизоваться', 'info')
 security.init_app(app=app, datastore = user_datastore)
@@ -86,12 +89,17 @@ def create_user():
         if not user:
             user_to_create = User(ldap_account='svc_fs_uva', email='svc_fs_uva@pgkweb.ru', active=True)
             user_datastore.create_user(ldap_account='svc_fs_uva', email='svc_fs_uva@pgkweb.ru', active=True)
+            db.session.commit()
+            
+            user = User.query.first()
+
+            # user_to_create.fs_uniquifier = '000'
             
             role = Role.query.first()
             if not role:
                 user_datastore.create_role(name='admin', description='Администратор, полные полномочия')
                 role = Role.query.first()
-            # user_datastore.add_role_to_user(user, 'admin')
+            user_datastore.add_role_to_user(user, 'admin')
             # print('user =', security.datastore.find_user(email="svc_fs_uva@pgkweb.ru"))
             # user_datastore.create_user(email='admin@admin', password='admin')
             db.session.commit()

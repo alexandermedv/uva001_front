@@ -46,7 +46,7 @@ class User(db.Model, UserMixin):
 
 
     def __repr__(self):
-        return '<User {}>'.format(self.last_name)
+        return '<User {}>'.format(self.ldap_account)
     
     # Модель подразумевает одну роль на один логин и много ролей на один роут
     def get_roles(self, *args):

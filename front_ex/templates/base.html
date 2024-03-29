@@ -22,18 +22,21 @@
         
           <!-- Администрирование -->
           <ul class="nav navbar-nav navbar-right" style="font-size: 15px;">
-            <li class="dropdown">
+            <!-- <li class="dropdown">
                 {% if 'admin' in current_user.roles %}
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Администрирование<span class="caret"></span></a>
                 {% endif %}
               <ul class="dropdown-menu">
                 <li><a href="/admin/user">Управление пользователями</a></li>
               </ul>
-            </li>
+            </li> -->
+            
             <!-- Пользователь  -->
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle fa-lg"></i></a>
               <ul class="dropdown-menu">
+                <li><a href="/admin/user">Управление пользователями</a></li>
+                <li role="separator" class="divider"></li>
                 <li><a href="/user/profile">Профиль</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="/logout">Выход</a></li>

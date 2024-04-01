@@ -201,6 +201,18 @@ def create_layout():
                     ],
             ),
             html.Hr(style={'color':'#730031'}),
+            # Тест
+            # html.Div(dbc.Card([
+            #             #dbc.CardHeader('Выберите клиента и грузоотправителя для отображения графика',style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 18}),
+            #             dbc.CardBody(
+            #                 [
+            #                     # html.H6('Выберите клиента и грузоотправителя для отображения графика', 
+            #                     #         className='card-title'),
+            #                     dcc.Graph(id='graph_go_cl', style = {'width': '50%'}),
+            #                 ]
+            #             )
+            #         ]),
+            # ),
             # 3 Блок (рейтинг ГО и график)
             html.Div(className='row', children=
                 [
@@ -262,11 +274,11 @@ def create_layout():
                     html.Div(className='five columns', children=
                         [
                             dbc.Card([
-                                dbc.CardHeader('Выберите клиента и грузоотправителя для отображения графика',style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 18}),
+                                #dbc.CardHeader('Выберите клиента и грузоотправителя для отображения графика',style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 18}),
                                 dbc.CardBody(
                                     [
-                                        # html.H6('Выберите клиента и грузоотправителя для отображения графика', 
-                                        #         className='card-title'),
+                                        html.H6('Выберите клиента и грузоотправителя для отображения графика', 
+                                                className='card-title'),
                                         dcc.Graph(id='graph_go_cl'),
                                     ]
                                 )

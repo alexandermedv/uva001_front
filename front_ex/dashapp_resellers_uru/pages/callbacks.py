@@ -118,10 +118,10 @@ def update_style_data(active_cell):
 # Активная ячейка в рейтинге ГО
 @dash_app.callback(
     (
+        Output("graph_go_cl", "figure"),
         Output("go_rating", "style_data_conditional"), 
         Output("go_id", "children"),
         Output("go_name", "children"),
-        Output("graph_go_cl", "figure"),
     ),
     [
         Input('go_rating', 'active_cell'),
@@ -141,9 +141,9 @@ def update_style_data(active_cell_go, data_go, client):
 
     if active_row_go_id is None:
         go_last_row = -1
-        return ([], "Грузоотправитель не выбран", "Кликните по таблице ниже", None)#no_update, 
+        return (no_update, [], "Грузоотправитель не выбран", "Кликните по таблице ниже")#no_update, 
     elif active_row_go_id == go_last_row:
-        return (no_update, no_update, no_update, None)
+        return (no_update, no_update, no_update, no_update)
     else:
         #print('active_row_go_id, go_last_row = ', active_row_go_id, go_last_row)
         go_last_row = active_row_go_id
@@ -151,12 +151,14 @@ def update_style_data(active_cell_go, data_go, client):
         go_name = 'Грузоотправитель: ' + str(data_go[int(active_row_go_id)]['Грузоотправитель имя'])
 
         #hld_cl, fit = df_fit.loc[df_fit["Клиент"] ==client, ['Клиент (холдинг)', 'Доля ФИТ(%)']].min()
-        df2_grouped_balak = pd.DataFrame(get_data_for_graph(go_id))
+        df_temp = get_data_for_graph(go_id)
+        df2_grouped_balak = pd.DataFrame(df_temp)
         fig = px.scatter(df2_grouped_balak, 
                          x="Дата раскредитования", y="Сумма услуги общая", 
                          #category_orders={'Клиент': [client, list(df2_grouped_balak['Клиент'].unique()).remove(client)]},
                          color='Наименование клиента',#"Клиент",
                          hover_name='Наименование клиента',
+                         render_mode="svg",
                          #trendline='ols', 
                          title='<b>Распределение вагоноотправок по ГО:</b> %s' % go_name + " (" + go_id +")",
                          #height=600
@@ -178,10 +180,12 @@ def update_style_data(active_cell_go, data_go, client):
             )),
             plot_bgcolor='#EFECEC'
         )
+        #fig.show()
         print('len(df2_grouped_balak) = ', len(df2_grouped_balak))
         print('df2_grouped_balak.dtypes = ', df2_grouped_balak.dtypes)
         #print('df2_grouped_balak.columns =', df2_grouped_balak[['Наименование клиента', 'Дата раскредитования', 'Сумма услуги общая']].head(3))
         return (
+            fig,
             #Стили для таблицы ГО
             [
                 {
@@ -201,8 +205,8 @@ def update_style_data(active_cell_go, data_go, client):
                     "border": "1px solid darkgray", #"1px solid rgb(0, 116, 217)",
                 }
             ], 
-            go_id, go_name,
-            fig,
+            go_id, 
+            go_name,
         )
     
 # --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

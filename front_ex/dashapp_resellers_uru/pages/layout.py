@@ -173,9 +173,70 @@ def create_layout():
                                         ),
                                     ],
                                 ),
-                            ], className='six columns',
+                            ], className='four columns',
                         ),
-                        html.Div(id='go_current_card', 
+                        html.Div(className='eight columns', children=
+                            [
+                                dbc.Card(
+                                    [
+                                        dbc.CardBody(
+                                            [
+                                                html.H6('Рейтинг грузоотправителей для выбранного клиента', 
+                                                        className='card-title'),
+                                                dash_table.DataTable(id="go_rating", 
+                                                    columns=[
+                                                        {"name":"Грузоотправитель", "id": "Грузоотправитель"},
+                                                        {"name":"Грузоотправитель имя", "id": "Грузоотправитель имя"},
+                                                        {"name":"Договор", "id": "Договор"},
+                                                        {"name":"Сумма продаж ГО у клиента", "id": "Сумма продаж ГО у клиента", 
+                                                                "type": "numeric", "format": {'specifier': ',.0f',
+                                                                                                "locale": {"group": " "}}},
+                                                        {"name":"Доля ГО у клиента", "id": "Доля ГО у клиента", 
+                                                                "type": "numeric", "format": {'specifier': ',.0%'}},
+                                                        {"name":"Результат анализа СПАРК", "id": "Результат анализа"},
+                                                        {"name":"Метрика посредничества", "id": "Метрика посредничества", 
+                                                                        "type": "numeric", "format": {'specifier': ',.0%'}},
+                                                    ],
+                                                    page_size=10,
+                                                    sort_action="native", filter_action="native",
+                                                    export_format='xlsx', export_headers='display', 
+                                                    style_as_list_view=True,
+                                                    style_cell_conditional=[
+                                                        {
+                                                            'if': {'column_id': 'Грузоотправитель'},
+                                                            'textAlign': 'left',
+                                                            'width': '10%'
+                                                        },
+                                                        {
+                                                            'if': {'column_id': ['Метрика посредничества', 'Сумма продаж ГО у клиента']},
+                                                            'width': '15%'
+                                                        },
+                                                    ],
+                                                    style_cell={
+                                                        'height': 'auto', 'maxheight': '50px',
+                                                        'minWidth': '50px', 'maxWidth': '300px',
+                                                        'whiteSpace': 'normal',
+                                                        'fontSize': 11, 'font-family': 'Arial'
+                                                        },
+                                                    style_header={
+                                                        'backgroundColor': '#EFECEC',
+                                                        'color': 'black',
+                                                        'fontWeight': 'bold'
+                                                    }
+                                                )
+                                            ]
+                                        )
+                                    ]
+                                )
+                            ]
+                        ),
+                    ],
+            ),
+            html.Hr(style={'color':'#730031'}),
+            # 3 Блок (график по распределению вагоноотправок по ГО)
+            html.Div(className='row', children=
+                [
+                    html.Div(id='go_current_card', 
                                 children = [
                                     dbc.Card(
                                             [
@@ -196,89 +257,16 @@ def create_layout():
                                             ],
                                             className="h-100",
                                         ),
-                                ], className='six columns',
+                                ], className='four columns',
                         ),
-                    ],
-            ),
-            html.Hr(style={'color':'#730031'}),
-            # Тест
-            # html.Div(dbc.Card([
-            #             #dbc.CardHeader('Выберите клиента и грузоотправителя для отображения графика',style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 18}),
-            #             dbc.CardBody(
-            #                 [
-            #                     # html.H6('Выберите клиента и грузоотправителя для отображения графика', 
-            #                     #         className='card-title'),
-            #                     dcc.Graph(id='graph_go_cl', style = {'width': '50%'}),
-            #                 ]
-            #             )
-            #         ]),
-            # ),
-            # 3 Блок (рейтинг ГО и график)
-            html.Div(className='row', children=
-                [
-                    html.Div(className='seven columns', children=
-                        [
-                            dbc.Card(
-                                [
-                                    dbc.CardBody(
-                                        [
-                                            html.H6('Рейтинг грузоотправителей для выбранного клиента', 
-                                                    className='card-title'),
-                                            dash_table.DataTable(id="go_rating", 
-                                                columns=[
-                                                    {"name":"Грузоотправитель", "id": "Грузоотправитель"},
-                                                    {"name":"Грузоотправитель имя", "id": "Грузоотправитель имя"},
-                                                    {"name":"Договор", "id": "Договор"},
-                                                    {"name":"Сумма продаж ГО у клиента", "id": "Сумма продаж ГО у клиента", 
-                                                            "type": "numeric", "format": {'specifier': ',.0f',
-                                                                                            "locale": {"group": " "}}},
-                                                    {"name":"Доля ГО у клиента", "id": "Доля ГО у клиента", 
-                                                            "type": "numeric", "format": {'specifier': ',.0%'}},
-                                                    {"name":"Результат анализа СПАРК", "id": "Результат анализа"},
-                                                    {"name":"Метрика посредничества", "id": "Метрика посредничества", 
-                                                                    "type": "numeric", "format": {'specifier': ',.0%'}},
-                                                ],
-                                                page_size=10,
-                                                sort_action="native", filter_action="native",
-                                                export_format='xlsx', export_headers='display', 
-                                                style_as_list_view=True,
-                                                style_cell_conditional=[
-                                                    {
-                                                        'if': {'column_id': 'Грузоотправитель'},
-                                                        'textAlign': 'left',
-                                                        'width': '10%'
-                                                    },
-                                                    {
-                                                        'if': {'column_id': ['Метрика посредничества', 'Сумма продаж ГО у клиента']},
-                                                        'width': '15%'
-                                                    },
-                                                ],
-                                                style_cell={
-                                                    'height': 'auto', 'maxheight': '50px',
-                                                    'minWidth': '50px', 'maxWidth': '300px',
-                                                    'whiteSpace': 'normal',
-                                                    'fontSize': 11, 'font-family': 'Arial'
-                                                    },
-                                                style_header={
-                                                    'backgroundColor': '#EFECEC',
-                                                    'color': 'black',
-                                                    'fontWeight': 'bold'
-                                                }
-                                            )
-                                        ]
-                                    )
-                                ]
-                            )
-                        ]
-                    ),
-                    html.Div(className='five columns', children=
+                    html.Div(className='eight columns', children=
                         [
                             dbc.Card([
                                 #dbc.CardHeader('Выберите клиента и грузоотправителя для отображения графика',style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 18}),
                                 dbc.CardBody(
                                     [
-                                        html.H6('Выберите клиента и грузоотправителя для отображения графика', 
-                                                className='card-title'),
+                                        # html.H6('Выберите клиента и грузоотправителя для отображения графика', 
+                                        #         className='card-title'),
                                         dcc.Graph(id='graph_go_cl'),
                                     ]
                                 )

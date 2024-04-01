@@ -160,7 +160,7 @@ def update_style_data(active_cell_go, data_go, client):
                          hover_name='Наименование клиента',
                          render_mode="svg",
                          #trendline='ols', 
-                         title='<b>Распределение вагоноотправок по ГО:</b> %s' % go_name + " (" + go_id +")",
+                         title='<b>Распределение вагоноотправок </b> %s' % go_name + " (" + go_id +")",
                          #height=600
         )
         fig.update_layout(
@@ -180,10 +180,6 @@ def update_style_data(active_cell_go, data_go, client):
             )),
             plot_bgcolor='#EFECEC'
         )
-        #fig.show()
-        print('len(df2_grouped_balak) = ', len(df2_grouped_balak))
-        print('df2_grouped_balak.dtypes = ', df2_grouped_balak.dtypes)
-        #print('df2_grouped_balak.columns =', df2_grouped_balak[['Наименование клиента', 'Дата раскредитования', 'Сумма услуги общая']].head(3))
         return (
             fig,
             #Стили для таблицы ГО

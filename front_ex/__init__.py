@@ -1,12 +1,12 @@
 # Инициализация Celery
 import os
 from os import path as op
-from flask import Flask, redirect, url_for, request
+from flask import Flask, redirect, url_for, request, jsonify
 from healthcheck import HealthCheck
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 
-from flask import Flask, jsonify
+#from flask import Flask, jsonify
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 # from flask_script import Manager
@@ -19,14 +19,15 @@ from flask_security import Security, SQLAlchemyUserDatastore, current_user, logi
 from flask_admin.contrib import fileadmin
 
 # Добавление русской локали
-from flask_babelex import Babel
+#from flask_babelex import Babel
+from flask_babel import Babel
 
 # Встроенные API
 # from flask_restful import Api
 
 # from .forms import LoginForm
 # Добавляем логирование пользователей и роли
-from flask_sqlalchemy import SQLAlchemy
+#from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_cors import CORS
 
@@ -45,6 +46,9 @@ Bootstrap(app)
 app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
 app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Moscow'
 babel = Babel(app)
+# def get_locale():
+#     return 'en'
+# babel.init_app(app, locale_selector=get_locale)
 
 # Добавляем базы данных и логин-менеджер
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']

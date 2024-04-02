@@ -151,31 +151,38 @@ def update_style_data(active_cell_go, data_go, client):
         df_temp = get_data_for_graph(go_id)
         df2_grouped_balak = pd.DataFrame(df_temp)
         fig = px.scatter(df2_grouped_balak, 
-                         x="Дата раскредитования", y="Сумма услуги общая", 
-                         #category_orders={'Клиент': [client, list(df2_grouped_balak['Клиент'].unique()).remove(client)]},
-                         color='Наименование клиента',#"Клиент",
-                         hover_name='Наименование клиента',
-                         render_mode="svg",
-                         #trendline='ols', 
-                         title='<b>Распределение вагоноотправок </b> %s' % go_name + " (" + go_id +")",
-                         #height=600
+                        x="Дата раскредитования", y="Сумма услуги общая", 
+                        #category_orders={'Клиент': [client, list(df2_grouped_balak['Клиент'].unique()).remove(client)]},
+                        color='Наименование клиента',#"Клиент",
+                        hover_name='Наименование клиента',
+                        render_mode="svg",
+                        #trendline='ols', 
+                        title='<b>Распределение вагоноотправок, </b> %s' % go_name + " (" + go_id +")",
+                        #height=600
         )
         fig.update_layout(
             legend=dict(
-            orientation="h",
-            xanchor="center",
-            yanchor="top",
-            y=-0.2,
-            x=0.5,
-            #itemwidth=70,
-            title_font_color='#730031',
-            title_font_family="Arial",
-            font=dict(
-                family="Arial",
-                size=12,
-                color="black"
+                orientation="h",
+                xanchor="center",
+                yanchor="top",
+                y=-0.2,
+                x=0.5,
+                #title_font_color='#730031',
+                #title_font_family="Arial",
+                font=dict(
+                    family="Arial",
+                    size=9,
+                    color="black"
             )),
-            plot_bgcolor='#EFECEC'
+            title={
+                #'color': '#730031',
+                #'family': "Arial",
+                'yanchor': 'top',
+                'font_size': 11
+            },
+            margin=dict(r=0, t=25, b=0),
+            plot_bgcolor='#EFECEC',
+            paper_bgcolor="rgba(0, 0, 0, 0)",
         )
         return (
             fig,
@@ -224,7 +231,7 @@ def populate_datatable(n_intervals):
             style_cell={
                 'height': 'auto',
                 #'minWidth': '160px', 'width': '180px', 'maxWidth': '200px',
-                'whiteSpace': 'normal', 'fontSize': 11, 'font-family': 'Arial'
+                'whiteSpace': 'normal', 'fontSize': 10, 'font-family': 'Arial'
             },
             style_cell_conditional=[
                 {
@@ -239,7 +246,8 @@ def populate_datatable(n_intervals):
             style_header={
                 'backgroundColor': '#EFECEC',
                 'color': 'black',
-                'fontWeight': 'bold'
+                'fontWeight': 'bold',
+                'fontSize': 10, 'font-family': 'Arial'
             }
         )
     ]

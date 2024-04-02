@@ -24,7 +24,6 @@ cl_last_row, go_last_row = -1, -1
             Output("go_rating", "data"),
             Output('go_rating', 'active_cell'),
             Output('go_rating', "selected_cells")
-            #Output('client_info', 'children'),
     ),
     [
         Input('client_table', 'active_cell'),
@@ -32,8 +31,6 @@ cl_last_row, go_last_row = -1, -1
     prevent_initial_call=True
 )
 def update_style_data(active_cell):
-    #input_triggered = dash.callback_context.triggered[0]["prop_id"].split(".")[0]
-    #if input_triggered == "client_table":
     if active_cell is None:
         raise PreventUpdate
     
@@ -168,7 +165,7 @@ def update_style_data(active_cell_go, data_go, client):
             orientation="h",
             xanchor="center",
             yanchor="top",
-            y=-0.15,
+            y=-0.2,
             x=0.5,
             #itemwidth=70,
             title_font_color='#730031',

@@ -37,7 +37,7 @@ def update_table_data(active_cell): #, selected_cells, active_cell
                             style={'font-size': 14,
                                     'font-family': 'Arial',
                                     'text-align': 'left',
-                                    'color': '#808080'},
+                                },
                         ),
                         html.P('Состоит в холдинге: {}'.format(dff['Холдинг клиента'][0])),
                         html.P('ИНН: {}, ОКПО: {}'.format(dff['ИНН клиента'][0], dff['ОГРН клиента'][0])),

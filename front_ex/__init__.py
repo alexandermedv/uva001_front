@@ -19,7 +19,9 @@ from flask_security import Security, SQLAlchemyUserDatastore, current_user, logi
 from flask_admin.contrib import fileadmin
 
 # Добавление русской локали
-from flask_babelex import Babel
+from flask_babel import Babel
+from sqlalchemy import func
+from datetime import timedelta
 
 # Встроенные API
 # from flask_restful import Api
@@ -72,12 +74,24 @@ from .models import User,Role,Dash,HomeIndexView,UserModelView,RoleModelView,Rep
 # Добавляем админку
 # Добавление ролевой модели из Flask_Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+# print(user_datastore)
 
-print(user_datastore)
+from .forms import UserLoginForm 
 
-security = Security()
-app.config['SECURITY_MSG_LOGIN'] = ('Для просмотра сайта требуется авторизоваться', 'info')
-security.init_app(app=app, datastore = user_datastore)
+# security = Security()
+# app.config['SECURITY_REGISTERABLE']=True
+# app.config['SECURITY_PASSWORD_SALT'] = 'salt'
+
+# AT
+# security = Security(login_form=UserLoginForm)
+# app.config['SECURITY_MSG_LOGIN'] = ('Для просмотра сайта требуется авторизоваться', 'info')
+# security.init_app(app=app, datastore = user_datastore)
+
+# AT
+# app.config['SECURITY_USER_INDENTITY_ATTRIBUTES'] = [
+#     {'ldap_account':{'case_intensitive': False}}
+# ]
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds=15)
 
 # декоратор под первого пользователя
 # @app.before_first_request
@@ -213,3 +227,9 @@ health.add_check(front_db_available)
 health.add_check(log_db_available)
 
 app.add_url_rule('/healthcheck', 'healthcheck', view_func=lambda: health.run())
+
+# AT
+@login.user_loader
+def user_loader(user):
+    print('@login.user_loader', int(user))
+    return User.query.filter(User.id==int(user)).first()

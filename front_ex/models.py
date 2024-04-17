@@ -1,6 +1,7 @@
 from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin, current_user
-from flask_security import RoleMixin
+# AT
+# from flask_security import RoleMixin
 from flask import url_for, redirect, render_template, flash, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import StringField, PasswordField, BooleanField
@@ -146,7 +147,9 @@ def requires_roles(*roles):
     return wrapper
 
 # Роли
-class Role(db.Model, RoleMixin):
+class Role(db.Model):
+# AT
+# class Role(db.Model, RoleMixin):
     __tablename__ = 'role'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)

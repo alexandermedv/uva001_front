@@ -4,9 +4,12 @@ from wtforms import SubmitField, TextAreaField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Length, InputRequired, Email, NumberRange, EqualTo
 from wtforms.fields import DateField, EmailField
 from wtforms.widgets import TextInput
-from flask_security.forms import LoginForm
 
-class LoginForm(FlaskForm):
+# AT
+# from flask_security.forms import LoginForm
+
+# class LoginForm(FlaskForm):
+class UserLoginForm(FlaskForm):
     """Форма авторизации пользователя"""
 
     ldap_account = StringField('Аккаунт windows')

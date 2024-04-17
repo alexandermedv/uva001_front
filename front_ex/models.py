@@ -190,6 +190,22 @@ class Log(db.Model):
 
 
 #### Встраивание Flask Admin
+# class UserModelView(ModelView):
+#     '''
+#         Закладка Пользователи
+#     '''
+#     # def is_accessible(self):
+#     #     return (current_user.is_active , current_user.is_authenticated)
+    
+#     # def _handle_view(self, name):
+#     #     if not self.is_accessible():
+#     #         return redirect(url_for('signin'))
+
+#     column_list = ['id'] 
+#     form_columns = ('id')
+
+#     can_export = True
+
 class UserModelView(ModelView):
     '''
         Закладка Пользователи

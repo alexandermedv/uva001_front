@@ -14,7 +14,9 @@ from flask_migrate import Migrate
 # from flask_migrate import MigrateCommand
 # from flask_login import UserMixin, LoginManager
 from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 
+# from flask_login import 
 from flask_security import Security, SQLAlchemyUserDatastore, current_user, login_required
 from flask_admin.contrib import fileadmin
 
@@ -57,8 +59,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True} 
 app.config['SECRET_KEY'] = os.urandom(24)
 db = SQLAlchemy(app)
-db.create_all(bind=None)
-db.create_all(bind=['log'])
+
+# AT
+# db.create_all(bind=None)
+# db.create_all()
+# db.create_all(bind=['log'])
 
 # Миграция - создание и обновление структуры баз данных
 migrate = Migrate(app, db, compare_type=True)
@@ -97,8 +102,10 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds=15)
 # @app.before_first_request
 def create_user():
     with app.app_context():
-        db.create_all(bind=None)
-        db.create_all(bind=['log'])
+        # AT
+        # db.create_all(bind=None)
+        db.create_all()
+        # db.create_all(bind=['log'])
         user = User.query.first()
         if not user:
             user_to_create = User(ldap_account='svc_fs_uva', email='svc_fs_uva@pgkweb.ru', active=True)
@@ -133,9 +140,11 @@ except OSError:
 
 # добавление административной формы
 # adminuser=admin.user
-admin = Admin(app, name = 'Администрирование', template_mode='bootstrap3', \
+# admin = Admin(app, name = 'Администрирование', template_mode='bootstrap3', \
+#     index_view=HomeIndexView(name='Обзор', endpoint='adminuser', url='/admin'))
+admin = Admin(app, name = 'Администрирование', # template_mode='bootstrap3', \
     index_view=HomeIndexView(name='Обзор', endpoint='adminuser', url='/admin'))
-admin.add_view(UserModelView(User, db.session, name='Пользователи'))
+admin.add_view(ModelView(User, db.session, name='Пользователи'))
 admin.add_view(RoleModelView(Role, db.session, name='Роли'))
 admin.add_view(DashModelView(Dash, db.session, name='Дэшборды'))
 admin.add_view(ReportModelView(Report, db.session, name='Отчеты'))

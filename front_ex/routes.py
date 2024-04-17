@@ -125,7 +125,7 @@ def render_dashapp_credibility_rating():
 
 # Test
 @app.route('/resellers_uru_dash/')
-@auth_required('token')
+@login_required
 @logger(os.environ['USER_ACTIONS_FILE'])
 def render_dashapp_resellers_uru():
     """Автоматизированный мониторинг: выявление потенциальных посредников"""

@@ -242,3 +242,8 @@ app.add_url_rule('/healthcheck', 'healthcheck', view_func=lambda: health.run())
 def user_loader(user):
     print('@login.user_loader', int(user))
     return User.query.filter(User.id==int(user)).first()
+
+# Если нет авторизации - переброска на страницу авторизации
+@login.unauthorized_handler
+def unauthorized_handler_callback():
+    return redirect(url_for('signin'))

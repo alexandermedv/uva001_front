@@ -2,19 +2,96 @@ import json
 import flask
 import psycopg2
 from flask import url_for, redirect, render_template, flash, request, jsonify, send_from_directory
-from flask_security import login_required, current_user, login_user, logout_user, auth_required, roles_required
+from flask_security import logout_user, auth_required, roles_required #import login_required, current_user, login_user,
+
+from flask_login import login_required, current_user, login_user
 import pandas as pd
 from sqlalchemy import func
 import os
+from flask import session
 
-from . import app, db, security, login
-from .forms import LoginForm, ProfileForm
+from . import app, db, login 
+# AT
+# security
+
+# from .forms import LoginForm, ProfileForm
+from .forms import UserLoginForm, ProfileForm
 from .models import User, requires_roles, Report
 from sqlalchemy import create_engine
 from .report1 import utils as report1
 from .glossary import utils as glossary
 from .ldap import ldap_authentication
 from .utils import logger
+
+
+# Общие вводные
+@app.route('/')
+@logger(os.environ['USER_ACTIONS_FILE'])
+def redirect_login():
+    print('/ session', session)
+    return redirect(url_for('signin'))
+
+
+@app.route('/index')
+@login_required
+# @auth_required('session')
+# @roles_required('admin')
+@logger(os.environ['USER_ACTIONS_FILE'])
+def index():
+    """Первичная страница"""
+    # print('login.current_user.is_authenticated() =', login.current_user.is_authenticated())
+    # print('authenticated?', current_user.is_authenticated())
+    return render_template('index.html')
+
+
+@app.route('/signin', methods=['GET', 'POST'])
+@logger(os.environ['USER_ACTIONS_FILE'])
+def signin():
+    """Вход в систему"""
+    
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    # form = LoginForm()
+    form = UserLoginForm()
+    # print('user = ', User.ldap_account)
+    # print('user = ', form.ldap_account.data)
+    if form.validate_on_submit():
+        login = form.ldap_account.data.lower()  
+        print('login =', login)
+        password = form.password.data
+        print('password =', password)
+        print('ldap_authentication(login, password) = ', ldap_authentication(login, password))
+        print(User.query.first().id)
+        user = User.query.filter(func.lower(User.ldap_account)==login).first()
+        print('user =', user.ldap_account)
+        # AT
+        # print('user =', security.datastore.find_user(email="svc_fs_uva@pgkweb.ru"))
+        if user and ldap_authentication(login, password):
+            print('Логиним юзера')
+            login_user(user)
+            # security.datastore.commit()
+            print('Получилось залогиниться?', current_user.is_authenticated())
+            print('current_user =', current_user)
+            print('current_user.email =', current_user.email)
+            print('current_user.check_report_roles(glossary) =', current_user.check_report_roles('glossary'))
+            if 'next' in request.args:
+                return redirect(request.args['next'])
+            return redirect(url_for('index'))
+        # Переписать
+        else:
+            flash('Аккаунт Windows, либо пароль указаны некорректно.')
+            return redirect(url_for('signin'))
+    return render_template('/user/signin.html', title='Sign In', form=form)
+   
+
+@app.route('/logout')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def logout():
+    """Выход из системы"""
+    logout_user()
+    return redirect(url_for('signin'))
+
 
 # Руты к дэшбордам
 @app.route('/airflow_dash/')
@@ -46,6 +123,7 @@ def render_dashapp_credibility_rating():
     """Рейтинг добросовестности клиентов"""
     return render_template('/dashapp_credibility_rating/overview.html')
 
+# Test
 @app.route('/resellers_uru_dash/')
 #@login_required
 @logger(os.environ['USER_ACTIONS_FILE'])
@@ -306,64 +384,6 @@ def serverside_table():
         cursor.close()
 
 
-@app.route('/signin', methods=['GET', 'POST'])
-@logger(os.environ['USER_ACTIONS_FILE'])
-def signin():
-    """Вход в систему"""
-    
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = LoginForm()
-    # print('user = ', User.ldap_account)
-    # print('user = ', form.ldap_account.data)
-    if form.validate_on_submit():
-        login = form.ldap_account.data.lower()  
-        print('login =', login)
-        password = form.password.data
-        print('password =', password)
-        print('ldap_authentication(login, password) = ', ldap_authentication(login, password))
-        print(User.query.first().id)
-        user = User.query.filter(func.lower(User.ldap_account)==login).first()
-        print('user =', user.ldap_account)
-        print('user =', security.datastore.find_user(email="svc_fs_uva@pgkweb.ru"))
-        if user and ldap_authentication(login, password):
-            print('Логиним юзера')
-            login_user(user)
-            # security.datastore.commit()
-            print('Получилось залогиниться?', current_user.is_authenticated())
-            print('current_user =', current_user)
-            print('current_user.email =', current_user.email)
-            print('current_user.check_report_roles(glossary) =', current_user.check_report_roles('glossary'))
-            if 'next' in request.args:
-                return redirect(request.args['next'])
-            print('редиректим на индекс')
-            return redirect(url_for('index'))
-        # Переписать
-        else:
-            flash('Аккаунт Windows, либо пароль указаны некорректно.')
-            return redirect(url_for('signin'))
-    return render_template('/user/signin.html', title='Sign In', form=form)
-
-
-# Общие вводные
-@app.route('/')
-@logger(os.environ['USER_ACTIONS_FILE'])
-def redirect_login():
-    return redirect(url_for('signin'))
-
-
-@app.route('/index')
-# @login_required
-# @auth_required('session')
-# @roles_required('admin')
-@logger(os.environ['USER_ACTIONS_FILE'])
-def index():
-    """Первичная страница"""
-    # print('login.current_user.is_authenticated() =', login.current_user.is_authenticated())
-    # print('authenticated?', current_user.is_authenticated())
-    return render_template('index.html')
-    
-
 @app.route('/user/profile', methods=['GET', 'POST'])
 @login_required
 @logger(os.environ['USER_ACTIONS_FILE'])
@@ -375,15 +395,6 @@ def profile():
         form.login.data = current_user.ldap_account
         form.email.data = current_user.email
         return render_template('/user/profile.html', title='profile', form=form)
-
-
-@app.route('/logout')
-@login_required
-@logger(os.environ['USER_ACTIONS_FILE'])
-def logout():
-    """Выход из системы"""
-    logout_user()
-    return redirect(url_for('signin'))
 
 
 # Отчетность

@@ -5,14 +5,13 @@ services:
       build:  
          context: .
          dockerfile: dockerfile311.test
-      command: python wsgi_test.py
-      # command: gunicorn -w 1 -b 0.0.0.0:7007 wsgi:app  
+      command: python wsgi_sas13_tstdb_p311.py
       volumes: 
          - .:/usr/src/app/
       ports: 
          # - "127.0.0.1:7008:7007"
          # - "7101:7102"
-         - "7248:7247"
+         - "7248:7249"
       environment: 
          - TZ=Europe/Moscow
          - HTTP_PROXY=msc01-cfw01.pgk.rzd:9090

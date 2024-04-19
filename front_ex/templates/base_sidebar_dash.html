@@ -145,11 +145,11 @@
               
               <li><a href="/credibility_rating_dash"><i class="fa fa-dashboard"></i>Рейтинг добросовестности клиентов</a></li>
 
+              <!-- {% if 'resellers_uru' in current_user.roles %} -->
+              <!-- <li><a href="/resellers_uru_dash"><i class="fa fa-dashboard"></i>Автоматизированный мониторинг: выявление потенциальных посредников</a></li> -->
+              <!-- {% endif %} -->
               <li><a href="/resellers_uru_dash"><i class="fa fa-dashboard"></i>Автоматизированный мониторинг: выявление потенциальных посредников</a></li>
-
-              <!-- {% if 'resellers_uru' in current_user.roles %}
-              <li><a href="/resellers_uru_dash"><i class="fa fa-dashboard"></i>Автоматизированный мониторинг: выявление потенциальных посредников</a></li>
-              {% endif %} -->
+              
 
               {% if 'admin' in current_user.roles %}
                 <li><a href="https://jira.pgk.ru/projects/CITA/issues"><i class="fa fa-dashboard"></i>Jira</a></li>

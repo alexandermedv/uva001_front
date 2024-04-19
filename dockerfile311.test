@@ -23,7 +23,7 @@ COPY . /usr/src/app/
 # AT pip nexus
 COPY pip.conf .
 ENV PIP_CONFIG_FILE pip.conf
-RUN pip install -r requirements_3_11_short.txt
+RUN pip install -r requirement_sas13_tstdb_p311.txt
 
 # install necessary python modules
 # RUN pip install --proxy=http://msc01-cfw01.pgk.rzd:9090 -r requirements.txt
@@ -33,8 +33,14 @@ RUN pip install -r requirements_3_11_short.txt
 
 USER root
 
-# run entrypoint.sh
-# ENTRYPOINT ["sh", "/usr/src/app/entrypoint.sh"]
+RUN sed -i 's/providers = provider_sect/providers = provider_sect\n\
+ssl_conf = ssl_sect\n\
+\n\
+[ssl_sect]\n\
+system_default = system_default_sect\n\
+\n\
+[system_default_sect]\n\
+Options = UnsafeLegacyRenegotiation/' /etc/ssl/openssl.cnf
 
-EXPOSE 7103
+EXPOSE 7249
 # EXPOSE {FLASK_PORT_PROD}

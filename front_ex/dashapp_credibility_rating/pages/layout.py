@@ -15,7 +15,7 @@ df_clients = get_clients_df() # min_date, max_date
 
 gruzes_card =  dbc.Card(
     [
-        dbc.CardHeader("🚚 Изменения грузовой базы клиента", style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 18}),
+        dbc.CardHeader("🚚 Изменения грузовой базы клиента", style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 14}),
         dbc.CardBody(
             dash_table.DataTable(
                 id='gruzes_table',
@@ -65,7 +65,7 @@ gruzes_card =  dbc.Card(
 
 debitors_card = dbc.Card(
     [
-        dbc.CardHeader("ДЗ клиента", style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 18}),
+        dbc.CardHeader("ДЗ клиента", style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 14}),
         dbc.CardBody(
             [
                 html.Label("Информация по дебиторской задолженности находится в разработке",
@@ -80,7 +80,7 @@ debitors_card = dbc.Card(
 
 client_card = dbc.Card(
     [
-        dbc.CardHeader('Информация о клиенте',style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 18}),
+        dbc.CardHeader('Информация о клиенте',style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 14}),
         dbc.CardBody(id ='client_card_body', children=
             [
                 html.Label("Для выбора клиента кликните по таблице выше",
@@ -95,7 +95,7 @@ client_card = dbc.Card(
 
 posredniki_card = dbc.Card(
     [
-        dbc.CardHeader('⭐ Анализ посредничества грузоотправителей по выбранному клиенту',style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 18}),
+        dbc.CardHeader('⭐ Анализ посредничества грузоотправителей по выбранному клиенту',style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 14}),
         dbc.CardBody(
             dash_table.DataTable(
                 id='go_rating_table',
@@ -148,7 +148,7 @@ posredniki_card = dbc.Card(
 )
 
 profit_card = dbc.Card([
-    dbc.CardHeader('💰 ДО: Доходность с 1 января 2023',style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 18}),
+    dbc.CardHeader('💰 ДО: Доходность с 1 января 2023',style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 14}),
     dbc.CardBody(children=[dcc.Graph(id='pie_profit', style={'height':card_height})])  
 ])
 
@@ -177,16 +177,16 @@ def create_layout():
     """Создание шаблона"""
     # engine_cons = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     layout = html.Div([
-        #html.Div([
-            html.Div(className='row', children=[
-                #html.Strong('''Рейтинг: '''),
+        html.Div(className='row', children=
+            [
                 html.Article('''В таблице собраны данные из разных источников.
-                             Данные по доходности выгружены из BW за период с 1 января 2023 по последнее воскресенье.
+                                Данные по доходности выгружены из BW за период с 1 января 2023 по последнее воскресенье.
                             В столбце "Флаги" отмечаются алерты со следующими настройками:
                             ⭐ - Доля посредничества >= {:.0f}% ;
                             🚚 - Изменение доли основного груза >= {:.0f}% ;
                             💰 - Доля критичнодоходности >= {:.0f}% ; '''.format(flag_posr*100, flag_gruz*100, flag_profit*100),
-                     style={'background-color': '#FFFFF0', 'padding': '30px', 'fontSize': 10, 'font-family': 'Arial'}),
+                        style={'background-color': '#FFFFF0', 'padding': '30px', 'fontSize': 10, 'font-family': 'Arial'}
+                ),
                 dbc.Card(
                     dash_table.DataTable(
                         id='table',
@@ -226,24 +226,18 @@ def create_layout():
                             'overflow': 'hidden', 'textOverflow': 'ellipsis', 'maxWidth': 0,
                             'padding': '5px', 
                             'minWidth': 45, 'maxWidth': 120, 'width': 45,
-                            'fontSize': 11, 'font-family': 'Arial'
+                            'fontSize': 10, 'font-family': 'Arial'
                         },
-                        #style_table={'max-height': card_height},
                     )
                 )
-                ,]
-            ),
-            # Row 4
-            html.Br(),
-            cards_1,
-            html.Br(),
-            cards_2,
-            #html.Hr(style={'color':'#730031'}),      
-            html.Br(),
-            cards_3,
-            # Row 5 -
-            #dbc.Alert(id='tbl_out')
-        #], className="sub_page",)
+            ]
+        ),
+        html.Br(),
+        cards_1,
+        html.Br(),
+        cards_2,    
+        html.Br(),
+        #cards_3,
     ], className="page_landscape_a3",)
 
     return layout

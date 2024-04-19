@@ -34,6 +34,7 @@ fig_lvl_1.add_trace(go.Scatter(x=[x_line_1, x_line_1], y=[0,max_y_1],
 fig_lvl_1.add_trace(go.Scatter(x=[0,max_x_1], y=[y_line_1, y_line_1], 
                               mode='lines', line=dict(color="blue", width=1)))
 fig_lvl_1.update_layout(title='Метрика посредничества за 180 дней <br><sup>Клиенты, выделенные красным, требуют дополнительного анализа</sup>', 
+                        margin=dict(r=0),
                        showlegend=False, height=700)
 
 fig_lvl_2 = go.Figure()
@@ -50,6 +51,7 @@ fig_lvl_2.add_trace(go.Scatter(x=[x_line_2, x_line_2], y=[0,max_y_2],
 fig_lvl_2.add_trace(go.Scatter(x=[0,max_x_2], y=[y_line_2, y_line_2], 
                               mode='lines', line=dict(color="blue", width=1)))
 fig_lvl_2.update_layout(title='Метрика посредничества за 360 дней <br><sup>Клиенты, выделенные красным, требуют дополнительного анализа</sup>', 
+                        margin=dict(r=0),
                        showlegend=False, height=700)
 
 # Это индексирование нужно для того чтобы в dash можно было выбирать строку
@@ -68,7 +70,6 @@ def create_layout():
     layout = html.Div([
         html.Div([
             html.Div(
-                #className = 'table-container',
                 children=dash_table.DataTable(
                     id='client_table',
                     columns=[
@@ -120,7 +121,7 @@ def create_layout():
                         #'height': 'auto',
                         'minWidth': '50px', 'maxWidth': '300px',
                         'whiteSpace': 'normal',
-                        'fontSize': 11, 'font-family': 'Arial',
+                        'fontSize': 10, 'font-family': 'Arial',
                         #'overflow': 'hidden', 'textOverflow': 'ellipsis', 
                     },
                     #style_table={"height": "500px", "overflowY": "hidden"},
@@ -131,146 +132,137 @@ def create_layout():
                         'height':'70px'
                     },
                     #fixed_rows={'headers': True},
-                )
+                ),
+                style=dict(margin=dict(b=0),)
             ),
             html.Hr(),
             # 2-й большой блок
             html.Div(className='row', children=
-                    [
-                        html.Div(id='client_current_card', 
-                            children = [
-                                dbc.Card(
-                                    [
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(
-                                                    dbc.CardImg(
-                                                        src="./assets/Лого ПГК серый.png",
-                                                        className="img-fluid rounded-start",
-                                                        style={"opacity": 0.4, "maxHeight": "225px", "maxWidth": "149"},
-                                                    ),
-                                                    className="col-md-4",
-                                                ),
-                                                dbc.Col(
-                                                    dbc.CardBody(
-                                                        [
-                                                            html.Div(
-                                                                    children=[
-                                                                        html.H6("Клиент не выбран", id = 'client_name'),
-                                                                        html.H6("Кликните по таблице выше", id = 'client_id'),
-                                                                        html.Div(id='client_info'),
-                                                                        ]
-                                                                    ),
-                                                        ]
-                                                    ),
-                                                    className="col-md-8",
-                                                ),
-                                            ],
-                                        ),
-                                        dbc.CardFooter(
-                                            'Чтобы выбрать другого клиента, нажмите на него в таблице выше',
-                                            className="card-text text-muted",
-                                        ),
-                                    ],
-                                ),
-                            ], className='six columns',
-                        ),
-                        html.Div(id='go_current_card', 
-                                children = [
-                                    dbc.Card(
-                                            [
-                                                dbc.CardBody(
-                                                    [
-                                                        html.Div(id='go_info', 
-                                                                children=[
-                                                                    html.H6("Грузоотправитель не выбран", id = 'go_name'),
-                                                                    html.H6("Кликните по таблице ниже", id = 'go_id')
-                                                                ]),
-                                                    ]
-                                                ),
-                                                #className="col-md-8",
-                                                dbc.CardFooter(
-                                                    'Чтобы выбрать грузоотправителя, нажмите на него в ретинге грузоотправителей',
-                                                    className="card-text text-muted",
-                                                ),
-                                            ],
-                                            className="h-100",
-                                        ),
-                                ], className='six columns',
-                        ),
-                    ],
-            ),
-            html.Hr(style={'color':'#730031'}),
-            # 3 Блок (рейтинг ГО и график)
-            html.Div(className='row', children=
                 [
-                    html.Div(className='seven columns', children=
-                            [
-                                dbc.Card(
-                                    [
-                                        dbc.CardBody(
-                                            [
-                                                html.H6('Рейтинг грузоотправителей для выбранного клиента', 
-                                                        className='card-title'),
-                                                dash_table.DataTable(id="go_rating", 
-                                                    columns=[
-                                                        {"name":"Грузоотправитель", "id": "Грузоотправитель"},
-                                                        {"name":"Грузоотправитель имя", "id": "Грузоотправитель имя"},
-                                                        {"name":"Договор", "id": "Договор"},
-                                                        {"name":"Сумма продаж ГО у клиента", "id": "Сумма продаж ГО у клиента", 
-                                                                "type": "numeric", "format": {'specifier': ',.0f',
-                                                                                                "locale": {"group": " "}}},
-                                                        {"name":"Доля ГО у клиента", "id": "Доля ГО у клиента", 
-                                                                "type": "numeric", "format": {'specifier': ',.0%'}},
-                                                        {"name":"Результат анализа СПАРК", "id": "Результат анализа"},
-                                                        {"name":"Метрика посредничества", "id": "Метрика посредничества", 
-                                                                        "type": "numeric", "format": {'specifier': ',.0%'}},
-                                                    ],
-                                                    page_size=10,
-                                                    sort_action="native", filter_action="native",
-                                                    export_format='xlsx', export_headers='display', 
-                                                    style_as_list_view=True,
-                                                    style_cell_conditional=[
-                                                        {
-                                                            'if': {'column_id': 'Грузоотправитель'},
-                                                            'textAlign': 'left',
-                                                            'width': '10%'
-                                                        },
-                                                        {
-                                                            'if': {'column_id': ['Метрика посредничества', 'Сумма продаж ГО у клиента']},
-                                                            'width': '15%'
-                                                        },
-                                                    ],
-                                                    style_cell={
-                                                        'height': 'auto', 'maxheight': '50px',
-                                                        'minWidth': '50px', 'maxWidth': '300px',
-                                                        'whiteSpace': 'normal',
-                                                        'fontSize': 11, 'font-family': 'Arial'
-                                                        },
-                                                    style_header={
-                                                        'backgroundColor': '#EFECEC',
-                                                        'color': 'black',
-                                                        'fontWeight': 'bold'
-                                                    }
-                                                )
-                                            ]
-                                        )
-                                    ]
-                                )
-                            ]
-                    ),
-                    html.Div(className='five columns', children=
-                            [
-                                dbc.Card(
+                    html.Div(id='client_current_card', children = 
+                        [
+                            dbc.Card(
+                                [
                                     dbc.CardBody(
                                         [
-                                            html.H6('Выберите клиента и грузоотправителя для отображения графика', 
-                                                    className='card-title'),
-                                            dcc.Graph(id='my-output'),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        dbc.CardImg(
+                                                            src="./assets/Лого ПГК серый.png",
+                                                            className="img-fluid rounded-start",
+                                                            style={"opacity": 0.4, "maxHeight": "225px", "maxWidth": "149"},
+                                                        ),
+                                                        className="col-md-4",
+                                                    ),
+                                                    dbc.Col(
+                                                        dbc.CardBody(
+                                                            [
+                                                                html.Div(
+                                                                        children=[
+                                                                            html.H6("Клиент не выбран", id = 'client_name'),
+                                                                            html.H6("Кликните по таблице выше", id = 'client_id'),
+                                                                            html.Br(),
+                                                                            html.Div(id='client_info'),
+                                                                            ]
+                                                                        ),
+                                                            ]
+                                                        ),
+                                                        className="col-md-8",
+                                                    ),
+                                                ],
+                                            ),
                                         ]
-                                    )
-                                ),
-                            ]
+                                    ),
+                                    dbc.CardFooter(
+                                        'Чтобы выбрать другого клиента, нажмите на него в таблице выше',
+                                        className="card-text text-muted",
+                                    ),
+                                ],
+                                className="h-100",
+                            ),
+                        ], className='six columns',
+                    ),
+                    html.Div(id='go_current_card', children = 
+                        [
+                            dbc.Card(
+                                [
+                                    dbc.CardBody(
+                                        [
+                                            html.Div(id='go_info', 
+                                                    children=[
+                                                        html.H6("Грузоотправитель не выбран", id = 'go_name'),
+                                                        html.H6("Кликните по таблице ниже", id = 'go_id')
+                                                    ]),
+                                        ]
+                                    ),
+                                    #className="col-md-8",
+                                    dbc.CardFooter(
+                                        'Чтобы выбрать грузоотправителя, нажмите на него в ретинге грузоотправителей',
+                                        className="card-text text-muted",
+                                    ),
+                                ],
+                                className="h-100",
+                            ),
+                        ], 
+                        className='six columns',
+                    ),
+                ],
+            ),
+            html.Hr(style={'color':'#730031'}),
+            # 3 Блок (график по распределению вагоноотправок по ГО)
+            html.Div(className='row', children=
+                [
+                    html.Div(className='six columns', children=
+                        [
+                            dash_table.DataTable(id="go_rating", 
+                                columns=[
+                                    {"name":"Грузоотправитель", "id": "Грузоотправитель"},
+                                    {"name":"Грузоотправитель имя", "id": "Грузоотправитель имя"},
+                                    {"name":"Договор", "id": "Договор"},
+                                    {"name":"Сумма продаж ГО у клиента", "id": "Сумма продаж ГО у клиента", 
+                                            "type": "numeric", "format": {'specifier': ',.0f',
+                                                                            "locale": {"group": " "}}},
+                                    {"name":"Доля ГО у клиента", "id": "Доля ГО у клиента", 
+                                            "type": "numeric", "format": {'specifier': ',.0%'}},
+                                    {"name":"Результат анализа СПАРК", "id": "Результат анализа"},
+                                    {"name":"Метрика посредничества", "id": "Метрика посредничества", 
+                                                    "type": "numeric", "format": {'specifier': ',.0%'}},
+                                ],
+                                page_size=10,
+                                sort_action="native", filter_action="native",
+                                export_format='xlsx', export_headers='display', 
+                                style_as_list_view=True,
+                                style_cell_conditional=[
+                                    {
+                                        'if': {'column_id': 'Грузоотправитель'},
+                                        'textAlign': 'left',
+                                        'width': '10%'
+                                    },
+                                    {
+                                        'if': {'column_id': ['Метрика посредничества', 'Сумма продаж ГО у клиента']},
+                                        'width': '15%'
+                                    },
+                                ],
+                                style_cell={
+                                    'height': 'auto', 'maxheight': '50px',
+                                    'minWidth': '50px', 'maxWidth': '300px',
+                                    'whiteSpace': 'normal',
+                                    'fontSize': 10, 'font-family': 'Arial'
+                                    },
+                                style_header={
+                                    'backgroundColor': '#EFECEC',
+                                    'color': 'black',
+                                    'fontWeight': 'bold',
+                                    'fontSize': 10, 'font-family': 'Arial'
+                                }
+                            )
+                        ]
+                    ),
+                    html.Div(className='six columns', children=
+                        [
+                            dcc.Graph(id='graph_go_cl'),
+                        ],
                     )
                 ]
             ),
@@ -278,8 +270,8 @@ def create_layout():
             html.Div(className='row', children=
                 [
                     html.Div(className='ten columns', children=
-                            [
-                                dbc.Card(
+                        [
+                            dbc.Card(
                                 [
                                     dbc.CardBody(
                                         [
@@ -289,9 +281,9 @@ def create_layout():
                                         ]
                                     )
                                 ]
-                                )
-                            ]
-                        ),
+                            )
+                        ]
+                    ),
                     html.Div(className='two columns', children=[
                     html.P('Измените комментарий в таблице, нажмите Enter и кнопку ниже:'),
                     dbc.Button("Загрузить комментарии в БД", id='save_to_postgres', 
@@ -304,43 +296,44 @@ def create_layout():
                 ], 
                  style={'background-color': '#EFECEC',  #f6f8ff
                                             'padding': '30px'}
-        ),
+            ),
 
-        # Level 1 и Level 2
-        html.Div(className='row',children=
-                 [
+            # Level 1 и Level 2
+            html.Div(className='row',children=
+                [
                     html.Div(className='six columns', children=[]),#card_lvl_1
                     html.Div(className='six columns', children=[]),#card_lvl_2
-                 ]
-        ),
+                ]
+            ),
 
-        # Графики
-        html.Div(className='row',children=
-                 [
-                    html.Div(className='six columns', 
-                             children=[
-                                 dcc.Graph(figure=fig_lvl_1),
-                                 html.Article('   Клиент отправляется в логи, при выполнении следующих условий: '),
-                                 html.Article('   - Количество рейсов клиента за 180 последних дней >= {}'.format(y_line_1)),
-                                 html.Article('   - Доля посредничества клиента >= {}'.format(x_line_1)),
-                                 html.Article('   -------------------------------------------'),
-                                 html.Article('   Количество клиентов: {}'.format(len(df_client_lvl_1[df_client_lvl_1['point_color']=='red']))),
-                             ]),
-                    html.Div(className='six columns', 
-                             children=[
-                                 dcc.Graph(figure=fig_lvl_2),
-                                 html.Article('Клиент отправляется в логи, при выполнении следующих условий: '),
-                                 html.Article('- Количество рейсов клиента за 360 последних дней >= {}'.format(y_line_2)),
-                                 html.Article('- Доля посредничества клиента >= {}'.format(x_line_2)),
-                                 html.Article('-------------------------------------------'),
-                                 html.Article('Количество клиентов: {}'.format(len(df_client_lvl_2[df_client_lvl_2['point_color']=='red']))),
-                             ]),
-                 ],
-                 style={'margin-left': '15px'}
-        ),
-        
-        html.Hr(style={'color':'#730031'}),
-
+            # Графики
+            html.Div(className='row',children=
+                [
+                    html.Div(className='six columns', children=
+                        [
+                            dcc.Graph(figure=fig_lvl_1),
+                            html.Article('   Клиент отправляется в логи, при выполнении следующих условий: '),
+                            html.Article('   - Количество рейсов клиента за 180 последних дней >= {}'.format(y_line_1)),
+                            html.Article('   - Доля посредничества клиента >= {}'.format(x_line_1)),
+                            html.Article('   -------------------------------------------'),
+                            html.Article('   Количество клиентов: {}'.format(len(df_client_lvl_1[df_client_lvl_1['point_color']=='red']))),
+                        ]
+                    ),
+                    html.Div(className='six columns', children=
+                        [
+                            dcc.Graph(figure=fig_lvl_2),
+                            html.Article('Клиент отправляется в логи, при выполнении следующих условий: '),
+                            html.Article('- Количество рейсов клиента за 360 последних дней >= {}'.format(y_line_2)),
+                            html.Article('- Доля посредничества клиента >= {}'.format(x_line_2)),
+                            html.Article('-------------------------------------------'),
+                            html.Article('Количество клиентов: {}'.format(len(df_client_lvl_2[df_client_lvl_2['point_color']=='red']))),
+                        ]
+                    ),
+                ],
+                style={'margin-left': '15px'}
+            ),
+            
+            html.Hr(style={'color':'#730031'}),
         ], className="sub_page",)
     ], className="page_landscape_a3",)
 

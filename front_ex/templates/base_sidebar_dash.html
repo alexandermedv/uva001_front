@@ -127,7 +127,7 @@
               <li><a href="/tor_ik_dash"><i class="fa fa-dashboard"></i>Некачественные ремонты (дашборд)</a></li>
               {% endif %}
 
-              {% if 'empty_transportations' in current_user.roles %}  
+              {% if current_user.check_role('empty_transportations') %}  
               <li><a href="/empty_transportations_dash"><i class="fa fa-dashboard"></i>Порожние рейсы (дашборд)</a></li>
               {% endif %}
 
@@ -143,13 +143,11 @@
               <li><a href="/credibility_rating_dash"><i class="fa fa-dashboard"></i>Рейтинг добросовестности клиентов</a></li>
               {% endif %}
 
-              <!-- {% if 'resellers_uru' in current_user.roles %} -->
-              <!-- <li><a href="/resellers_uru_dash"><i class="fa fa-dashboard"></i>Автоматизированный мониторинг: выявление потенциальных посредников</a></li> -->
-              <!-- {% endif %} -->
-              <li><a href="/resellers_uru_dash"><i class="fa fa-dashboard"></i>Автоматизированный мониторинг: выявление потенциальных посредников</a></li>
+              {% if current_user.check_role('resellers_uru') %}  
+              <li><a href="/esellers_uru_dash"><i class="fa fa-dashboard"></i>Автоматизированный мониторинг: выявление потенциальных посредников</a></li>
+              {% endif %} 
               
-
-              {% if 'admin' in current_user.roles %}
+              {% if 'admin' in current_user.get_roles() %}
                 <li><a href="https://jira.pgk.ru/projects/CITA/issues"><i class="fa fa-dashboard"></i>Jira</a></li>
               {% endif %}
               

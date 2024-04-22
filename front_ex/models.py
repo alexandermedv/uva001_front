@@ -88,10 +88,6 @@ class User(db.Model, UserMixin):
     def check_password(self,  password):
         return check_password_hash(self.password, password)
 
-    # Проверка пересечения по ролям
-    def get_roles(self, *args):
-        return self.roles
-
     def get_roles_names(self, *args):
         roles = self.get_roles(*args)
         roles_names = []
@@ -99,8 +95,8 @@ class User(db.Model, UserMixin):
             roles_names.append(role.name.lower())        
         return roles_names
 
-    def check_roles(self, object_roles):
-        return set(self.get_roles_names()).intersection()    
+    def check_role(self, role_name):
+        return role_name in self.get_roles_names()    
 
     def check_dash_roles(self, dash_id):
         dash = Dash.query.filter_by(instance = dash_id).first()

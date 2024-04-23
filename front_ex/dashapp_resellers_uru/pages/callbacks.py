@@ -76,7 +76,7 @@ def update_style_data(active_cell):
                 }
             ], 
             client, 
-            'Клиент: '+str(client_name),
+            client_name, #'Клиент: '+str(client_name),
             [
                 dcc.ConfirmDialogProvider(
                     id='danger_client_go_in_logs',
@@ -90,26 +90,6 @@ def update_style_data(active_cell):
             data_go.to_dict('records'), # Построение рейтинга ГО и Список ГО для выбранного Клиента
             active_cell_go, # Если мы меняем выбор Клиента, то в таблице с ГО активную строку обнуляем
             [], # selected_cells обнуляем
-            # # Доп инфо по выбранным клиенту и ГО
-            # [
-            #     html.H4(id='current_client_name', children=client_name),
-            #     html.H4(id='current_client', children=client),
-            #     #html.H4(df_client.loc[int(active_row_id)]['Наименование клиента'] + " (" + client +")"),
-            #     html.P(f'Холдинг клиента: {hld_cl}'),
-            #     html.P(f'Доля фитинговых перевозок: {fit} %'),
-            #     dcc.ConfirmDialogProvider(
-            #         id='danger_client_go_in_logs',
-            #         children=dbc.Button('Отправить клиента в логи', outline=True, color="danger"),
-            #                              #className="btn btn-danger"),
-            #         message='Вы хотите добавить клиента {} ({}) в таблицу с логами. Продолжить?'.format(client_name, client)
-            #     ),
-            #     html.Div(id='placeholder_2', children=[]),
-            # ], 
-            # [
-            #     html.P("Выбран грузоотправитель"),
-            #     html.H4(go_name),
-            #     html.H4(go),
-            # ], 
         )
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Активная ячейка в рейтинге ГО
@@ -252,16 +232,14 @@ def populate_datatable(n_intervals):
         )
     ]
 
-# Отправить выбранного клиента в логи . P.s. кнопка "danger_client_go_in_logs" пока не работает. Возможно библиотеки python устарели. вернуться позже 
+# Отправить выбранного клиента в логи.
 @dash_app.callback(
     [
         Output('placeholder_2', 'children'), 
         Output('resellers_logs_2', 'data'),
     ],
     [Input('danger_client_go_in_logs', 'submit_n_clicks'),],
-    [State('resellers_logs_2', 'data'), 
-     #State('current_client', 'children'),
-     #State('current_client_name', 'children')
+    [State('resellers_logs_2', 'data'),
      State('client_id', 'children'),
      State('client_name', 'children'),
     ],
@@ -281,7 +259,7 @@ def client_to_logs(n_clicks_2, dataset_2, client, client_name):
                 return output_placeholder, no_update
             else:
                 #Если столбцы в таблице dashboard.resellers_log поменяются, то этот метод может работать некорректно
-                pg_2.loc[-1, ['Дата обнаружения', 'Клиент','Наименование клиента', 'Комментарий']] = [dt.datetime.today().strftime('%d.%m.%Y'), client, client_name, None]
+                pg_2.loc[-1, ['Дата обнаружения', 'Клиент','Наименование клиента', 'Комментарий']] = [dt.datetime.today().strftime('%d.%m.%Y'), client, client_name, None] #str("Клиент добавлен вручную пользователем {user}")
                 pg_2.index+=1
                 pg_2 = pg_2.sort_index()
                 update_postgres_resellers_log(pg_2)

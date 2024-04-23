@@ -159,13 +159,14 @@ def create_layout():
                                                         dbc.CardBody(
                                                             [
                                                                 html.Div(
-                                                                        children=[
-                                                                            html.H6("Клиент не выбран", id = 'client_name'),
-                                                                            html.H6("Кликните по таблице выше", id = 'client_id'),
-                                                                            html.Br(),
-                                                                            html.Div(id='client_info'),
-                                                                            ]
-                                                                        ),
+                                                                    children=[
+                                                                        html.H6("Клиент:"),
+                                                                        html.H6("Клиент не выбран", id = 'client_name'),
+                                                                        html.H6("Кликните по таблице выше", id = 'client_id'),
+                                                                        html.Br(),
+                                                                        html.Div(id='client_info'),
+                                                                        ]
+                                                                    ),
                                                             ]
                                                         ),
                                                         className="col-md-8",
@@ -191,6 +192,7 @@ def create_layout():
                                         [
                                             html.Div(id='go_info', 
                                                     children=[
+                                                        html.H6("Грузоотправитель:"),
                                                         html.H6("Грузоотправитель не выбран", id = 'go_name'),
                                                         html.H6("Кликните по таблице ниже", id = 'go_id')
                                                     ]),

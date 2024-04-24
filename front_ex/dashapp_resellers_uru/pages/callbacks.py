@@ -24,7 +24,6 @@ cl_last_row, go_last_row = -1, -1
             Output("go_rating", "data"),
             Output('go_rating', 'active_cell'),
             Output('go_rating', "selected_cells")
-            #Output('client_info', 'children'),
     ),
     [
         Input('client_table', 'active_cell'),
@@ -32,8 +31,6 @@ cl_last_row, go_last_row = -1, -1
     prevent_initial_call=True
 )
 def update_style_data(active_cell):
-    #input_triggered = dash.callback_context.triggered[0]["prop_id"].split(".")[0]
-    #if input_triggered == "client_table":
     if active_cell is None:
         raise PreventUpdate
     
@@ -79,7 +76,7 @@ def update_style_data(active_cell):
                 }
             ], 
             client, 
-            'Клиент: '+str(client_name),
+            client_name, #'Клиент: '+str(client_name),
             [
                 dcc.ConfirmDialogProvider(
                     id='danger_client_go_in_logs',
@@ -93,35 +90,15 @@ def update_style_data(active_cell):
             data_go.to_dict('records'), # Построение рейтинга ГО и Список ГО для выбранного Клиента
             active_cell_go, # Если мы меняем выбор Клиента, то в таблице с ГО активную строку обнуляем
             [], # selected_cells обнуляем
-            # # Доп инфо по выбранным клиенту и ГО
-            # [
-            #     html.H4(id='current_client_name', children=client_name),
-            #     html.H4(id='current_client', children=client),
-            #     #html.H4(df_client.loc[int(active_row_id)]['Наименование клиента'] + " (" + client +")"),
-            #     html.P(f'Холдинг клиента: {hld_cl}'),
-            #     html.P(f'Доля фитинговых перевозок: {fit} %'),
-            #     dcc.ConfirmDialogProvider(
-            #         id='danger_client_go_in_logs',
-            #         children=dbc.Button('Отправить клиента в логи', outline=True, color="danger"),
-            #                              #className="btn btn-danger"),
-            #         message='Вы хотите добавить клиента {} ({}) в таблицу с логами. Продолжить?'.format(client_name, client)
-            #     ),
-            #     html.Div(id='placeholder_2', children=[]),
-            # ], 
-            # [
-            #     html.P("Выбран грузоотправитель"),
-            #     html.H4(go_name),
-            #     html.H4(go),
-            # ], 
         )
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Активная ячейка в рейтинге ГО
 @dash_app.callback(
     (
+        Output("graph_go_cl", "figure"),
         Output("go_rating", "style_data_conditional"), 
         Output("go_id", "children"),
         Output("go_name", "children"),
-        Output("my-output", "figure"),
     ),
     [
         Input('go_rating', 'active_cell'),
@@ -141,9 +118,9 @@ def update_style_data(active_cell_go, data_go, client):
 
     if active_row_go_id is None:
         go_last_row = -1
-        return ([], "Грузоотправитель не выбран", "Кликните по таблице ниже", None)#no_update, 
+        return (no_update, [], "Грузоотправитель не выбран", "Кликните по таблице ниже")#no_update, 
     elif active_row_go_id == go_last_row:
-        return (no_update, no_update, no_update, None)
+        return (no_update, no_update, no_update, no_update)
     else:
         #print('active_row_go_id, go_last_row = ', active_row_go_id, go_last_row)
         go_last_row = active_row_go_id
@@ -151,34 +128,44 @@ def update_style_data(active_cell_go, data_go, client):
         go_name = 'Грузоотправитель: ' + str(data_go[int(active_row_go_id)]['Грузоотправитель имя'])
 
         #hld_cl, fit = df_fit.loc[df_fit["Клиент"] ==client, ['Клиент (холдинг)', 'Доля ФИТ(%)']].min()
-        df2_grouped_balak = pd.DataFrame(get_data_for_graph(go=go_id))
+        df_temp = get_data_for_graph(go_id)
+        df2_grouped_balak = pd.DataFrame(df_temp)
         fig = px.scatter(df2_grouped_balak, 
-                         x='Дата раскредитования', y='Сумма услуги общая', 
-                         #category_orders={'Клиент': [client, list(df2_grouped_balak['Клиент'].unique()).remove(client)]},
-                         color='Наименование клиента',#"Клиент",
-                         hover_name='Наименование клиента',
-                         #trendline='ols', 
-                         title='<b>Распределение вагоноотправок по ГО:</b> %s' % go_name + " (" + go_id +")",
-                         #height=600
+                        x="Дата раскредитования", y="Сумма услуги общая", 
+                        #category_orders={'Клиент': [client, list(df2_grouped_balak['Клиент'].unique()).remove(client)]},
+                        color='Наименование клиента',#"Клиент",
+                        hover_name='Наименование клиента',
+                        render_mode="svg",
+                        #trendline='ols', 
+                        title='<b>Распределение вагоноотправок, </b> %s' % go_name + " (" + go_id +")",
+                        #height=600
         )
         fig.update_layout(
             legend=dict(
-            orientation="h",
-            xanchor="center",
-            yanchor="top",
-            y=-0.15,
-            x=0.5,
-            #itemwidth=70,
-            title_font_color='#730031',
-            title_font_family="Arial",
-            font=dict(
-                family="Arial",
-                size=12,
-                color="black"
+                orientation="h",
+                xanchor="center",
+                yanchor="top",
+                y=-0.2,
+                x=0.5,
+                #title_font_color='#730031',
+                #title_font_family="Arial",
+                font=dict(
+                    family="Arial",
+                    size=9,
+                    color="black"
             )),
-            plot_bgcolor='#EFECEC'
+            title={
+                #'color': '#730031',
+                #'family': "Arial",
+                'yanchor': 'top',
+                'font_size': 11
+            },
+            margin=dict(r=0, t=25, b=0),
+            plot_bgcolor='#EFECEC',
+            paper_bgcolor="rgba(0, 0, 0, 0)",
         )
         return (
+            fig,
             #Стили для таблицы ГО
             [
                 {
@@ -198,8 +185,8 @@ def update_style_data(active_cell_go, data_go, client):
                     "border": "1px solid darkgray", #"1px solid rgb(0, 116, 217)",
                 }
             ], 
-            go_id, go_name,
-            fig,
+            go_id, 
+            go_name,
         )
     
 # --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -224,7 +211,7 @@ def populate_datatable(n_intervals):
             style_cell={
                 'height': 'auto',
                 #'minWidth': '160px', 'width': '180px', 'maxWidth': '200px',
-                'whiteSpace': 'normal', 'fontSize': 11, 'font-family': 'Arial'
+                'whiteSpace': 'normal', 'fontSize': 10, 'font-family': 'Arial'
             },
             style_cell_conditional=[
                 {
@@ -239,21 +226,20 @@ def populate_datatable(n_intervals):
             style_header={
                 'backgroundColor': '#EFECEC',
                 'color': 'black',
-                'fontWeight': 'bold'
+                'fontWeight': 'bold',
+                'fontSize': 10, 'font-family': 'Arial'
             }
         )
     ]
 
-# Отправить выбранного клиента в логи . P.s. кнопка "danger_client_go_in_logs" пока не работает. Возможно библиотеки python устарели. вернуться позже 
+# Отправить выбранного клиента в логи.
 @dash_app.callback(
     [
         Output('placeholder_2', 'children'), 
         Output('resellers_logs_2', 'data'),
     ],
     [Input('danger_client_go_in_logs', 'submit_n_clicks'),],
-    [State('resellers_logs_2', 'data'), 
-     #State('current_client', 'children'),
-     #State('current_client_name', 'children')
+    [State('resellers_logs_2', 'data'),
      State('client_id', 'children'),
      State('client_name', 'children'),
     ],
@@ -273,7 +259,7 @@ def client_to_logs(n_clicks_2, dataset_2, client, client_name):
                 return output_placeholder, no_update
             else:
                 #Если столбцы в таблице dashboard.resellers_log поменяются, то этот метод может работать некорректно
-                pg_2.loc[-1, ['Дата обнаружения', 'Клиент','Наименование клиента', 'Комментарий']] = [dt.datetime.today().strftime('%d.%m.%Y'), client, client_name, None]
+                pg_2.loc[-1, ['Дата обнаружения', 'Клиент','Наименование клиента', 'Комментарий']] = [dt.datetime.today().strftime('%d.%m.%Y'), client, client_name, None] #str("Клиент добавлен вручную пользователем {user}")
                 pg_2.index+=1
                 pg_2 = pg_2.sort_index()
                 update_postgres_resellers_log(pg_2)

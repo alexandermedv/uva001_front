@@ -139,9 +139,11 @@
               <li><a href="/airflow_dash"><i class="fa fa-dashboard"></i>Мониторинг ресурсов</a></li>
               {% endif %}
 
-              {% if 'credibility_rating' in current_user.roles %}
+              <!-- {% if 'credibility_rating' in current_user.roles %}
               <li><a href="/credibility_rating_dash"><i class="fa fa-dashboard"></i>Рейтинг добросовестности клиентов</a></li>
-              {% endif %}
+              {% endif %} -->
+              
+              <li><a href="/credibility_rating_dash"><i class="fa fa-dashboard"></i>Рейтинг добросовестности клиентов</a></li>
 
               {% if current_user.check_role('resellers_uru') %}  
               <li><a href="/esellers_uru_dash"><i class="fa fa-dashboard"></i>Автоматизированный мониторинг: выявление потенциальных посредников</a></li>

@@ -51,29 +51,17 @@ def signin():
     
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    # form = LoginForm()
+
     form = UserLoginForm()
-    # print('user = ', User.ldap_account)
-    # print('user = ', form.ldap_account.data)
+
     if form.validate_on_submit():
         login = form.ldap_account.data.lower()  
-        print('login =', login)
         password = form.password.data
-        print('password =', password)
-        print('ldap_authentication(login, password) = ', ldap_authentication(login, password))
-        print(User.query.first().id)
         user = User.query.filter(func.lower(User.ldap_account)==login).first()
-        print('user =', user.ldap_account)
-        # AT
-        # print('user =', security.datastore.find_user(email="svc_fs_uva@pgkweb.ru"))
+
         if user and ldap_authentication(login, password):
-            print('Логиним юзера')
             login_user(user)
-            # security.datastore.commit()
-            print('Получилось залогиниться?', current_user.is_authenticated())
-            print('current_user =', current_user)
-            print('current_user.email =', current_user.email)
-            print('current_user.check_report_roles(glossary) =', current_user.check_report_roles('glossary'))
+
             if 'next' in request.args:
                 return redirect(request.args['next'])
             return redirect(url_for('index'))
@@ -117,7 +105,7 @@ def render_dashapp14():
     return render_template('/dashapp14_spark_api_count_request/overview.html')
 
 @app.route('/credibility_rating_dash/')
-#@login_required
+@login_required
 @logger(os.environ['USER_ACTIONS_FILE'])
 def render_dashapp_credibility_rating():
     """Рейтинг добросовестности клиентов"""
@@ -125,7 +113,7 @@ def render_dashapp_credibility_rating():
 
 # Test
 @app.route('/resellers_uru_dash/')
-#@login_required
+@login_required
 @logger(os.environ['USER_ACTIONS_FILE'])
 def render_dashapp_resellers_uru():
     """Автоматизированный мониторинг: выявление потенциальных посредников"""

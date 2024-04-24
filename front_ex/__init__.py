@@ -28,9 +28,7 @@ from datetime import timedelta
 # Встроенные API
 # from flask_restful import Api
 
-# from .forms import LoginForm
 # Добавляем логирование пользователей и роли
-#from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_cors import CORS
 
@@ -49,13 +47,9 @@ Bootstrap(app)
 app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
 app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Moscow'
 babel = Babel(app)
-# def get_locale():
-#     return 'en'
-# babel.init_app(app, locale_selector=get_locale)
 
 # Добавляем базы данных и логин-менеджер
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
-print(os.environ['SQLALCHEMY_DATABASE_URI'])
 app.config['SQLALCHEMY_BINDS'] = {'log': os.environ['SQLALCHEMY_DATABASE_LOG']}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # 25.12.23 AT - Ошибка входа, Илья
@@ -82,24 +76,10 @@ from .models import User,Role,Dash,HomeIndexView,UserModelView,RoleModelView,Rep
 # Добавляем админку
 # Добавление ролевой модели из Flask_Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-# print(user_datastore)
 
 from .forms import UserLoginForm 
 
-# security = Security()
-# app.config['SECURITY_REGISTERABLE']=True
-# app.config['SECURITY_PASSWORD_SALT'] = 'salt'
-
-# AT
-# security = Security(login_form=UserLoginForm)
-# app.config['SECURITY_MSG_LOGIN'] = ('Для просмотра сайта требуется авторизоваться', 'info')
-# security.init_app(app=app, datastore = user_datastore)
-
-# AT
-# app.config['SECURITY_USER_INDENTITY_ATTRIBUTES'] = [
-#     {'ldap_account':{'case_intensitive': False}}
-# ]
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds=15)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
 
 # декоратор под первого пользователя
 # @app.before_first_request
@@ -226,14 +206,6 @@ def log_db_available():
         result = False
     return result, "log_db_checked"
 
-# def get_sap_s4_con_str():
-#     """Строка подключения к S4 прод"""
-#     return os.environ['SAP_HOST_S4']
-
-# def get_udv_con_str():
-#     """Строка подключения к УДВ прод"""
-#     return os.environ['UDV']
-
 
 health.add_check(front_db_available)
 health.add_check(log_db_available)
@@ -243,7 +215,6 @@ app.add_url_rule('/healthcheck', 'healthcheck', view_func=lambda: health.run())
 # AT
 @login.user_loader
 def user_loader(user):
-    print('@login.user_loader', int(user))
     return User.query.filter(User.id==int(user)).first()
 
 # Если нет авторизации - переброска на страницу авторизации

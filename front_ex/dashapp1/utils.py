@@ -2,7 +2,7 @@
 import os
 import datetime as dt
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 #from app import engine_analysis, engine_cons
 
 # from . import engine_cons
@@ -48,7 +48,7 @@ def get_osv_detail_by_dates(start_date, end_date, debug = False):
     if debug:
         print(sql)
     # return pd.read_sql(sql, con=engine_cons, params={"dstart":start_date,"dfinish":end_date})
-    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
+    return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH']))
 
 
 # Выгрузка куба данных операций по счету 94* за выбранный период
@@ -331,5 +331,8 @@ def get_max_date():
     FROM dashboard.osv_94
     '''
     # return engine_cons.execute(sql).fetchone()[0]
-    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
-    return con.execute(sql).fetchone()[0]
+    engine = create_engine(os.environ['POSTGRE_URL_DASH'])
+    with engine.connect() as con:
+        result = con.execute(text(sql)).fetchone()[0]
+
+    return result

@@ -79,7 +79,7 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 from .forms import UserLoginForm 
 
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=1000)
 
 # декоратор под первого пользователя
 # @app.before_first_request

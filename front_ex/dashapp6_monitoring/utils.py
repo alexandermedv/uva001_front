@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 # import front_ex.config as config
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 
 def get_get_open_ap_by_groups_182():
@@ -859,8 +859,11 @@ def get_max_date():
     FROM dashboard.osv_94
     '''
     # return engine_cons.execute(sql).fetchone()[0]
-    con = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
-    return con.execute(sql).fetchone()[0]
+    engine = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
+    with engine.connect() as con:
+        result = con.execute(text(sql)).fetchone()[0]
+
+    return result
 
 
 # def get_ap_issues():

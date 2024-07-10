@@ -16,11 +16,11 @@ from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey
 from . import db
 
 # Связь роли с пользователем
-# roles_users = db.Table(
-#     'roles_users',
-#     db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-#     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
-# )
+roles_users = db.Table(
+    'roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),   
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
@@ -39,7 +39,7 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean())
     
     # AT new seq
-    fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
+    # fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
     # Пароль не требуется, поскольку он проверяется 
     # по LDAP
     roles = db.relationship('Role', secondary='roles_users',
@@ -158,19 +158,19 @@ class Role(db.Model):
     # def get_permissions(self):
     #     return ''
 
-class UserRoles(db.Model):
-    # Because peewee does not come with built-in many-to-many
-    # relationships, we need this intermediary class to link
-    # user to roles.
-    __tablename__ = 'roles_users'
-    id = Column(Integer(), primary_key=True)
-    user_id = db.Column('user', Integer(), ForeignKey('user.id'))
-    role_id = db.Column('role_id', Integer(), ForeignKey('role.id'))
-    name = property(lambda self: self.role.name)
-    description = property(lambda self: self.role.description)
+# class UserRoles(db.Model):
+#     # Because peewee does not come with built-in many-to-many
+#     # relationships, we need this intermediary class to link
+#     # user to roles.
+#     __tablename__ = 'roles_users'
+#     # id = Column(Integer(), primary_key=True)
+#     user_id = db.Column('user', Integer(), ForeignKey('user.id'))
+#     role_id = db.Column('role_id', Integer(), ForeignKey('role.id'))
+#     # name = property(lambda self: self.role.name)
+#     # description = property(lambda self: self.role.description)
 
-    def get_permissions(self):
-        return self.role.get_permissions()
+#     def get_permissions(self):
+#         return self.role.get_permissions()
 
 # Логи
 class Log(db.Model):

@@ -127,7 +127,9 @@ except OSError:
 #     index_view=HomeIndexView(name='Обзор', endpoint='adminuser', url='/admin'))
 admin = Admin(app, name = 'Администрирование', # template_mode='bootstrap3', \
     index_view=HomeIndexView(name='Обзор', endpoint='adminuser', url='/admin'))
-admin.add_view(ModelView(User, db.session, name='Пользователи'))
+
+admin.add_view(UserModelView(User, db.session, name='Пользователи'))
+# admin.add_view(ModelView(User, db.session, name='Пользователи'))
 admin.add_view(RoleModelView(Role, db.session, name='Роли'))
 admin.add_view(DashModelView(Dash, db.session, name='Дэшборды'))
 admin.add_view(ReportModelView(Report, db.session, name='Отчеты'))

@@ -590,8 +590,7 @@ def get_resellers_kol(start_date, end_date, branches, gruz, rod):
     ''' % (start_date, end_date, branches, gruz, rod)
 
     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'],
-                                              max_identifier_length=128,
-                                              encoding='utf-8'))
+                                              max_identifier_length=128))
 
 
 def get_resellers_count(start_date, end_date, branches, gruz, rod):
@@ -608,8 +607,7 @@ def get_resellers_count(start_date, end_date, branches, gruz, rod):
 
     return pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'],
                                               pool_size=20,
-                                              max_identifier_length=128,
-                                              encoding='utf-8'))
+                                              max_identifier_length=128))
 
 
 def get_resellers_sum(start_date, end_date, branches, gruz, rod):

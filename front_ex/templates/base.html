@@ -21,7 +21,6 @@
           </ul>
         
           <!-- Администрирование -->
-          {% if current_user.check_dash_roles('admin') %}
           <ul class="nav navbar-nav navbar-right" style="font-size: 15px;">
             <!-- <li class="dropdown">
                 {% if 'admin' in current_user.roles %}
@@ -44,7 +43,6 @@
               </ul>
             </li>
           </ul>
-          {% endif %}
           <!-- Поиск -->
           <!-- 
           <form class="navbar-form navbar-right">

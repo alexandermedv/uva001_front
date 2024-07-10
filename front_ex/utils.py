@@ -91,7 +91,6 @@ def logger(path):
                 # file.write(f'Вызвана функция: {old_function.__name__}\n')
                 # file.write('-------------------------------------------' + '\n')
                 
-
             result = old_function(*args, **kwargs)
 
             return result

@@ -1,18 +1,15 @@
 version: '3.7'
 services: 
-   test_app:
-      container_name: test_front_3_11
+   prod_app_311:
+      container_name: prod_app_311
       build:  
          context: .
-         dockerfile: dockerfile311.test
-      command: python wsgi_test.py
-      # command: gunicorn -w 1 -b 0.0.0.0:7007 wsgi:app  
+         dockerfile: dockerfile311.prod
+      command: python wsgi_sas14_311.py
       volumes: 
          - .:/usr/src/app/
       ports: 
-         # - "127.0.0.1:7008:7007"
-         # - "7101:7102"
-         - "7104:7103"
+         - "127.0.0.1:7001:7002"
       environment: 
          - TZ=Europe/Moscow
          - HTTP_PROXY=msc01-cfw01.pgk.rzd:9090
@@ -24,5 +21,5 @@ networks:
         driver: bridge
         ipam:
             config:
-            - subnet: 172.17.48.0/24
+            - subnet: 172.17.188.0/24
             

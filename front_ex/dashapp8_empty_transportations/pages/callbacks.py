@@ -86,23 +86,35 @@ def hide_graph(input):
         return {'display':'block'}
     else:
         return {'display':'none'}
-
-# Скрытие фильтра по дорогам по выбору закладки 
-@dash_app.callback(Output('name1', 'style'), [Input('dashboard8-tabs', 'value'),])
+    
+# Скрытие фильтра по РПС по выбору закладки 
+@dash_app.callback(Output('dashboard8-dropdown1-in-rpc', 'style'), [Input('dashboard8-tabs', 'value'),])
 def hide_graph(input):
-    if (input !='tab-2') & (input != 'tab-3'):
+    # print('input', input, flush=True)
+    if (input !='tab-3') & (input != 'tab-4'):
         return {'display':'block'}
     else:
         return {'display':'none'}
+
+
+# # Скрытие фильтра по дорогам по выбору закладки 
+# @dash_app.callback(Output('name1', 'style'), [Input('dashboard8-tabs', 'value'),])
+# def hide_graph(input):
+#     print('input', input, flush=True)
+#     if (input !='tab-1') & (input != 'tab-3'):
+#         return {'display':'block'}
+#     else:
+#         return {'display':'none'}
 
 # Построение содержимого выбранной закладки
 @dash_app.callback(Output('tab-content', 'children'),
                    [Input('dashboard8-tabs', 'value'),
                    Input('dashboard8-date-picker-range', 'start_date'),
                    Input('dashboard8-date-picker-range', 'end_date'),
-                   Input('dashboard8-dropdown1-in-railway', 'value')
+                   Input('dashboard8-dropdown1-in-railway', 'value'), 
+                   Input('dashboard8-dropdown1-in-rpc', 'value')
                    ])
-def render_content(tab, start_date, end_date, railway):
+def render_content(tab, start_date, end_date, railway, rps):
     """Построение содержимого выбранной закладки"""
 
     # start_date = pd.to_datetime(start_date)
@@ -111,11 +123,11 @@ def render_content(tab, start_date, end_date, railway):
     if tab == 'tab-1':
         """Динамика"""
         # Закладка динамика
-        trans_empty_by_type = get_trans_empty_by_type(railway=railway, start_date=start_date, end_date=end_date)
-        trans_empty_by_money = get_trans_empty_by_money(railway=railway, start_date=start_date, end_date=end_date)
-        trans_empty_by_type_month = get_trans_empty_by_type_month(railway=railway, start_date=start_date, end_date=end_date)
-        trans_empty_by_money_month = get_trans_empty_by_money_month(railway=railway, start_date=start_date, end_date=end_date)
-        tab1_trans_empty_by_delay_stat = get_tab1_trans_empty_by_delay_stat(railway=railway, start_date=start_date, end_date=end_date)
+        trans_empty_by_type = get_trans_empty_by_type(railway=railway, start_date=start_date, end_date=end_date, rps=rps)
+        trans_empty_by_money = get_trans_empty_by_money(railway=railway, start_date=start_date, end_date=end_date, rps=rps)
+        trans_empty_by_type_month = get_trans_empty_by_type_month(railway=railway, start_date=start_date, end_date=end_date, rps=rps)
+        trans_empty_by_money_month = get_trans_empty_by_money_month(railway=railway, start_date=start_date, end_date=end_date, rps=rps)
+        # tab1_trans_empty_by_delay_stat = get_tab1_trans_empty_by_delay_stat(railway=railway, start_date=start_date, end_date=end_date, rps=rps)
         
         content = html.Div([
             # Первая линия
@@ -340,9 +352,9 @@ def render_content(tab, start_date, end_date, railway):
         return content
     elif tab == 'tab-2':
         """По дорогам"""
-        trans_empty_by_railway_delay = get_trans_empty_by_railway_delay(start_date=start_date, end_date=end_date)
-        trans_empty_by_railway_penalty = get_trans_empty_by_railway_penalty(start_date=start_date, end_date=end_date)
-        trans_empty_by_railway_mean_delay = get_trans_empty_by_railway_mean_delay(start_date=start_date, end_date=end_date)
+        trans_empty_by_railway_delay = get_trans_empty_by_railway_delay(start_date=start_date, end_date=end_date, rps=rps)
+        trans_empty_by_railway_penalty = get_trans_empty_by_railway_penalty(start_date=start_date, end_date=end_date, rps=rps)
+        trans_empty_by_railway_mean_delay = get_trans_empty_by_railway_mean_delay(start_date=start_date, end_date=end_date, rps=rps)
         
         # Tab-2 pie content вагонорейсы
         internal_delay = trans_empty_by_railway_delay

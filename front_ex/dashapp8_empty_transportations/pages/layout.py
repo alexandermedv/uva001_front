@@ -15,7 +15,7 @@ from sqlalchemy import create_engine
 # import front_ex.config as config
 
 #from flask_app import engine_analysis, engine_cons
-from ..utils import get_trans_empty_by_railway_penalty
+from ..utils import get_trans_empty_by_railway_penalty, get_trans_empty_by_rps_penalty
 
 def create_layout():
     """Создание шаблона"""
@@ -57,7 +57,7 @@ def create_layout():
                     min_date_allowed=date(2000, 1, 1),
                     max_date_allowed=date(2050, 1, 1),
                     initial_visible_month=date(2021, 4, 1),
-                    start_date=date(2021, 1, 1),
+                    start_date=date(2023, 1, 1),
                     # Последний день предыдущего месяца
                     end_date=(dt.date.today() - dt.timedelta(days=1)).replace(day=1) - dt.timedelta(days=1),
                     # end_date=get_max_date().strftime("%m.%d.%Y"),
@@ -69,27 +69,47 @@ def create_layout():
                     end_date_placeholder_text='Конец периода',
                     className='four columns'
                 ),
-                # html.Div(
-                #     html.Output('Дорога:'),
-                #     className='one column',
-                #     style={"display": "flex",  "align-items": "center", "height": "38px"},
-                #     # id = 'name1',
-                # ),
+                
+                dcc.Dropdown(
+                    id="dashboard8-dropdown1-in-rpc",
+                    # value='',
+                    # clearable=False,
+                    # style={'display': 'flex'},
+                    # style={'justify-content': 'center', 'font-size': "50%", 'display': 'inline-block'},
+                    # options=[{'label': i, 'value': i} for i in [''] + get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
+                    options=[{'label': i, 'value': i} for i in get_trans_empty_by_rps_penalty()['РПС'].unique().tolist()],
+                    placeholder = 'Выберите РПС',
+                    multi=True,
+                className='three columns'
+                ),
+
+                html.Div(
+                    html.Output('  '),
+                    className='one column',
+                    style={"display": "flex",  "align-items": "center", "height": "38px"},
+                    # id = 'name1',
+                ),
+
                 dcc.Dropdown(
                     id="dashboard8-dropdown1-in-railway",
                     # value='',
                     # clearable=False,
-                    style={'justify-content': 'center', 'font-size': "50%", 'display': 'inline-block'},
+                    style={'justify-content': 'center', 'font-size': "50%", 'display': 'flex'},
                     # options=[{'label': i, 'value': i} for i in [''] + get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
                     options=[{'label': i, 'value': i} for i in get_trans_empty_by_railway_penalty()['Дорога назначения'].unique().tolist()],
                     placeholder = 'Выберите дорогу',
                     multi=True,
-                className='seven columns'),
-                
-                html.Button('Выгрузить', id='download-report-button', n_clicks=0),
+                className='four columns'),
+
+                # html.Output(id='free1', className='one column', style={"display": "flex",}),
+          
+
+                # AT. Выгрузку убираем, поскольку есть аналог в SAP
+                # html.Button('Выгрузить', id='download-report-button', n_clicks=0),
+            
             ], className="row"
             ),
-                        html.Div([
+            html.Div([
                 # html.Output(id='link1', className='one column', hidden=True),
                 dcc.Link(
                     id='link1', 

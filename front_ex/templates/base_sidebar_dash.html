@@ -140,6 +140,10 @@
               {% if current_user.check_dash_roles('resellers_uru') %}  
               <li><a href="/resellers_uru_dash"><i class="fa fa-dashboard"></i>Автоматизированный мониторинг: выявление потенциальных посредников</a></li>
               {% endif %} 
+
+              {% if current_user.check_dash_roles('resellers_uru') %}  
+              <li><a href="/zakupki_uru_dash"><i class="fa fa-dashboard"></i>Закупки</a></li>
+              {% endif %} 
               
               {% if current_user.check_dash_roles('admin') %}   
               <li><a href="/airflow_dash"><i class="fa fa-dashboard"></i>Мониторинг ресурсов</a></li>

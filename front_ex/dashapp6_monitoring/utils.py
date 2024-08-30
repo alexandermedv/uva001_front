@@ -315,7 +315,7 @@ def get_incoming_ap(start_date):
 				FROM dashboard.actplans aa
 				LEFT JOIN dashboard.overview bb
 							ON aa."AuditID" = bb."IDFld"
-				WHERE "APADate" IS NULL
+				WHERE ("APADate" IS NULL OR TO_DATE(LEFT("APADate", 10), 'DD/MM/YYYY') > '%s')
 					AND "APStatus" <> '61'
 					AND aa."Deleted" = '-1'
 				GROUP BY "OrigID"
@@ -349,7 +349,7 @@ def get_incoming_ap(start_date):
 					)
 			) z
 		GROUP BY z.issue_risk_level
-	'''% (start_date, start_date)
+	'''% (start_date, start_date, start_date)
 
 	con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
 	df1 = pd.read_sql(sql, con)
@@ -583,7 +583,7 @@ def get_outcoming_ap(end_date):
 				FROM dashboard.actplans aa
 				LEFT JOIN dashboard.overview bb
 					ON aa."AuditID" = bb."IDFld"
-				WHERE "APADate" IS NULL
+				WHERE ("APADate" IS NULL OR TO_DATE(LEFT("APADate", 10), 'DD/MM/YYYY') > '%s')
 					AND "APStatus" <> '61'
 					AND aa."Deleted" = '-1'
 					AND bb."ActlDate6" IS NOT NULL
@@ -623,7 +623,7 @@ def get_outcoming_ap(end_date):
 				)
 			) z
 		GROUP BY z.issue_risk_level
-	'''% (end_date, end_date)
+	'''% (end_date, end_date, end_date)
 
 	con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
 	df1 = pd.read_sql(sql, con)

@@ -33,7 +33,7 @@ def render_content(start_date, end_date):
 
 	x1_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
 	x1_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
-	y1_data = df1['actname'][df1['issue_risk_level']=='Низкий'].tolist()
+	y1_data = df1['actname'][df1['issue_risk_level']=='Низкий'].apply(lambda x: x[:20]).tolist()
 	
 	x1_text_bold = []
 	for item in x1_text:
@@ -41,14 +41,14 @@ def render_content(start_date, end_date):
 
 	x2_data = df1['count'][df1['issue_risk_level']=='Средний'].astype(str).tolist()
 	x2_text = df1['count'][df1['issue_risk_level']=='Средний'].astype(str)
-	y2_data = df1['actname'][df1['issue_risk_level']=='Средний'].tolist()
+	y2_data = df1['actname'][df1['issue_risk_level']=='Средний'].apply(lambda x: x[:20]).tolist()
 	x2_text_bold = []
 	for item in x2_text:
 		x2_text_bold.append('<b>' + item + '</b>')
 
 	x3_data = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str).tolist()
 	x3_text = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str)
-	y3_data = df1['actname'][df1['issue_risk_level']=='Высокий'].tolist()
+	y3_data = df1['actname'][df1['issue_risk_level']=='Высокий'].apply(lambda x: x[:20]).tolist()
 	x3_text_bold = []
 	for item in x3_text:
 		x3_text_bold.append('<b>' + item + '</b>')
@@ -59,21 +59,21 @@ def render_content(start_date, end_date):
 
 	x4_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
 	x4_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
-	y4_data = df1['actname'][df1['issue_risk_level']=='Низкий'].tolist()
+	y4_data = df1['actname'][df1['issue_risk_level']=='Низкий'].apply(lambda x: x[:20]).tolist()
 	x4_text_bold = []
 	for item in x4_text:
 		x4_text_bold.append('<b>' + item + '</b>')
 
 	x5_data = df1['count'][df1['issue_risk_level']=='Средний'].astype(str).tolist()
 	x5_text = df1['count'][df1['issue_risk_level']=='Средний'].astype(str)
-	y5_data = df1['actname'][df1['issue_risk_level']=='Средний'].tolist()
+	y5_data = df1['actname'][df1['issue_risk_level']=='Средний'].apply(lambda x: x[:20]).tolist()
 	x5_text_bold = []
 	for item in x5_text:
 		x5_text_bold.append('<b>' + item + '</b>')
 
 	x6_data = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str).tolist()
 	x6_text = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str)
-	y6_data = df1['actname'][df1['issue_risk_level']=='Высокий'].tolist()
+	y6_data = df1['actname'][df1['issue_risk_level']=='Высокий'].apply(lambda x: x[:20]).tolist()
 	x6_text_bold = []
 	for item in x6_text:
 		x6_text_bold.append('<b>' + item + '</b>')
@@ -85,21 +85,21 @@ def render_content(start_date, end_date):
 
 	x7_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
 	x7_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
-	y7_data = df1['actname'][df1['issue_risk_level']=='Низкий'].tolist()
+	y7_data = df1['actname'][df1['issue_risk_level']=='Низкий'].apply(lambda x: x[:20]).tolist()
 	x7_text_bold = []
 	for item in x7_text:
 		x7_text_bold.append('<b>' + item + '</b>')
 
 	x8_data = df1['count'][df1['issue_risk_level']=='Средний'].astype(str).tolist()
 	x8_text = df1['count'][df1['issue_risk_level']=='Средний'].astype(str)
-	y8_data = df1['actname'][df1['issue_risk_level']=='Средний'].tolist()
+	y8_data = df1['actname'][df1['issue_risk_level']=='Средний'].apply(lambda x: x[:20]).tolist()
 	x8_text_bold = []
 	for item in x8_text:
 		x8_text_bold.append('<b>' + item + '</b>')
 
 	x9_data = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str).tolist()
 	x9_text = df1['count'][df1['issue_risk_level']=='Высокий'].astype(str)
-	y9_data = df1['actname'][df1['issue_risk_level']=='Высокий'].tolist()
+	y9_data = df1['actname'][df1['issue_risk_level']=='Высокий'].apply(lambda x: x[:20]).tolist()
 	x9_text_bold = []
 	for item in x9_text:
 		x9_text_bold.append('<b>' + item + '</b>')

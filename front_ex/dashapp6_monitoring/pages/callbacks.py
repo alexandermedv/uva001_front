@@ -564,7 +564,7 @@ def render_content(start_date, end_date):
 							],
 							"layout": go.Layout(
 								# autosize=True,
-								height=200,
+								height=300,
 								barmode='stack',
 								title_text='Низкий уровень',
 								margin={

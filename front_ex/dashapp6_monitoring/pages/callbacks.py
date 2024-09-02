@@ -106,10 +106,10 @@ def render_content(start_date, end_date):
 
 	sum3 = sum(map(int, x7_data)) + sum(map(int, x8_data)) + sum(map(int, x9_data))
 
-	incoming_ap = get_incoming_ap(start_date)
+	incoming_ap = get_incoming_ap(start_date, end_date)
 	increase_ap = get_increase_ap(start_date, end_date)
 	decrease_ap = get_decrease_ap(start_date, end_date)
-	outcoming_ap = get_outcoming_ap(end_date)
+	outcoming_ap = get_outcoming_ap(start_date, end_date)
 
 	if not incoming_ap[incoming_ap['issue_risk_level'] == 'Высокий'].empty:
 		y11 = incoming_ap[incoming_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]

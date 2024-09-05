@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
 from dash.dash_table.Format import Format, Scheme, Group
-from ..utils import get_materials_df, get_filials_df, get_df_grouped_zavod, get_ekbe_postavshiki_df, get_df_grouped_zavod_postav, get_df_grouped_zavod_for_bar
+from ..utils import get_materials_df, get_filials_df, get_ekbe_postavshiki_df, get_df_grouped_zavod_postav, get_df_grouped_zavod_for_bar, style_cell_datatable, style_header_datatable #get_df_grouped_zavod
 
 # Перенос дашборда по закупкам на портал
 
@@ -14,7 +14,7 @@ material_dict = material_dict.to_dict()
 filials = get_filials_df()
 filials_names_list = filials[['Завод', 'Завод_название']].drop_duplicates()
 filials_names={filials_names_list.loc[i, 'Завод']:filials_names_list.loc[i, 'Завод_название'] for i in range(len(filials_names_list))}
-df_grouped_zavod = get_df_grouped_zavod()
+#df_grouped_zavod = get_df_grouped_zavod()
 ekbe_postavshiki = get_ekbe_postavshiki_df()
 df_grouped_zavod_postav = get_df_grouped_zavod_postav()
 df_grouped_zavod_for_bar = get_df_grouped_zavod_for_bar()
@@ -74,18 +74,8 @@ def create_layout():
                                             'borderRight': '1px solid rgb(167,166,166)',
                                         },
                                     ],
-                                    style_cell={
-                                        'height': 'auto',
-                                        'maxheight': '50px',
-                                        'minWidth': '50px', 'maxWidth': '300px',
-                                        'whiteSpace': 'normal',
-                                        'fontSize': 11, 'font-family': 'Arial'
-                                        },
-                                    style_header={
-                                        'backgroundColor': '#EFECEC',
-                                        'color': 'black',
-                                        'fontWeight': 'bold'
-                                    }
+                                    style_cell= style_cell_datatable,
+                                    style_header= style_header_datatable
                                 ),
                                 html.Article('Для каждого материала посчитано количество и сумма закупок за каждый год по дате поставки материала. Количество заказа в данном случае подразумевается как "Количество закупаемой продукции/услуг" за соответствующий год. Нажмите на таблицу, чтобы выбрать материал.'),
                                 html.Hr(style={'color':'#730031'}),
@@ -121,18 +111,8 @@ def create_layout():
                                     page_size=11,
                                     filter_action="native",
                                     sort_action="native",
-                                    style_cell={
-                                        'height': 'auto',
-                                        'minWidth': '50px', 'maxWidth': '300px',
-                                        'whiteSpace': 'normal',
-                                        'fontSize': 11, 'font-family': 'Arial'
-                                    },
-                                    #style_cell_conditional=style_cell_conditional,
-                                    style_header={
-                                        'backgroundColor': '#EFECEC',
-                                        'color': 'black',
-                                        'fontWeight': 'bold'
-                                    }
+                                    style_cell= style_cell_datatable,
+                                    style_header= style_header_datatable
                                 ),
                                 html.Div(id='name_zavod', className='row'),
                                 html.Br(),
@@ -153,20 +133,20 @@ def create_layout():
                                     className='row'
                                 ),
                                 html.Hr(),
-                                html.Div(
-                                    [
-                                        html.Div(html.H4('Выберите вид документа закупки:'), 
-                                                className='col-2'),
-                                        html.Div(
-                                            dcc.Dropdown(id='vid_zak_dd', 
-                                                    options=df_grouped_zavod['Вид документа закупки'].unique(),  #[df_grouped_zavod['Вид документа закупки']!='ZUZD']
-                                                    value='ZUPR'#df_grouped_zavod.loc[0,'Вид документа закупки']
-                                            ), 
-                                            className='col'),
-                                    ],
-                                    className='row'
-                                ),
-                                html.Div(id='vid_zak_df')
+                                # html.Div(
+                                #     [
+                                #         html.Div(html.H4('Выберите вид документа закупки:'), 
+                                #                 className='col-2'),
+                                #         html.Div(
+                                #             dcc.Dropdown(id='vid_zak_dd', 
+                                #                     options=df_grouped_zavod['Вид документа закупки'].unique(),  #[df_grouped_zavod['Вид документа закупки']!='ZUZD']
+                                #                     value='ZUPR'#df_grouped_zavod.loc[0,'Вид документа закупки']
+                                #             ), 
+                                #             className='col'),
+                                #     ],
+                                #     className='row'
+                                # ),
+                                # html.Div(id='vid_zak_df')
                                 
                             ]
                         ),
@@ -210,20 +190,9 @@ def create_layout():
                                     filter_action="native",
                                     sort_action="native",
                                     export_format='xlsx',
-                                    style_cell={
-                                        'height': 'auto',
-                                        'minWidth': '50px', 'maxWidth': '300px',
-                                        'whiteSpace': 'normal',
-                                        'fontSize': 11, 'font-family': 'Arial'
-                                    },
-                                    #style_cell_conditional=style_cell_conditional,
-                                    style_header={
-                                        'backgroundColor': '#EFECEC',
-                                        'color': 'black',
-                                        'fontWeight': 'bold'
-                                    }
+                                    style_cell= style_cell_datatable,
+                                    style_header= style_header_datatable
                                 ),
-                                html.Hr(),
                                 html.Div(id='postav_materials_table', children=[]),
                             ]
                         ),
@@ -252,18 +221,8 @@ def create_layout():
                                     filter_action="native",
                                     sort_action="native",
                                     export_format='xlsx',
-                                    style_cell={
-                                        'height': 'auto',
-                                        'minWidth': '50px', 'maxWidth': '300px',
-                                        'whiteSpace': 'normal',
-                                        'fontSize': 11, 'font-family': 'Arial'
-                                    },
-                                    #style_cell_conditional=style_cell_conditional,
-                                    style_header={
-                                        'backgroundColor': '#EFECEC',
-                                        'color': 'black',
-                                        'fontWeight': 'bold'
-                                    }
+                                    style_cell= style_cell_datatable,
+                                    style_header= style_header_datatable
                                 ),
                             ]
                         ),
@@ -273,8 +232,11 @@ def create_layout():
                     dcc.Tab(html.Div(
                             [
                                 html.Hr(),
-                                html.Article('За основу взятые следующие таблицы из SAP S4: EKBE, EKKO, EKPO, EKET.'),
-                                html.Article('Вид закупок(ekko."BSART") из списка: NB, ZUPR(Закупка прочих услуг ТМЦ), ZP01(Материалы).')
+                                html.Article('За основу взятые следующие таблицы из SAP S4: EKBE(История к документу закупки), EKKO(Заголовок док зак), EKPO(Позиция док зак), EKET(График поставок).'),
+                                html.Article('Вид закупок(ekko."BSART") из списка: NB, ZUPR(Закупка прочих услуг ТМЦ), ZP01(Материалы).'),
+                                html.Br(),
+                                html.Article('Идеи: проверить поставщиков, у которых много разных групп материалов. Еще посмотреть поставщиков, у которых доля ПГК в выручке из СПАРК > 75%'),
+                                html.Article('30.08.2024: Добавил в таблицу dashboard.zakupki_grouped_zavod_uru (до этого было 222219 строк) столбец Поставщик. Нужно добавить на вкладку выгрузку по всем закупкам выбранного поставщика')
                             ]
                         ),
                         label="Описание",

@@ -2,14 +2,16 @@
 import datetime as dt
 import dash_bootstrap_components as dbc
 import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import pandas as pd
 import dash
 from dash import dash_table, no_update, html, dcc
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 from ..pages import dash_app
-from ..pages.layout import materials, material_dict, filials, filials_names, df_grouped_zavod_for_bar
-from ..utils import get_df_pivot_otkl
+from ..pages.layout import materials, material_dict, filials, filials_names, df_grouped_zavod_for_bar, ekbe_postavshiki
+from ..utils import get_df_pivot_otkl, get_df_postav_materials_2, postav_materials_2_columns, clrs, get_df_grouped_zavod, style_cell_datatable, style_header_datatable
 
 df_pivot_otkl = get_df_pivot_otkl()
 
@@ -45,7 +47,7 @@ def style_active_row(active_visible_row_id):
     ],
     prevent_initial_call=True
 )
-def update_style_data(active_cell):
+def update_materials_data(active_cell):
     input_triggered = dash.callback_context.triggered[0]["prop_id"].split(".")[0]
     if active_cell is None:
         raise PreventUpdate
@@ -131,20 +133,112 @@ def analytics_for_current_zavod(active_cell):
                     {"id":"Общее отклонение от среднего", "name":"Общее отклонение от среднего",
                             "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}}
                 ],
-            style_cell={
-                'height': 'auto',
-                'minWidth': '50px', 'maxWidth': '300px',
-                'whiteSpace': 'normal',
-                'fontSize': 11, 'font-family': 'Arial'
-            },
-            #style_cell_conditional=style_cell_conditional,
-            style_header={
-                'backgroundColor': '#EFECEC',
-                'color': 'black',
-                'fontWeight': 'bold'
-            }
+            style_cell= style_cell_datatable,
+            style_header= style_header_datatable
     )
     return style_active_row(active_visible_row_id), html.H5('Выбран завод {}: {}'.format(zavod, filials_names[zavod])), fig, table_zavod_vidz
+
+
+# Выбор поставщика
+@dash_app.callback(
+    (
+        Output('postav_table', 'style_data_conditional'),
+        Output('postav_materials_table', 'children'),
+    ),
+    
+    Input('postav_table', 'active_cell'),
+    prevent_initial_call=True
+)
+def update_data_for_postavshiki(active_cell):
+    input_triggered = dash.callback_context.triggered[0]["prop_id"].split(".")[0]
+    if active_cell is None:
+        raise PreventUpdate
+    
+    active_row_id = active_cell['row_id'] if active_cell else None
+    active_visible_row_id = active_cell['row'] if active_cell else None
+        
+    if active_row_id is None:
+        return (no_update, no_update)
+    else:
+        postav = ekbe_postavshiki.loc[int(active_row_id), 'Поставщик']
+        postav_name = ekbe_postavshiki.loc[int(active_row_id), 'Наименование поставщик']
+        data_temp = get_df_postav_materials_2(postav) #postav_materials_2[postav_materials_2['Поставщик']==postav].reset_index(drop=True)
+        data_temp_for_graphs = data_temp[:5]
+        if len(data_temp_for_graphs)>0:
+            fig_postav_materials_2 = make_subplots(
+                rows=len(data_temp_for_graphs), cols=2,
+                vertical_spacing = 0.03,
+                #row_heights=[1]*len(data_temp_for_graphs),
+                shared_xaxes=True,
+                shared_yaxes='columns',
+                x_title='Год',#row_titles=list(data_temp_for_graphs["Расшифровка группы материалов"].values),
+                subplot_titles=('Количество заказа(в ЕИ)', 'Сумма в рублях')
+            )
+            for i, gr_material in enumerate(data_temp_for_graphs["Расшифровка группы материалов"].values):
+                fig_postav_materials_2.add_trace(
+                    go.Bar(
+                        x = ['2020', '2021', '2022', '2023', '2024'],
+                        y=list(data_temp_for_graphs.loc[data_temp_for_graphs["Расшифровка группы материалов"]==gr_material][['Количество заказа 2020', 
+                                                                                    'Количество заказа 2021',
+                                                                                    'Количество заказа 2022', 
+                                                                                    'Количество заказа 2023', 
+                                                                                    'Количество заказа 2024']].transpose().iloc[:,0]),
+                        name = gr_material,
+                        marker_color = clrs[i],
+                    ),
+                    row = i+1,
+                    col = 1,
+                )
+                fig_postav_materials_2.add_trace(
+                    go.Bar(
+                        x = ['2020', '2021', '2022', '2023', '2024'],
+                        y=list(data_temp_for_graphs.loc[data_temp_for_graphs["Расшифровка группы материалов"]==gr_material][['Сумма во ВВ 2020', 
+                                                                                    'Сумма во ВВ 2021',
+                                                                                    'Сумма во ВВ 2022', 
+                                                                                    'Сумма во ВВ 2023', 
+                                                                                    'Сумма во ВВ 2024']].transpose().iloc[:,0]),
+                        name = gr_material,
+                        showlegend = False,
+                        marker_color = clrs[i],
+                    ),
+                    row = i+1,
+                    col = 2,
+                )
+            fig_postav_materials_2.update_layout(title_text="Топ-5 групп материалов по поставщику: {}".format(postav_name))#, height = 100*max(3, len(data_temp_for_graphs))
+
+            df_grouped_zavod = get_df_grouped_zavod(postav)
+
+            div_childr = [
+                html.H5('Разбивка по группам грузов для поставщика: {}({})'.format(postav_name, postav)),
+                dcc.Graph(id='bars_zakupki', figure=fig_postav_materials_2),
+                dash_table.DataTable(
+                    columns=postav_materials_2_columns,
+                    data=data_temp.to_dict('records'),
+                    page_size=10,
+                    filter_action='native',
+                    sort_action='native',
+                    export_format='xlsx',
+                    style_cell= style_cell_datatable,
+                    style_header= style_header_datatable
+                ),
+                html.H5('Информация по закупкам. Поставщик: {}({})'.format(postav_name, postav)),
+                dash_table.DataTable(
+                    columns=[{'id': i, "name": i} for i in df_grouped_zavod.columns.drop('index')],
+                    data=df_grouped_zavod.to_dict('records'),
+                    page_size=10,
+                    filter_action='native',
+                    sort_action='native',
+                    export_format='xlsx',
+                    style_cell= style_cell_datatable,
+                    style_header= style_header_datatable
+                )
+                  
+            ]
+            return (style_active_row(active_visible_row_id), div_childr)
+        else:
+            return (style_active_row(active_visible_row_id), [])
+
+
 
 # @app.callback(
 #     Output('vid_zak_df', 'children'),
@@ -200,53 +294,4 @@ def analytics_for_current_zavod(active_cell):
 #                                 'fontWeight': 'bold'
 #                             }
 #                             )
-
-
-# # Выбор поставщика
-# @app.callback(
-#     Output('postav_table', 'style_data_conditional'),
-#     Output('postav_materials_table', 'children'),
-#     Input('postav_table', 'active_cell'),
-#     prevent_initial_call=True
-# )
-# def update_style_data_2(active_cell):
-#     input_triggered = dash.callback_context.triggered[0]["prop_id"].split(".")[0]
-#     if active_cell is None:
-#         raise PreventUpdate
-    
-#     active_row_id = active_cell['row_id'] if active_cell else None
-#     active_visible_row_id = active_cell['row'] if active_cell else None
-        
-#     if active_row_id is None:
-#         return (no_update, no_update)
-#     else:
-#         postav = ekbe_postavshiki.loc[int(active_row_id), 'Поставщик']
-#         data_temp = postav_materials_2[postav_materials_2['Поставщик']==postav].reset_index(drop=True)
-#         if len(data_temp)>0:
-#             div_childr = [
-#                 html.H5('Разбивка по группам грузов для поставщика: {}({})'.format(postav_dict[postav], postav)),
-#                 dash_table.DataTable(
-#                     columns = postav_materials_2_columns,
-#                     data=data_temp.to_dict('records'),
-#                     page_size=20,
-#                     filter_action='native',
-#                     sort_action='native',
-#                     export_format='xlsx',
-#                     style_cell={
-#                         'height': 'auto',
-#                         'minWidth': '50px', 'maxWidth': '300px',
-#                         'whiteSpace': 'normal',
-#                         'fontSize': 11, 'font-family': 'Arial'
-#                     },
-#                     #style_cell_conditional=style_cell_conditional,
-#                     style_header={
-#                         'backgroundColor': '#EFECEC',
-#                         'color': 'black',
-#                         'fontWeight': 'bold'
-#                     },
-#                 ),
-#             ]
-#             return (style_active_row(active_visible_row_id), div_childr)
-#         else:
-#             return (style_active_row(active_visible_row_id), [])
 

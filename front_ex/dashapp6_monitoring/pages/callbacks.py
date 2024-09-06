@@ -31,8 +31,8 @@ def render_content(start_date, end_date):
 	# df1 = get_monitoring().sort_values(by=s, ascending=True)
 	kol = 0
 	df1['actname'] = df1['actname'].apply(lambda x: x[5:] if x[:4] in {'2020', '2021', '2022', '2023', '2024'} else x)
-	df1['actname'] = df1['actname'].apply(lambda x: x.split()[1:] if x[:7] == 'ПГК-УВА' else x)
-	df1['actname'] = df1['actname'].apply(lambda x: x[:18])
+	df1['actname'] = df1['actname'].apply(lambda x: ' '.join(x.split()[1:]) if x[:7] == 'ПГК-УВА' else x)
+	df1['actname'] = df1['actname'].apply(lambda x: x[:27])
 
 	x1_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
 	x1_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
@@ -61,8 +61,8 @@ def render_content(start_date, end_date):
 	df1 = get_open_ap_by_groups_365(start_date, end_date)
 	
 	df1['actname'] = df1['actname'].apply(lambda x: x[5:] if x[:4] in {'2020', '2021', '2022', '2023', '2024'} else x)
-	df1['actname'] = df1['actname'].apply(lambda x: x.split()[1:] if x[:7] == 'ПГК-УВА' else x)
-	df1['actname'] = df1['actname'].apply(lambda x: x[:18])
+	df1['actname'] = df1['actname'].apply(lambda x: ' '.join(x.split()[1:]) if x[:7] == 'ПГК-УВА' else x)
+	df1['actname'] = df1['actname'].apply(lambda x: x[:27])
 
 	x4_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
 	x4_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
@@ -92,7 +92,7 @@ def render_content(start_date, end_date):
 
 	df1['actname'] = df1['actname'].apply(lambda x: x[5:] if x[:4] in {'2020', '2021', '2022', '2023', '2024'} else x)
 	df1['actname'] = df1['actname'].apply(lambda x: x.split()[1:] if x[:7] == 'ПГК-УВА' else x)
-	df1['actname'] = df1['actname'].apply(lambda x: x[:25])
+	df1['actname'] = df1['actname'].apply(lambda x: x[:27])
 
 	x7_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
 	x7_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)

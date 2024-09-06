@@ -74,8 +74,8 @@ def get_issues_large_sql(start_date, end_date):
                     LEFT JOIN dashboard.overview bb
                         ON aa."AuditID" = bb."IDFld"
                     WHERE 1=1
-                        AND ("APADate" IS NULL OR TO_DATE(LEFT("APADate", 10), 'DD/MM/YYYY') > TO_DATE('{start_date}', 'YYYY-MM-DD'))
-                        AND "APStatus" <> '61'
+                        AND ("APADate" IS NULL OR TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY') > TO_DATE('{start_date}', 'YYYY-MM-DD'))
+                        --AND "APStatus" <> '61'
                         AND aa."Deleted" = '-1'
                         AND ("ActlDate6" IS NOT NULL AND TO_DATE(left("ActlDate6", 10), 'MM/DD/YYYY') <= TO_DATE('{start_date}', 'YYYY-MM-DD'))
                     GROUP BY "OrigID"
@@ -89,8 +89,8 @@ def get_issues_large_sql(start_date, end_date):
                     LEFT JOIN dashboard.overview bb
                         ON aa."AuditID" = bb."IDFld"
                     WHERE 1=1
-                        AND ("APADate" IS NULL OR TO_DATE(LEFT("APADate", 10), 'DD/MM/YYYY') > TO_DATE('{end_date}', 'YYYY-MM-DD'))
-                        AND "APStatus" <> '61'
+                        AND ("APADate" IS NULL OR TO_DATE(LEFT("APADate", 10), 'MM/DD/YYYY') > TO_DATE('{end_date}', 'YYYY-MM-DD'))
+                        --AND "APStatus" <> '61'
                         AND aa."Deleted" = '-1'
                         AND ("ActlDate6" IS NOT NULL AND TO_DATE(left("ActlDate6", 10), 'MM/DD/YYYY') <= TO_DATE('{end_date}', 'YYYY-MM-DD'))
                     GROUP BY "OrigID"
@@ -209,7 +209,7 @@ def get_incoming_ap(start_date, end_date):
                 AND a."Deleted" = '-1'
                 AND a."Dispos" = '52'
                 AND k."ActlDate6" IS NOT NULL
-                AND TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY') IS NOT NULL
+                --AND TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY') IS NOT NULL
                 AND i.open_actplans IS NOT NULL
 			) z
 		GROUP BY z.issue_risk_level
@@ -235,10 +235,6 @@ def get_increase_ap(start_date, end_date):
 				AND "Subject" IS NOT NULL
 				AND a."Deleted" = '-1'
 				AND a."Dispos" = '52'
-				AND (k."Close_date" IS NULL 
-					OR
-					k."Close_date" >= to_date('{end_date}', 'YYYY-MM-DD')
-					)
 				AND TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY') IS NOT NULL
 				AND TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY') BETWEEN TO_DATE('{start_date}', 'YYYY-MM-DD') AND TO_DATE('{end_date}', 'YYYY-MM-DD')
 			) z
@@ -264,8 +260,12 @@ def get_decrease_ap(start_date, end_date):
 				AND "Subject" IS NOT NULL
 				AND a."Deleted" = '-1'
 				AND a."Dispos" = '52'
-				AND k."Close_date" IS NOT NULL
-				AND k."Close_date" BETWEEN TO_DATE('{start_date}', 'YYYY-MM-DD') AND TO_DATE('{end_date}', 'YYYY-MM-DD')
+				AND CASE WHEN ii.open_actplans IS NULL THEN k."Close_date"
+                    ELSE NULL
+                    END IS NOT NULL
+				AND CASE WHEN ii.open_actplans IS NULL THEN GREATEST(k."Close_date", TO_DATE(left(k."ActlDate6", 10), 'MM/DD/YYYY'))
+                    ELSE NULL
+                    END BETWEEN TO_DATE('{start_date}', 'YYYY-MM-DD') AND TO_DATE('{end_date}', 'YYYY-MM-DD')
 				AND k."ActlDate6" IS NOT NULL
 				
 			) z

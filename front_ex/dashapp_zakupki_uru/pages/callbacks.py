@@ -11,7 +11,7 @@ from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 from ..pages import dash_app
 from ..pages.layout import materials, material_dict, filials, filials_names, df_grouped_zavod_for_bar, ekbe_postavshiki
-from ..utils import get_df_pivot_otkl, get_df_postav_materials_2, postav_materials_2_columns, clrs, get_df_grouped_zavod, style_cell_datatable, style_header_datatable
+from ..utils import get_df_pivot_otkl, get_df_postav_materials_2, postav_materials_2_columns, clrs, get_df_grouped_zavod, style_cell_datatable, style_header_datatable, grouped_zavod_columns
 
 df_pivot_otkl = get_df_pivot_otkl()
 
@@ -161,7 +161,7 @@ def update_data_for_postavshiki(active_cell):
         return (no_update, no_update)
     else:
         postav = ekbe_postavshiki.loc[int(active_row_id), 'Поставщик']
-        postav_name = ekbe_postavshiki.loc[int(active_row_id), 'Наименование поставщик']
+        postav_name = ekbe_postavshiki.loc[int(active_row_id), 'Поставщик имя']
         data_temp = get_df_postav_materials_2(postav) #postav_materials_2[postav_materials_2['Поставщик']==postav].reset_index(drop=True)
         data_temp_for_graphs = data_temp[:5]
         if len(data_temp_for_graphs)>0:
@@ -207,6 +207,7 @@ def update_data_for_postavshiki(active_cell):
             fig_postav_materials_2.update_layout(title_text="Топ-5 групп материалов по поставщику: {}".format(postav_name))#, height = 100*max(3, len(data_temp_for_graphs))
 
             df_grouped_zavod = get_df_grouped_zavod(postav)
+            df_grouped_zavod['Дата поставки'] = df_grouped_zavod['Дата поставки'].dt.date
 
             div_childr = [
                 html.H5('Разбивка по группам грузов для поставщика: {}({})'.format(postav_name, postav)),
@@ -221,16 +222,16 @@ def update_data_for_postavshiki(active_cell):
                     style_cell= style_cell_datatable,
                     style_header= style_header_datatable
                 ),
-                html.H5('Информация по закупкам. Поставщик: {}({})'.format(postav_name, postav)),
+                html.H5('Детальная информация по закупкам. Поставщик: {}({})'.format(postav_name, postav)),
                 dash_table.DataTable(
-                    columns=[{'id': i, "name": i} for i in df_grouped_zavod.columns.drop('index')],
+                    columns=grouped_zavod_columns,#[{'id': i, "name": i} for i in df_grouped_zavod.columns.drop('index')],
                     data=df_grouped_zavod.to_dict('records'),
                     page_size=10,
                     filter_action='native',
                     sort_action='native',
                     export_format='xlsx',
                     style_cell= style_cell_datatable,
-                    style_header= style_header_datatable
+                    style_header= style_header_datatable,
                 )
                   
             ]

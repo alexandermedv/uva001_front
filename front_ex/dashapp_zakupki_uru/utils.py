@@ -39,7 +39,14 @@ def get_df_grouped_zavod(postav):
 
 def get_ekbe_postavshiki_df():
     sql4 = '''
-        SELECT *
+        SELECT index, id,
+            "Поставщик", 
+            COALESCE("Поставщик имя", "Наименование поставщик kna1") AS "Поставщик имя",
+            "ИНН поставщик", "ОГРН поставщик", "ОКВЭД поставщик",
+            "Разных групп материалов",
+            "Количество заказа 2022", "Количество заказа 2023", "Количество заказа 2024",
+            "Сумма во ВВ 2022", "Сумма во ВВ 2023", "Сумма во ВВ 2024",
+            "Последний фин период", "Выручка посл фин период", "Доля ПГК в выручке поставщика"
         FROM dashboard.zakupki_ekbe_postavshiki_uru
     '''
     return pd.read_sql(sql4, con=conn, index_col='index')
@@ -99,6 +106,30 @@ postav_materials_2_columns = [
              "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
     {"id":"Сумма во ВВ 2024", "name":"Сумма во ВВ 2024",
              "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+]
+
+grouped_zavod_columns = [
+    {"id":"Завод", "name":"Завод"},
+    {"id":"Завод_название", "name":"Имя завода"},
+    {"id":"Поставщик", "name":"Поставщик"},
+    {"id":"Дата поставки", "name":"Дата поставки"},
+    {"id":"Документ закупки", "name":"Документ закупки"},
+    {"id":"Вид документа закупки", "name":"Вид документа закупки"},
+    {"id":"Материал", "name":"Материал"},
+    {"id":"Наим. материала", "name":"Наим. материала"},
+    {"id":"Количество заказа", "name":"Кол-во заказа",
+            "type": "numeric", "format": {'specifier': ',.2f',"locale": {"group": " "}}},
+    {"id":"ЕИ", "name":"ЕИ"},
+    {"id":"Сумма во ВВ", "name":"Сумма во ВВ",
+            "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+    {"id":"Цена в закупке(филиал)", "name":"Средняя цена в закупке",
+            "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+    {"id":"Средняя цена", "name":"Средняя цена(Материал-Вид ДЗ)",
+            "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+    {"id":"Дельта среднего", "name":"Дельта среднего",
+            "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+    {"id":"Общее отклонение от среднего", "name":"Общее отклонение от среднего",
+            "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
 ]
 
 

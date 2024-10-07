@@ -28,6 +28,52 @@ def create_layout():
                         html.Div(
                             [
                                 html.Br(),
+                                dash_table.DataTable(
+                                    id='postav_table',
+                                    columns = [
+                                        {"id":"Поставщик", "name":"Поставщик"},
+                                        {"id":"Поставщик имя", "name":"Наименование поставщик"},
+                                        {"id":"ИНН поставщик", "name":"ИНН поставщик"},
+                                        {"id":"ОГРН поставщик", "name":"ОГРН поставщик"},
+                                        {"id":"ОКВЭД поставщик", "name":"ОКВЭД поставщик"},
+                                        {"id":"Разных групп материалов", "name":"Разных групп материалов",
+                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+                                        {"id":"Количество заказа 2022", "name":"Кол-во заказа 2022",
+                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+                                        {"id":"Количество заказа 2023", "name":"Кол-во заказа 2023",
+                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+                                        {"id":"Количество заказа 2024", "name":"Кол-во заказа 2024",
+                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+                                        {"id":"Сумма во ВВ 2022", "name":"Сумма во ВВ 2022",
+                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+                                        {"id":"Сумма во ВВ 2023", "name":"Сумма во ВВ 2023",
+                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+                                        {"id":"Сумма во ВВ 2024", "name":"Сумма во ВВ 2024",
+                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+                                        {"id":"Последний фин период", "name":"Последний фин период", "type": "numeric"},
+                                        {"id":"Выручка посл фин период", "name":"Выручка посл фин период",
+                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
+                                        {"id":"Доля ПГК в выручке поставщика", "name":"Доля ПГК в выручке поставщика",
+                                                "type": "numeric", "format": {'specifier': ',.0%'}},
+                                    ],
+                                    data=ekbe_postavshiki.to_dict('records'),
+                                    page_size=10,
+                                    filter_action="native",
+                                    sort_action="native",
+                                    export_format='xlsx',
+                                    style_cell= style_cell_datatable,
+                                    style_header= style_header_datatable
+                                ),
+                                html.Div(id='postav_materials_table', children=[]),
+                            ]
+                        ),
+                        label="Поставщики",
+                        className="tab",
+                    ),
+                    dcc.Tab(
+                        html.Div(
+                            [
+                                html.Br(),
                                 dash_table.DataTable(id = 'deviation_means_table', 
                                     data=materials.to_dict('records'),
                                     columns=[
@@ -158,52 +204,6 @@ def create_layout():
                             [
                                 html.Br(),
                                 dash_table.DataTable(
-                                    id='postav_table',
-                                    columns = [
-                                        {"id":"Поставщик", "name":"Поставщик"},
-                                        {"id":"Наименование поставщик", "name":"Наименование поставщик"},
-                                        {"id":"ИНН поставщик", "name":"ИНН поставщик"},
-                                        {"id":"ОГРН поставщик", "name":"ОГРН поставщик"},
-                                        {"id":"ОКВЭД поставщик", "name":"ОКВЭД поставщик"},
-                                        {"id":"Разных групп материалов", "name":"Разных групп материалов",
-                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
-                                        {"id":"Количество заказа 2022", "name":"Кол-во заказа 2022",
-                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
-                                        {"id":"Количество заказа 2023", "name":"Кол-во заказа 2023",
-                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
-                                        {"id":"Количество заказа 2024", "name":"Кол-во заказа 2024",
-                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
-                                        {"id":"Сумма во ВВ 2022", "name":"Сумма во ВВ 2022",
-                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
-                                        {"id":"Сумма во ВВ 2023", "name":"Сумма во ВВ 2023",
-                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
-                                        {"id":"Сумма во ВВ 2024", "name":"Сумма во ВВ 2024",
-                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
-                                        {"id":"Последний фин период", "name":"Последний фин период", "type": "numeric"},
-                                        {"id":"Выручка посл фин период", "name":"Выручка посл фин период",
-                                                "type": "numeric", "format": {'specifier': ',.0f',"locale": {"group": " "}}},
-                                        {"id":"Доля ПГК в выручке поставщика", "name":"Доля ПГК в выручке поставщика",
-                                                "type": "numeric", "format": {'specifier': ',.0%'}},
-                                    ],
-                                    data=ekbe_postavshiki.to_dict('records'),
-                                    page_size=10,
-                                    filter_action="native",
-                                    sort_action="native",
-                                    export_format='xlsx',
-                                    style_cell= style_cell_datatable,
-                                    style_header= style_header_datatable
-                                ),
-                                html.Div(id='postav_materials_table', children=[]),
-                            ]
-                        ),
-                        label="Поставщики",
-                        className="tab",
-                    ),
-                    dcc.Tab(
-                        html.Div(
-                            [
-                                html.Br(),
-                                dash_table.DataTable(
                                     columns = [
                                         {"id":"Завод", "name":"Завод"},
                                         {"id":"Завод_название", "name":"Завод_название"},
@@ -232,11 +232,34 @@ def create_layout():
                     dcc.Tab(html.Div(
                             [
                                 html.Hr(),
+                                html.H5('Данные:'),
                                 html.Article('За основу взятые следующие таблицы из SAP S4: EKBE(История к документу закупки), EKKO(Заголовок док зак), EKPO(Позиция док зак), EKET(График поставок).'),
+                                html.Article('Оставляем только те документы закупок, у которых есть несторнированный 101-й вид движения в MSEG'),
+                                html.Article('Убираем документы закупок, где Количество заказа равно нулю'),
                                 html.Article('Вид закупок(ekko."BSART") из списка: NB, ZUPR(Закупка прочих услуг ТМЦ), ZP01(Материалы).'),
                                 html.Br(),
-                                html.Article('Идеи: проверить поставщиков, у которых много разных групп материалов. Еще посмотреть поставщиков, у которых доля ПГК в выручке из СПАРК > 75%'),
-                                html.Article('30.08.2024: Добавил в таблицу dashboard.zakupki_grouped_zavod_uru (до этого было 222219 строк) столбец Поставщик. Нужно добавить на вкладку выгрузку по всем закупкам выбранного поставщика')
+                                html.H5('Сравнение средних цен:'),
+                                html.Article('Средняя цена в закупке сравнивается со средней ценой по группировке: (Вид документа закупки)-(Материал)-(ЕИ)'),
+                                html.Article('При этом из расчета средних исключены поставщики: ПГК Диджитал (0001015926), ПГК Центральная Азия (0002000388), ЦКР (0001008149), ЦКР ИТ (0001012161)'),
+                                html.Article(''),
+                                html.Br(),
+                                html.Br(),
+                                html.H5('Наблюдения:'),
+                                html.Article('Поставщик 0001004888  ООО "ВТОРМЕТПРОМ" - Деятельность автомобильного грузового транспорта. Вся его выручка это ПГК'),
+                                html.Article('Поставщик 0001010426  ООО "ЧЕРНОБРОВКИНА" - Вся выручка за 2022г это ПГК'),
+                                html.Article('Также у следующих поставщиков доля выручки от ПГК больше 80% за год или близко: 0001001480 , 0001002163 , 0001010143 , 0001003383 , 0001006771 , 0001013111 , 0001013359 , 0001015535 , 0001011495 , 0001004874'),
+                                html.Article(' Поставщик и сотрудник Марина Кашина(P070000828) - Много командировок?'),
+                                html.Article(' Поставщик и сотрудник АЛЕКСАНДР ЗАМЯТКИН(P070000321) - посмотреть'),
+                                html.Article(' Поставщик и сотрудник ЕВГЕНИЯ ШПАК(P070000426) - закупка ноутбуков'),
+                                html.Br(),
+                                html.H5('На будущее:'),
+                                html.Article('Проверить поставщиков, у которых много разных групп материалов.'),
+                                html.Article('Посмотреть поставщиков, у которых доля ПГК в выручке из СПАРК > 50%'),
+                                html.Article('Обновить данные СПАРК'),
+
+                                html.Article('Из ekko подтянуть договоры'),
+                                
+
                             ]
                         ),
                         label="Описание",

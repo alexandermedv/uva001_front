@@ -10,10 +10,8 @@ from dash import dash_table, no_update, html, dcc
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 from ..pages import dash_app
-from ..pages.layout import materials, material_dict, filials, filials_names, df_grouped_zavod_for_bar, ekbe_postavshiki
-from ..utils import get_df_pivot_otkl, get_df_postav_materials_2, postav_materials_2_columns, clrs, get_df_grouped_zavod, style_cell_datatable, style_header_datatable, grouped_zavod_columns
+from ..utils import get_materials_and_otkl_df, get_filials_df, get_ekbe_postavshiki_df, postav_materials_2_columns, clrs, get_df_grouped_zavod, style_cell_datatable, style_header_datatable, grouped_zavod_columns # get_df_postav_materials_2,
 
-df_pivot_otkl = get_df_pivot_otkl()
 
 # Стиль активной строки
 def style_active_row(active_visible_row_id):
@@ -58,9 +56,7 @@ def update_materials_data(active_cell):
     if active_row_id is None:
         return (no_update, no_update)
     else:
-        material = materials.loc[int(active_row_id)]['Материал']
-        data_material = df_pivot_otkl[df_pivot_otkl['Материал']==material].reset_index(drop=True)
-        #print('data_material.info = ',  data_material.info())
+        material, material_name, data_material = get_materials_and_otkl_df(id_material_in_table=active_row_id)
         if len(data_material)>0:
             fig = px.scatter(data_material, 
                   x='Дата поставки', y='Средняя цена_день',
@@ -70,7 +66,7 @@ def update_materials_data(active_cell):
                   #trendline="expanding", trendline_scope="overall", trendline_color_override="grey") # expanding - расширенное среднее (накопление за все время)
                   trendline="rolling",trendline_scope="overall", trendline_options=dict(window=5), trendline_color_override="grey") # скользящее среднее ( window = n - это среднее по последним n)
             fig.update_layout(
-                title='Динамика средней цены по материалу: {} ({})'.format(material, material_dict[material]),
+                title='Динамика средней цены по материалу: {} ({})'.format(material, material_name),
                 paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",#'#EFECEC'
                 #annotations=[dict(text='Тут будет<br>аннотация', x=0.5, y=0.5, font_size=20, showarrow=False)]
             )
@@ -100,22 +96,25 @@ def analytics_for_current_zavod(active_cell):
     if active_row_id is None:
         return (no_update, no_update, no_update, no_update)
     else:
-        zavod = filials.loc[int(active_row_id)]['Завод']
-        fig=px.bar(df_grouped_zavod_for_bar[df_grouped_zavod_for_bar['Завод']==zavod], 
+        zavod, zavod_name, df_grouped_zavod_for_bar = get_filials_df(id_filial_in_table=active_row_id)
+        fig=px.bar(
+            df_grouped_zavod_for_bar,
             x='Вид документа закупки', 
             y='Сумма во ВВ', 
             color='Вид документа закупки',
             color_discrete_map=dict({'NB':'#C17A75', 'ZP01':'#D9D9D9', 'ZUPR':'#7E7E7E'}),
-            text = df_grouped_zavod_for_bar[df_grouped_zavod_for_bar['Завод']==zavod]['Доля по виду док.'].apply(lambda x: '{0:1.0f}%'.format(100*x))
+            text = df_grouped_zavod_for_bar['Доля по виду док.'].apply(lambda x: '{0:1.0f}%'.format(100*x))
         )
-        fig.update_layout(title='Закупки завода: {}'.format(filials_names[zavod]),
+        fig.update_layout(
+            title=dict(text='Закупки завода: <br>{}'.format(zavod_name), font=dict(family='Arial')),
             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", 
-            showlegend=False
+            showlegend=False,
         )
+        fig.update_traces(width=1)
         
         #Таблица
         table_zavod_vidz = dash_table.DataTable(
-            data=df_grouped_zavod_for_bar[(df_grouped_zavod_for_bar['Завод']==zavod)].to_dict('records'),
+            data=df_grouped_zavod_for_bar.to_dict('records'),
                 columns=[
                     {"id":"Завод", "name":"Завод"},
                     {"id":"Завод_название", "name":"Завод_название"},
@@ -136,7 +135,7 @@ def analytics_for_current_zavod(active_cell):
             style_cell= style_cell_datatable,
             style_header= style_header_datatable
     )
-    return style_active_row(active_visible_row_id), html.H5('Выбран завод {}: {}'.format(zavod, filials_names[zavod])), fig, table_zavod_vidz
+    return style_active_row(active_visible_row_id), html.H5('Выбран завод {}: {}'.format(zavod, zavod_name)), fig, table_zavod_vidz
 
 
 # Выбор поставщика
@@ -160,9 +159,7 @@ def update_data_for_postavshiki(active_cell):
     if active_row_id is None:
         return (no_update, no_update)
     else:
-        postav = ekbe_postavshiki.loc[int(active_row_id), 'Поставщик']
-        postav_name = ekbe_postavshiki.loc[int(active_row_id), 'Поставщик имя']
-        data_temp = get_df_postav_materials_2(postav) #postav_materials_2[postav_materials_2['Поставщик']==postav].reset_index(drop=True)
+        postav, postav_name, data_temp = get_ekbe_postavshiki_df(id_postav_in_table=active_row_id)
         data_temp_for_graphs = data_temp[:5]
         if len(data_temp_for_graphs)>0:
             fig_postav_materials_2 = make_subplots(

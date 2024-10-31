@@ -4,22 +4,15 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
 from dash.dash_table.Format import Format, Scheme, Group
-from ..utils import get_materials_df, get_filials_df, get_ekbe_postavshiki_df, get_df_grouped_zavod_postav, get_df_grouped_zavod_for_bar, style_cell_datatable, style_header_datatable #get_df_grouped_zavod
+from ..utils import get_materials_and_otkl_df, get_filials_df, get_ekbe_postavshiki_df, get_df_grouped_zavod_postav, style_cell_datatable, style_header_datatable
 
 # Перенос дашборда по закупкам на портал
 
-materials = get_materials_df()
-material_dict = materials[['Материал', 'Наим. материала']].drop_duplicates().set_index('Материал')['Наим. материала']
-material_dict = material_dict.to_dict()
-filials = get_filials_df()
-filials_names_list = filials[['Завод', 'Завод_название']].drop_duplicates()
-filials_names={filials_names_list.loc[i, 'Завод']:filials_names_list.loc[i, 'Завод_название'] for i in range(len(filials_names_list))}
-#df_grouped_zavod = get_df_grouped_zavod()
-ekbe_postavshiki = get_ekbe_postavshiki_df()
-df_grouped_zavod_postav = get_df_grouped_zavod_postav()
-df_grouped_zavod_for_bar = get_df_grouped_zavod_for_bar()
-
 def create_layout():
+    materials = get_materials_and_otkl_df()
+    filials = get_filials_df()
+    df_grouped_zavod_postav = get_df_grouped_zavod_postav()
+    ekbe_postavshiki = get_ekbe_postavshiki_df()
     layout = html.Div([
         html.Div([
             dcc.Tabs(
@@ -233,10 +226,10 @@ def create_layout():
                             [
                                 html.Hr(),
                                 html.H5('Данные:'),
-                                html.Article('За основу взятые следующие таблицы из SAP S4: EKBE(История к документу закупки), EKKO(Заголовок док зак), EKPO(Позиция док зак), EKET(График поставок).'),
+                                html.Article('За основу взяты следующие таблицы из SAP S4: EKBE(История к документу закупки), EKKO(Заголовок док зак), EKPO(Позиция док зак), EKET(График поставок).'),
                                 html.Article('Оставляем только те документы закупок, у которых есть несторнированный 101-й вид движения в MSEG'),
                                 html.Article('Убираем документы закупок, где Количество заказа равно нулю'),
-                                html.Article('Вид закупок(ekko."BSART") из списка: NB, ZUPR(Закупка прочих услуг ТМЦ), ZP01(Материалы).'),
+                                html.Article('Фильтр на вид закупок(ekko."BSART") из списка: NB, ZUPR(Закупка прочих услуг ТМЦ), ZP01(Материалы).'),
                                 html.Br(),
                                 html.H5('Сравнение средних цен:'),
                                 html.Article('Средняя цена в закупке сравнивается со средней ценой по группировке: (Вид документа закупки)-(Материал)-(ЕИ)'),
@@ -257,8 +250,9 @@ def create_layout():
                                 html.Article('Посмотреть поставщиков, у которых доля ПГК в выручке из СПАРК > 50%'),
                                 html.Article('Обновить данные СПАРК'),
 
-                                html.Article('Из ekko подтянуть договоры'),
-                                
+                                html.Article(''),
+                                html.Article(''),
+                                html.Article(''),
 
                             ]
                         ),

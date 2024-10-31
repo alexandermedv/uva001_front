@@ -15,19 +15,46 @@ for i, clr in enumerate(clrs1):
     clrs[i] = str(clr)
 del clrs1
 
-def get_materials_df():
+def get_materials_and_otkl_df(id_material_in_table='000'):
     sql = '''
         SELECT *
         FROM dashboard.zakupki_materials_uru
     '''
-    return pd.read_sql(sql, con=conn, index_col='index')
+    df_temp = pd.read_sql(sql, con=conn, index_col='index')
+    if id_material_in_table=='000':
+        return df_temp
+    else:
+        material = df_temp.loc[int(id_material_in_table)]['Материал']
+        sql6 = '''
+            SELECT *
+            FROM dashboard.zakupki_pivot_otkl_uru
+            WHERE "Материал" = '%s'
+        ''' % (material)
+        return material, df_temp.loc[int(id_material_in_table)]['Наим. материала'], pd.read_sql(sql6, con=conn)
 
-def get_filials_df():
+def get_filials_df(id_filial_in_table='000'):
     sql2 = '''
         SELECT *
         FROM dashboard.zakupki_filials_uru
     '''
-    return pd.read_sql(sql2, con=conn)
+    df_filials_temp = pd.read_sql(sql2, con=conn)
+    if id_filial_in_table=='000':
+        return df_filials_temp
+    else:
+        zavod = df_filials_temp.loc[int(id_filial_in_table)]['Завод']
+        sql7 = '''
+            SELECT *
+            FROM dashboard.zakupki_grouped_zavod_for_bar_uru
+            WHERE "Завод" = '%s'
+        ''' % (zavod)
+        return zavod, df_filials_temp.loc[int(id_filial_in_table)]['Завод_название'], pd.read_sql(sql7, con=conn)
+
+def get_df_grouped_zavod_postav():
+    sql5 = '''
+        SELECT *
+        FROM dashboard.zakupki_grouped_zavod_postav_uru
+    '''
+    return pd.read_sql(sql5, con=conn)
 
 def get_df_grouped_zavod(postav):
     sql3 = '''
@@ -37,7 +64,7 @@ def get_df_grouped_zavod(postav):
     ''' % (postav)
     return pd.read_sql(sql3, con=conn)
 
-def get_ekbe_postavshiki_df():
+def get_ekbe_postavshiki_df(id_postav_in_table='000'):
     sql4 = '''
         SELECT index, id,
             "Поставщик", 
@@ -49,37 +76,18 @@ def get_ekbe_postavshiki_df():
             "Последний фин период", "Выручка посл фин период", "Доля ПГК в выручке поставщика"
         FROM dashboard.zakupki_ekbe_postavshiki_uru
     '''
-    return pd.read_sql(sql4, con=conn, index_col='index')
-
-def get_df_grouped_zavod_postav():
-    sql5 = '''
-        SELECT *
-        FROM dashboard.zakupki_grouped_zavod_postav_uru
-    '''
-    return pd.read_sql(sql5, con=conn)
-
-def get_df_pivot_otkl():
-    sql6 = '''
-        SELECT *
-        FROM dashboard.zakupki_pivot_otkl_uru
-    '''
-    return pd.read_sql(sql6, con=conn)
-
-def get_df_grouped_zavod_for_bar():
-    sql7 = '''
-        SELECT *
-        FROM dashboard.zakupki_grouped_zavod_for_bar_uru
-    '''
-    return pd.read_sql(sql7, con=conn)
-
-def get_df_postav_materials_2(postavshik):
-    sql8 = '''
-        SELECT *
-        FROM dashboard.zakupki_postav_materials_2_uru
-        WHERE "Поставщик" = '%s'
-        ORDER BY "Общяя сумма" DESC
-    ''' % (postavshik)
-    return pd.read_sql(sql8, con=conn)
+    ekbe_postavshiki = pd.read_sql(sql4, con=conn, index_col='index')
+    if id_postav_in_table=='000':
+        return ekbe_postavshiki
+    else:
+        postav = ekbe_postavshiki.loc[int(id_postav_in_table), 'Поставщик']
+        sql8 = '''
+            SELECT *
+            FROM dashboard.zakupki_postav_materials_2_uru
+            WHERE "Поставщик" = '%s'
+            ORDER BY "Общяя сумма" DESC
+        ''' % (postav)
+        return postav, ekbe_postavshiki.loc[int(id_postav_in_table), 'Поставщик имя'], pd.read_sql(sql8, con=conn)
 
 
 postav_materials_2_columns = [
@@ -115,6 +123,7 @@ grouped_zavod_columns = [
     {"id":"Дата поставки", "name":"Дата поставки"},
     {"id":"Документ закупки", "name":"Документ закупки"},
     {"id":"Вид документа закупки", "name":"Вид документа закупки"},
+    {"id":"Договор(RCM)", "name":"Договор(RCM)"},
     {"id":"Материал", "name":"Материал"},
     {"id":"Наим. материала", "name":"Наим. материала"},
     {"id":"Количество заказа", "name":"Кол-во заказа",
@@ -144,11 +153,3 @@ style_header_datatable={
     'color': 'black',
     'fontWeight': 'bold'
 }
-# def get_data_for_graph(go):
-#     if go:
-#         sql3 = '''
-#             SELECT *
-#             FROM dashboard.credibility_posrednics_2_uru
-#             WHERE "Грузоотправитель" = '%s'
-#         ''' % (go)
-#     return pd.read_sql(sql3, con=conn)

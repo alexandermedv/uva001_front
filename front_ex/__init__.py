@@ -160,6 +160,7 @@ from .dashapp12_tor_neis import dash_app as dashapp12_tor_neis
 from .dashapp15_airflow import dash_app as dashapp15_airflow
 from .dashapp_credibility_rating import dash_app as dashapp_credibility_rating
 from .dashapp_resellers_uru import dash_app as dashapp_resellers_uru
+from .dashapp_zakupki_uru import dash_app as dashapp_zakupki_uru
 
 # Добавляем руты и таски
 import front_ex.routes
@@ -184,6 +185,7 @@ dispatch_app = DispatcherMiddleware(app.wsgi_app, {
     'dashapp15': dashapp15_airflow.server, 
     'credibility_rating': dashapp_credibility_rating.server, 
     'resellers_uru': dashapp_resellers_uru.server, 
+    'zakupki_uru': dashapp_zakupki_uru.server, 
     })
 
 

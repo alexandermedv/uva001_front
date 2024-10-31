@@ -111,13 +111,19 @@ def render_dashapp_credibility_rating():
     """Рейтинг добросовестности клиентов"""
     return render_template('/dashapp_credibility_rating/overview.html')
 
-# Test
 @app.route('/resellers_uru_dash/')
 @login_required
 @logger(os.environ['USER_ACTIONS_FILE'])
 def render_dashapp_resellers_uru():
     """Автоматизированный мониторинг: выявление потенциальных посредников"""
     return render_template('/dashapp_resellers_uru/overview.html')
+
+@app.route('/zakupki_uru_dash/')
+@login_required
+@logger(os.environ['USER_ACTIONS_FILE'])
+def render_dashapp_zakupki_uru():
+    """Закупки"""
+    return render_template('/dashapp_zakupki_uru/overview.html')
 
 @app.route('/credit_risks_dash/')
 @login_required

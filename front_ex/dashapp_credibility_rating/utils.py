@@ -13,11 +13,12 @@ flag_gruz = 0.8
 flag_profit = 0.8
 
 # Таблица по клиентам
-def get_clients_df(client=None):
+def get_clients_df(client_id=None):
     """Таблица по клиентам"""
-    if client is None:
+    if client_id is None:
         sql = '''
-            SELECT "Клиент",
+            SELECT index as "id",
+                    "Клиент",
                     "Наименование клиента",
                     "Холдинг клиента",
                     "ИНН клиента",
@@ -53,7 +54,7 @@ def get_clients_df(client=None):
         df_clients = df_clients.sort_values(by=['Флаги', 'Кол-во рейсов ТМ'], ascending=False).reset_index(drop=True)
         #df_clients = df_clients.sort_values(by=['Доля посредничества', 'Холдинг клиента'], ascending=False).reset_index(drop=True)
         # Это индексирование нужно для того чтобы в dash можно было выбирать строку
-        df_clients['id'] = df_clients.index
+        # df_clients['id'] = df_clients.index
         return df_clients
     else:
         sql = '''
@@ -81,10 +82,10 @@ def get_clients_df(client=None):
                     "Доля низкодоходности",
                     "Доля критичнодоходности"
             FROM dashboard.credibility_uru
-            WHERE "Клиент" = '%s'
-        ''' % (client)
+            WHERE index = '%s'
+        ''' % (client_id)
         df_client = pd.read_sql(sql, con=create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128))
-        return df_client
+        return df_client.loc[0, "Клиент"], df_client
 
 # Таблица по грузам
 def get_gruzes_df(client=None):

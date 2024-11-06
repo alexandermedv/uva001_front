@@ -2,20 +2,11 @@
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
-
-
 from .. import app
-# , db, engine_cons
-
-# external_scripts = [
-#     {'src': 'https://code.jquery.com/jquery-3.5.1.js'},
-# ]
 
 dash_app = Dash(__name__, server=app,
                 url_base_pathname='/dashboards/resellers_uru/',
-                suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.BOOTSTRAP]) #external_scripts=external_scripts,
-#dash_app.config.update(app.config)
-#dash_app.layout = html.Div()
+                suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 dash_app.layout = html.Div(
     [dcc.Location(id="url", refresh=False), html.Div(id='page-content')]
@@ -24,7 +15,6 @@ dash_app.layout = html.Div(
 # Инициализируем после Dash
 # from .pages import callbacks
 from .pages import layout
-
 
 @dash_app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):

@@ -6,8 +6,6 @@ from dash import dcc, html
 from datetime import date
 
 # Переменные
-min_date = date(2021,1,1)
-max_date = date.today()
 conn = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
 
 # Таблица по клиентам
@@ -15,7 +13,8 @@ def get_clients_df(client=None):
     """Таблица по клиентам"""
     if client is None:
         sql = '''
-            SELECT "Ранг"::integer,
+            SELECT "id",
+                    "Ранг"::integer,
                     "Клиент",
                     "Наименование клиента",
                     "Кол-во рейсов клиента",
@@ -31,7 +30,8 @@ def get_clients_df(client=None):
         return df_clients
     else:
         sql = '''
-            SELECT "Ранг"::integer,
+            SELECT "id",
+                    "Ранг"::integer,
                     "Клиент",
                     "Наименование клиента",
                     "Кол-во рейсов клиента",
@@ -46,7 +46,7 @@ def get_clients_df(client=None):
         df_client = pd.read_sql(sql, con=conn)
         return df_client
 
-def get_go_rating(client):
+def get_go_rating(id_client):
     sql2 = '''
         SELECT "Грузоотправитель",
                 "Грузоотправитель имя",
@@ -54,11 +54,14 @@ def get_go_rating(client):
                 "Сумма продаж ГО у клиента",
                 "Доля ГО у клиента",
                 "Результат анализа",
-                "Метрика посредничества"
+                "Метрика посредничества",
+                "Клиент",
+                "Наименование клиента"
         FROM dashboard.credibility_posrednics_go_rating_uru е
-        WHERE "Клиент" = '%s'
-    ''' % (client)
-    return pd.read_sql(sql2, con=conn)
+        WHERE "client_id" = '%s'
+    ''' % (id_client)
+    temp_data = pd.read_sql(sql2, con=conn)
+    return temp_data.loc[0,"Клиент"], temp_data.loc[0, "Наименование клиента"], temp_data.drop(columns=["Клиент", "Наименование клиента"])
 
 def get_data_for_graph(go):
     if go:

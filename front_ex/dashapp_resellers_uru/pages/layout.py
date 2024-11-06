@@ -6,67 +6,53 @@ import plotly.graph_objects as go
 from dash.dash_table.Format import Format, Scheme, Group
 from ..utils import get_clients_df, get_values_for_levels
 
-# Перенос дашборда по посредникам на портал
-
-df_client = get_clients_df()
-
-df_variables, df_client_lvl_1, df_client_lvl_2 = get_values_for_levels()
-x_line_1 = df_variables.loc[df_variables['Переменная']=='x_line_1','Значение'].min()
-x_line_2 = df_variables.loc[df_variables['Переменная']=='x_line_2','Значение'].min()
-y_line_1 = df_variables.loc[df_variables['Переменная']=='y_line_1','Значение'].min()
-y_line_2 = df_variables.loc[df_variables['Переменная']=='y_line_2']['Значение'].min()
-max_x_1 = df_client_lvl_1['Доля посредничества'].max() 
-max_y_1 = df_client_lvl_1['Кол-во рейсов клиента'].max()
-max_x_2 = df_client_lvl_2['Доля посредничества'].max() 
-max_y_2 = df_client_lvl_2['Кол-во рейсов клиента'].max()
-
-fig_lvl_1 = go.Figure()
-fig_lvl_1.add_traces(
-    px.scatter(df_client_lvl_1, x = 'Доля посредничества', y='Кол-во рейсов клиента', 
-               color='point_color', color_discrete_map = {'red':'rgb(255,0,0)', 'green':'rgb(0,255,0)', 'darkgreen':'rgb(0,150,0)', 'blue':'rgb(0,0,255)', 'grey':'rgb(128,128,128)', 'yellow':'rgb(255, 204,0)'},
-               hover_name='Наименование клиента', hover_data = {'point_color':False, 'Клиент':True}
-              ).data,
-)
-fig_lvl_1.update_yaxes(type='log', title='Количество рейсов (log)')
-fig_lvl_1.update_xaxes(title='Доля посредничества')
-fig_lvl_1.add_trace(go.Scatter(x=[x_line_1, x_line_1], y=[0,max_y_1], 
-                              mode='lines', line=dict(color="blue", width=1)))
-fig_lvl_1.add_trace(go.Scatter(x=[0,max_x_1], y=[y_line_1, y_line_1], 
-                              mode='lines', line=dict(color="blue", width=1)))
-fig_lvl_1.update_layout(title='Метрика посредничества за 180 дней <br><sup>Клиенты, выделенные красным, требуют дополнительного анализа</sup>', 
-                        margin=dict(r=0),
-                       showlegend=False, height=700)
-
-fig_lvl_2 = go.Figure()
-fig_lvl_2.add_traces(
-    px.scatter(df_client_lvl_2, x = 'Доля посредничества', y='Кол-во рейсов клиента', 
-               color='point_color', color_discrete_map = {'red':'rgb(255,0,0)', 'green':'rgb(0,255,0)', 'darkgreen':'rgb(0,150,0)', 'blue':'rgb(0,0,255)', 'grey':'rgb(128,128,128)', 'yellow':'rgb(255, 204,0)'},
-               hover_name='Наименование клиента', hover_data = {'point_color':False, 'Клиент':True}
-              ).data,
-)
-fig_lvl_2.update_yaxes(type='log', title='Количество рейсов (log)')
-fig_lvl_2.update_xaxes(title='Доля посредничества')
-fig_lvl_2.add_trace(go.Scatter(x=[x_line_2, x_line_2], y=[0,max_y_2], 
-                              mode='lines', line=dict(color="blue", width=1)))
-fig_lvl_2.add_trace(go.Scatter(x=[0,max_x_2], y=[y_line_2, y_line_2], 
-                              mode='lines', line=dict(color="blue", width=1)))
-fig_lvl_2.update_layout(title='Метрика посредничества за 360 дней <br><sup>Клиенты, выделенные красным, требуют дополнительного анализа</sup>', 
-                        margin=dict(r=0),
-                       showlegend=False, height=700)
-
-# Это индексирование нужно для того чтобы в dash можно было выбирать строку
-df_client['id'] = df_client.index
-
-client_card = dbc.Card(
-    dbc.CardBody(
-        [
-            dash_table.DataTable(                       
-                    ),
-        ], style={'margin-right': '0px'}
-    ), style={'margin-right': '0px'}
-)
-
 def create_layout():
+    df_client = get_clients_df()
+
+    df_variables, df_client_lvl_1, df_client_lvl_2 = get_values_for_levels()
+    x_line_1 = df_variables.loc[df_variables['Переменная']=='x_line_1','Значение'].min()
+    x_line_2 = df_variables.loc[df_variables['Переменная']=='x_line_2','Значение'].min()
+    y_line_1 = df_variables.loc[df_variables['Переменная']=='y_line_1','Значение'].min()
+    y_line_2 = df_variables.loc[df_variables['Переменная']=='y_line_2']['Значение'].min()
+    max_x_1 = df_client_lvl_1['Доля посредничества'].max() 
+    max_y_1 = df_client_lvl_1['Кол-во рейсов клиента'].max()
+    max_x_2 = df_client_lvl_2['Доля посредничества'].max() 
+    max_y_2 = df_client_lvl_2['Кол-во рейсов клиента'].max()
+
+    fig_lvl_1 = go.Figure()
+    fig_lvl_1.add_traces(
+        px.scatter(df_client_lvl_1, x = 'Доля посредничества', y='Кол-во рейсов клиента', 
+                color='point_color', color_discrete_map = {'red':'rgb(255,0,0)', 'green':'rgb(0,255,0)', 'darkgreen':'rgb(0,150,0)', 'blue':'rgb(0,0,255)', 'grey':'rgb(128,128,128)', 'yellow':'rgb(255, 204,0)'},
+                hover_name='Наименование клиента', hover_data = {'point_color':False, 'Клиент':True}
+                ).data,
+    )
+    fig_lvl_1.update_yaxes(type='log', title='Количество рейсов (log)')
+    fig_lvl_1.update_xaxes(title='Доля посредничества')
+    fig_lvl_1.add_trace(go.Scatter(x=[x_line_1, x_line_1], y=[0,max_y_1], 
+                                mode='lines', line=dict(color="blue", width=1)))
+    fig_lvl_1.add_trace(go.Scatter(x=[0,max_x_1], y=[y_line_1, y_line_1], 
+                                mode='lines', line=dict(color="blue", width=1)))
+    fig_lvl_1.update_layout(title='Метрика посредничества за 180 дней <br><sup>Клиенты, выделенные красным, требуют дополнительного анализа</sup>', 
+                            margin=dict(r=0),
+                        showlegend=False, height=700)
+
+    fig_lvl_2 = go.Figure()
+    fig_lvl_2.add_traces(
+        px.scatter(df_client_lvl_2, x = 'Доля посредничества', y='Кол-во рейсов клиента', 
+                color='point_color', color_discrete_map = {'red':'rgb(255,0,0)', 'green':'rgb(0,255,0)', 'darkgreen':'rgb(0,150,0)', 'blue':'rgb(0,0,255)', 'grey':'rgb(128,128,128)', 'yellow':'rgb(255, 204,0)'},
+                hover_name='Наименование клиента', hover_data = {'point_color':False, 'Клиент':True}
+                ).data,
+    )
+    fig_lvl_2.update_yaxes(type='log', title='Количество рейсов (log)')
+    fig_lvl_2.update_xaxes(title='Доля посредничества')
+    fig_lvl_2.add_trace(go.Scatter(x=[x_line_2, x_line_2], y=[0,max_y_2], 
+                                mode='lines', line=dict(color="blue", width=1)))
+    fig_lvl_2.add_trace(go.Scatter(x=[0,max_x_2], y=[y_line_2, y_line_2], 
+                                mode='lines', line=dict(color="blue", width=1)))
+    fig_lvl_2.update_layout(title='Метрика посредничества за 360 дней <br><sup>Клиенты, выделенные красным, требуют дополнительного анализа</sup>', 
+                            margin=dict(r=0),
+                        showlegend=False, height=700)
+    
     layout = html.Div([
         html.Div([
             html.Div(
@@ -161,8 +147,8 @@ def create_layout():
                                                                 html.Div(
                                                                     children=[
                                                                         html.H6("Клиент:"),
-                                                                        html.H6("Клиент не выбран", id = 'client_name'),
-                                                                        html.H6("Кликните по таблице выше", id = 'client_id'),
+                                                                        html.H6("Клиент не выбран", id='client_name', style={'color':'red'}),
+                                                                        html.H6("Кликните по таблице выше", id='client_id'),
                                                                         html.Br(),
                                                                         html.Div(id='client_info'),
                                                                         ]
@@ -190,17 +176,14 @@ def create_layout():
                                 [
                                     dbc.CardBody(
                                         [
-                                            html.Div(id='go_info', 
-                                                    children=[
-                                                        html.H6("Грузоотправитель:"),
-                                                        html.H6("Грузоотправитель не выбран", id = 'go_name'),
-                                                        html.H6("Кликните по таблице ниже", id = 'go_id')
-                                                    ]),
+                                            html.H6("Грузоотправитель:"),
+                                            html.H6("Грузоотправитель не выбран", id = 'go_name', style={'color': 'red'}),
+                                            html.H6("Кликните по таблице ниже", id = 'go_id')
                                         ]
                                     ),
                                     #className="col-md-8",
                                     dbc.CardFooter(
-                                        'Чтобы выбрать грузоотправителя, нажмите на него в ретинге грузоотправителей',
+                                        'Чтобы выбрать грузоотправителя, нажмите на него в таблице ниже',
                                         className="card-text text-muted",
                                     ),
                                 ],

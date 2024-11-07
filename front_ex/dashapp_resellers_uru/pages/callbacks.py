@@ -8,8 +8,7 @@ from dash import dash_table, no_update, html, dcc
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 from ..pages import dash_app
-from ..utils import  get_go_rating, get_data_for_graph, query_resellers_logs, update_postgres_resellers_log, min_date, max_date  #get_clients_df, date_filter, get_go_posrednics_graph, get_gruzes_df,
-from ..pages.layout import df_client
+from ..utils import  get_go_rating, get_data_for_graph, query_resellers_logs, update_postgres_resellers_log#, min_date, max_date  #get_clients_df, date_filter, get_go_posrednics_graph, get_gruzes_df,
 
 # Глобальная переменная, нужна для того, чтобы не активировать пересчет, при активации той же строки таблицы клиентов.
 cl_last_row, go_last_row = -1, -1
@@ -19,6 +18,7 @@ cl_last_row, go_last_row = -1, -1
             Output('client_table', 'style_data_conditional'),
             Output('client_id', 'children'),
             Output('client_name', 'children'),
+            Output('client_name', 'style'),
             Output('client_info', 'children'),
             Output("go_rating", "page_current"),
             Output("go_rating", "data"),
@@ -40,14 +40,12 @@ def update_style_data(active_cell):
     global cl_last_row
         
     if active_row_id is None:
-        return (no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update)
+        return (no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update)
     elif active_row_id == cl_last_row: # Если выделенная строка не изменилась с прошлого клика
-        return (no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update)
+        return (no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update)
     else:
         cl_last_row = active_row_id
-        client = df_client.loc[int(active_row_id)]['Клиент']
-        client_name = df_client.loc[int(active_row_id)]['Наименование клиента']
-        data_go = get_go_rating(client)
+        client, client_name, data_go = get_go_rating(id_client=int(active_row_id))
         # Это индексирование нужно для того чтобы в dash можно было выбирать строку
         data_go['id'] = data_go.index
         page_cur = 0
@@ -76,7 +74,7 @@ def update_style_data(active_cell):
                 }
             ], 
             client, 
-            client_name, #'Клиент: '+str(client_name),
+            client_name, {'color':'black'},
             [
                 dcc.ConfirmDialogProvider(
                     id='danger_client_go_in_logs',
@@ -97,17 +95,19 @@ def update_style_data(active_cell):
     (
         Output("graph_go_cl", "figure"),
         Output("go_rating", "style_data_conditional"), 
-        Output("go_id", "children"),
         Output("go_name", "children"),
+        Output("go_name", "style"),
+        Output("go_id", "children"),
     ),
     [
         Input('go_rating', 'active_cell'),
         State('go_rating', 'data'),
         State('client_id', 'children'),
+        State('client_name', 'children')
     ],
     prevent_initial_call=True
 )
-def update_style_data(active_cell_go, data_go, client):
+def update_style_data(active_cell_go, data_go, client, client_name):
     if client is None:
         raise PreventUpdate
     
@@ -118,14 +118,13 @@ def update_style_data(active_cell_go, data_go, client):
 
     if active_row_go_id is None:
         go_last_row = -1
-        return (no_update, [], "Грузоотправитель не выбран", "Кликните по таблице ниже")#no_update, 
+        return (no_update, [], "Грузоотправитель не выбран", {'color':'red'}, "Кликните по таблице ниже")#no_update, 
     elif active_row_go_id == go_last_row:
-        return (no_update, no_update, no_update, no_update)
+        return (no_update, no_update, no_update, no_update, no_update)
     else:
-        #print('active_row_go_id, go_last_row = ', active_row_go_id, go_last_row)
         go_last_row = active_row_go_id
         go_id = data_go[int(active_row_go_id)]['Грузоотправитель']
-        go_name = 'Грузоотправитель: ' + str(data_go[int(active_row_go_id)]['Грузоотправитель имя'])
+        go_name = str(data_go[int(active_row_go_id)]['Грузоотправитель имя'])
 
         #hld_cl, fit = df_fit.loc[df_fit["Клиент"] ==client, ['Клиент (холдинг)', 'Доля ФИТ(%)']].min()
         df_temp = get_data_for_graph(go_id)
@@ -134,6 +133,7 @@ def update_style_data(active_cell_go, data_go, client):
                         x="Дата раскредитования", y="Сумма услуги общая", 
                         #category_orders={'Клиент': [client, list(df2_grouped_balak['Клиент'].unique()).remove(client)]},
                         color='Наименование клиента',#"Клиент",
+                        color_discrete_map={client_name: 'blue'},
                         hover_name='Наименование клиента',
                         render_mode="svg",
                         #trendline='ols', 
@@ -185,8 +185,8 @@ def update_style_data(active_cell_go, data_go, client):
                     "border": "1px solid darkgray", #"1px solid rgb(0, 116, 217)",
                 }
             ], 
-            go_id, 
-            go_name,
+            go_name, {'color': 'black'},
+            go_id
         )
     
 # --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

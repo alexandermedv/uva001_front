@@ -7,8 +7,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 #import pandas as pd
 from ..pages import dash_app
-from ..utils import get_gruzes_df, get_go_rating, min_date, max_date  #get_clients_df, date_filter, get_go_posrednics_graph
-from ..pages.layout import df_clients
+from ..utils import get_clients_df, get_gruzes_df, get_go_rating, min_date, max_date  #get_clients_df, date_filter, get_go_posrednics_graph
 
 @dash_app.callback(
     (
@@ -25,8 +24,9 @@ def update_table_data(active_cell): #, selected_cells, active_cell
         # Работа с выделенной строкой в dash.datatable
         active_row_id = active_cell['row_id'] if active_cell else None
         active_visible_row_id = active_cell['row'] if active_cell else None
-        client = df_clients.loc[active_row_id]['Клиент']
-        dff = df_clients[df_clients['Клиент']==client].reset_index(drop=True)
+        client, dff = get_clients_df(client_id=active_row_id)
+        # client = df_clients.loc[active_row_id]['Клиент']
+        # dff = df_clients[df_clients['Клиент']==client].reset_index(drop=True)
         gruzes_df = get_gruzes_df(client)
         go_rating = get_go_rating(client)
         # Карточка клиента
@@ -44,7 +44,7 @@ def update_table_data(active_cell): #, selected_cells, active_cell
                         html.P(dff['ОКВЭД']),
                         html.P('Дата регистрации: {}'.format(dff['Дата регистрации клиента'][0])),
                         html.P('Последний фин период (СПАРК): {}'.format(dff['Последний фин период'][0])),
-                        html.P('Выручка посл фин период(СПАРК): {:,.0f}'.format(dff['Выручка посл фин период'][0])),
+                        html.P('Выручка посл фин период(СПАРК): {}'.format(dff['Выручка посл фин период'][0])),
                     ]
                 )
         # Карточка доходности ДО

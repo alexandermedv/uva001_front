@@ -10,9 +10,6 @@ from ..utils import get_clients_df, flag_gruz, flag_posr, flag_profit
 card_height_s = '18rem'
 card_height = '36rem'
 
-df_clients = get_clients_df() # min_date, max_date
-#spark_extended_report['Дата регистрации клиента'] = pd.to_datetime(spark_extended_report['Дата регистрации клиента'], errors='coerce', format='%Y-%m-%d')
-
 gruzes_card =  dbc.Card(
     [
         dbc.CardHeader("🚚 Изменения грузовой базы клиента", style={'fontWeight': 'bold','font-family': 'Arial', 'font-size': 14}),
@@ -175,6 +172,7 @@ cards_3 = html.Div(className='row',
 
 def create_layout():
     """Создание шаблона"""
+    df_clients = get_clients_df() # min_date, max_date
     # engine_cons = create_engine(os.environ['POSTGRE_URL_DASH'], max_identifier_length=128)
     layout = html.Div([
         html.Div(className='row', children=

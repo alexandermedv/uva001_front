@@ -30,6 +30,9 @@ def render_content(start_date, end_date):
 	df1 = get_open_ap_by_groups_182(start_date, end_date)
 	# df1 = get_monitoring().sort_values(by=s, ascending=True)
 	kol = 0
+	df1['actname'] = df1['actname'].apply(lambda x: x[5:] if x[:4] in {'2020', '2021', '2022', '2023', '2024'} else x)
+	df1['actname'] = df1['actname'].apply(lambda x: ' '.join(x.split()[1:]) if x[:7] == 'ПГК-УВА' else x)
+	df1['actname'] = df1['actname'].apply(lambda x: x[:27])
 
 	x1_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
 	x1_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
@@ -56,6 +59,10 @@ def render_content(start_date, end_date):
 	sum1 = sum(map(int, x1_data)) + sum(map(int, x2_data)) + sum(map(int, x3_data))
 
 	df1 = get_open_ap_by_groups_365(start_date, end_date)
+	
+	df1['actname'] = df1['actname'].apply(lambda x: x[5:] if x[:4] in {'2020', '2021', '2022', '2023', '2024'} else x)
+	df1['actname'] = df1['actname'].apply(lambda x: ' '.join(x.split()[1:]) if x[:7] == 'ПГК-УВА' else x)
+	df1['actname'] = df1['actname'].apply(lambda x: x[:27])
 
 	x4_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
 	x4_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
@@ -83,6 +90,10 @@ def render_content(start_date, end_date):
 
 	df1 = get_open_ap_by_groups_366(start_date, end_date)
 
+	df1['actname'] = df1['actname'].apply(lambda x: x[5:] if x[:4] in {'2020', '2021', '2022', '2023', '2024'} else x)
+	df1['actname'] = df1['actname'].apply(lambda x: x.split()[1:] if x[:7] == 'ПГК-УВА' else x)
+	df1['actname'] = df1['actname'].apply(lambda x: x[:27])
+
 	x7_data = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str).tolist()
 	x7_text = df1['count'][df1['issue_risk_level']=='Низкий'].astype(str)
 	y7_data = df1['actname'][df1['issue_risk_level']=='Низкий'].apply(lambda x: x[:20]).tolist()
@@ -106,10 +117,10 @@ def render_content(start_date, end_date):
 
 	sum3 = sum(map(int, x7_data)) + sum(map(int, x8_data)) + sum(map(int, x9_data))
 
-	incoming_ap = get_incoming_ap(start_date)
+	incoming_ap = get_incoming_ap(start_date, end_date)
 	increase_ap = get_increase_ap(start_date, end_date)
 	decrease_ap = get_decrease_ap(start_date, end_date)
-	outcoming_ap = get_outcoming_ap(end_date)
+	outcoming_ap = get_outcoming_ap(start_date, end_date)
 
 	if not incoming_ap[incoming_ap['issue_risk_level'] == 'Высокий'].empty:
 		y11 = incoming_ap[incoming_ap['issue_risk_level'] == 'Высокий']['count'].iloc[0]
@@ -277,7 +288,7 @@ def render_content(start_date, end_date):
 													"r": 50,
 													"t": 50,
 													"b": 20,
-													"l": 150,
+													"l": 200,
 								},
 								showlegend=False,
 							),
@@ -359,7 +370,7 @@ def render_content(start_date, end_date):
 													"r": 50,
 													"t": 50,
 													"b": 20,
-													"l": 150,
+													"l": 200,
 								},
 								showlegend=False,
 
@@ -433,14 +444,14 @@ def render_content(start_date, end_date):
 								),
 							],
 							"layout": go.Layout(
-								height=200,
+								height=300,
 								barmode='stack',
 								title_text=f'''более 1 года – {sum3} недостатков ({round(sum3/(sum1+sum2+sum3)*100)}%)''',
 								margin={
 													"r": 50,
 													"t": 50,
 													"b": 20,
-													"l": 250,
+													"l": 200,
 								},
 								showlegend=False,
 							),

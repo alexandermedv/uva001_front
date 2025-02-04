@@ -67,7 +67,7 @@
                 <li><a href="/limit_oper"><i class="fa fa-dashboard"></i>Дебиторская задолженность</a></li>
               {% endif %}
 
-              {% if current_user.check_dash_roles('shortage') or current_user.check_dash_roles('auditor') %}
+              {% if current_user.check_dash_roles('dashapp1') %}
               <li><a href="/dashapp1"><i class="fa fa-dashboard"></i>Недостача запчастей</a></li>
               {% endif %}
 
